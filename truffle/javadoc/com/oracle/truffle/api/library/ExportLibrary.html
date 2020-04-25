@@ -38,7 +38,7 @@
 <li><a href="../../../../../index-all.html">Index</a></li>
 <li><a href="../../../../../help-doc.html">Help</a></li>
 </ul>
-<div class="aboutLanguage"><b>GraalVM Truffle Java API Reference<br>20.2.0-dev</b><br>27069670ff87f9c28089c298738fee1ff1737b9d</div>
+<div class="aboutLanguage"><b>GraalVM Truffle Java API Reference<br>20.2.0-dev</b><br>991e9f43c64b7bf7a9f71d14e2ffb72f926b7433</div>
 </div>
 <div class="subNav">
 <ul class="navList">
@@ -444,20 +444,13 @@ public @interface <span class="memberNameLabel">ExportLibrary</span></pre>
 
  <pre>
  &#64;ExportLibrary(value = ArrayLibrary.class, delegateTo = "delegate")
- &#64;ExportLibrary(ReflectionLibrary.class)
+ &#64;ExportLibrary(ReflectionLibrary.class, delegateTo = "delegate")
  final class ArrayFullWrapper {
 
      final Object delegate;
 
      ArrayFullWrapper(Object delegate) {
          this.delegate = delegate;
-     }
-
-     &#64;ExportMessage
-     final Object send(Message message, Object[] args,
-                     &#64;CachedLibrary("this.delegate") ReflectionLibrary lib)
-                     throws Exception {
-         return lib.send(delegate, message, args);
      }
 
      &#64;ExportMessage
@@ -571,7 +564,7 @@ public @interface <span class="memberNameLabel">ExportLibrary</span></pre>
 <li><a href="../../../../../index-all.html">Index</a></li>
 <li><a href="../../../../../help-doc.html">Help</a></li>
 </ul>
-<div class="aboutLanguage"><b>GraalVM Truffle Java API Reference<br>20.2.0-dev</b><br>27069670ff87f9c28089c298738fee1ff1737b9d</div>
+<div class="aboutLanguage"><b>GraalVM Truffle Java API Reference<br>20.2.0-dev</b><br>991e9f43c64b7bf7a9f71d14e2ffb72f926b7433</div>
 </div>
 <div class="subNav">
 <ul class="navList">
