@@ -254,7 +254,12 @@ extends <a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?
         <b>public</b> <b>boolean</b> expressions;
         <b>public</b> <b>boolean</b> statements;
         <b>public</b> <b>boolean</b> roots;
-        <b>public</b> <a href="http://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html?is-external=true" title="class or interface in java.util.function"><code>Predicate</code></a>&lt;<a href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a>&gt; rootNameFilter;
+
+        /** <a href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a> with a regular expression to match name of functions.
+         * Prior to version 0.6 <b>this</b> had to be a
+         * {&#064;code Function&lt;<a href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a>,<a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang"><code>Boolean</code></a>&gt;}.
+         */
+        <b>public</b> <a href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a> rootNameFilter;
         /* &#064;since 0.4 */
         <b>public</b> <a href="http://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html?is-external=true" title="class or interface in java.util.function"><code>Predicate</code></a>&lt;SourceInfo&gt; sourceFilter;
     }
@@ -526,7 +531,12 @@ extends <a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Object.html?
         <b>public</b> <b>boolean</b> expressions;
         <b>public</b> <b>boolean</b> statements;
         <b>public</b> <b>boolean</b> roots;
-        <b>public</b> <a href="http://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html?is-external=true" title="class or interface in java.util.function"><code>Predicate</code></a>&lt;<a href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a>&gt; rootNameFilter;
+
+        /** <a href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a> with a regular expression to match name of functions.
+         * Prior to version 0.6 <b>this</b> had to be a
+         * {&#064;code Function&lt;<a href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a>,<a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang"><code>Boolean</code></a>&gt;}.
+         */
+        <b>public</b> <a href="http://docs.oracle.com/javase/8/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>String</code></a> rootNameFilter;
         /* &#064;since 0.4 */
         <b>public</b> <a href="http://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html?is-external=true" title="class or interface in java.util.function"><code>Predicate</code></a>&lt;SourceInfo&gt; sourceFilter;
     }
