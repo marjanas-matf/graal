@@ -426,139 +426,149 @@
         </div>
       </div>
 
-          <div class="video-carousel vlog">
-            <div data-thumb="/resources/img/home/twitter.png">
-              <div class="row align-items-center">
-                <div class="col-sm-6">
-                  <h5 class="vlog__title">Twitter</h5>
-                  <p>Twitter runs one of the most visible social networks in the
-                  world on 1,000s of machines running 1,000s of JVMs in multiple
-                  datacenters and is constantly looking into ways to increase
-                  availability of the platform while reducing costs. Running on
-                  GraalVM, Twitter has realized an 8-11% CPU saving with the
-                  Tweet service alone requiring 18% fewer machines. </p>
-                </div>
-                <div class="col-sm-6">
-                  <div class="vlog__video">
-                    <div data-title="slide1">
-                      <img src="/resources/img/home/youtube.png" alt="">
-                    </div>
-                    <a href="" data-video="PtgKmzgIh4c" class="btn btn-primary btn-primary--filled js-popup">watch video</a>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <div id="video-view" class="modal-window">
+        <div class="modal-window__content">
+          <button type="button" title="Close" id="js-close" class="modal-window__close"><img src="/resources/img/btn-close.svg" alt="close_video"></button>
+          <div class="modal-window__video">
+            <div id="player"></div>
+          </div>
+        </div>
+      </div>
 
-              <div data-thumb="/resources/img/home/odnoklassniki.png">
-              <div class="row align-items-center">
-                <div class="col-sm-6">
-                  <h5 class="vlog__title">Odnoklassniki</h5>
-                  <p>Odnklassniki is a social network service for classmates and
-                  friends. To modernize their front-end Java application to
-                  provide a good experience for users with poor Internet
-                  connections they added server-side React.js rendering. After
-                  comparing implementation options they choose GraalVM for its
-                  high performance multi-language support and ease of migration.
-                  </p>
-                </div>
-                <div class="col-sm-6">
-                  <div class="vlog__video">
-                    <div data-title="slide2">
-                      <img src="/resources/img/home/youtube.png" alt="">
-                    </div>
-                    <a href="https://habr.com/ru/company/odnoklassniki/blog/480808/" target="_blank" data-video="" class="btn btn-primary btn-primary--filled">read more</a>
-                  </div>
+      <div class="video-carousel vlog">
+        <div data-thumb="/resources/img/home/twitter.png">
+          <div class="row align-items-center">
+            <div class="col-sm-6">
+              <h5 class="vlog__title">Twitter</h5>
+              <p>Twitter runs one of the most visible social networks in the
+              world on 1,000s of machines running 1,000s of JVMs in multiple
+              datacenters and is constantly looking into ways to increase
+              availability of the platform while reducing costs. Running on
+              GraalVM, Twitter has realized an 8-11% CPU saving with the
+              Tweet service alone requiring 18% fewer machines. </p>
+            </div>
+            <div class="col-sm-6">
+              <div class="vlog__video">
+                <div data-title="slide1">
+                  <img src="/resources/img/home/youtube.png" alt="Twitter">
+                  <a href="#" data-video="PtgKmzgIh4c" class="btn btn-primary btn-primary--filled js-popup">watch video</a>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div data-thumb="/resources/img/home/oci.png">
-              <div class="row align-items-center">
-                <div class="col-sm-6">
-                <h5 class="vlog__title">Oracle Cloud Infrastructure</h5>
-                <p>The Oracle Cloud Infrastructure (OCI) Monitoring service is a
-                foundational health monitoring tool that runs on GraalVM
-                Enterprise. By using GraalVM, the Monitoring service reduced its
-                garbage collection times by 25%, application pause times by 17%,
-                and saw a 10% increase in throughput. The benefits of these
-                improvements are being felt across the entire OCI platform. </p>
-              </div>
-                <div class="col-sm-6">
-                  <div class="vlog__video">
-                      <div data-title="slide3">
-                      <img src="/resources/img/home/youtube.png" alt="">
-                    </div>
-                    <a href="https://blogs.oracle.com/cloud-infrastructure/graalvm-powers-oracle-cloud-infrastructure" target="_blank" data-video="" class="btn btn-primary btn-primary--filled">read more</a>
-                  </div>
+        <div data-thumb="/resources/img/home/odnoklassniki.png">
+          <div class="row align-items-center">
+            <div class="col-sm-6">
+              <h5 class="vlog__title">Odnoklassniki</h5>
+              <p>Odnklassniki is a social network service for classmates and
+              friends. To modernize their front-end Java application to
+              provide a good experience for users with poor Internet
+              connections they added server-side React.js rendering. After
+              comparing implementation options they choose GraalVM for its
+              high performance multi-language support and ease of migration.
+              </p>
+            </div>
+            <div class="col-sm-6">
+              <div class="vlog__video">
+                <div data-title="slide2">
+                  <img src="/resources/img/home/youtube.png" alt="odnoklassniki">
                 </div>
+                <a href="https://habr.com/ru/company/odnoklassniki/blog/480808/" target="_blank" data-video="#" class="btn btn-primary btn-primary--filled">read more</a>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div data-thumb="/resources/img/home/nvidia.png">
-              <div class="row align-items-center">
-                <div class="col-sm-6">
-                  <h5 class="vlog__title">Nvidia grCUDA</h5>
-                  <p>Integrating GPU-accelerated libraries into existing
-                  software stacks can be challenging, especially for
-                  applications written in high-level scripting languages. Built
-                  on the GraalVM Language Implementation Framework, grCUDA lets
-                  developers efficiently share data between GPUs and GraalVM
-                  languages (R, Python, JavaScript) and launch GPU kernels.</p>
+        <div data-thumb="/resources/img/home/oci.png">
+          <div class="row align-items-center">
+            <div class="col-sm-6">
+            <h5 class="vlog__title">Oracle Cloud Infrastructure</h5>
+            <p>The Oracle Cloud Infrastructure (OCI) Monitoring service is a
+            foundational health monitoring tool that runs on GraalVM
+            Enterprise. By using GraalVM, the Monitoring service reduced its
+            garbage collection times by 25%, application pause times by 17%,
+            and saw a 10% increase in throughput. The benefits of these
+            improvements are being felt across the entire OCI platform. </p>
+          </div>
+            <div class="col-sm-6">
+              <div class="vlog__video">
+                  <div data-title="slide3">
+                  <img src="/resources/img/home/youtube.png" alt="oci">
                 </div>
-                <div class="col-sm-6">
-                  <div class="vlog__video">
-                    <div data-title="slide4">
-                      <img src="/resources/img/home/youtube.png" alt="">
-                    </div>
-                    <a href="https://devblogs.nvidia.com/grcuda-a-polyglot-language-binding-for-cuda-in-graalvm" target="_blank" data-video="" class="btn btn-primary btn-primary--filled">read more</a>
-                  </div>
-                </div>
+                <a href="https://blogs.oracle.com/cloud-infrastructure/graalvm-powers-oracle-cloud-infrastructure" target="_blank" data-video="#" class="btn btn-primary btn-primary--filled">read more</a>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div data-thumb="/resources/img/home/goldmansachs.png">
-              <div class="row align-items-center">
-                <div class="col-sm-6">
-                  <h5 class="vlog__title">Goldman Sachs</h5>
-                  <p>Goldman Sachs is reimplementing their in-house Slang
-                  programming language used for critical pricing and risk
-                  applications on GraalVM. They used the Language Implementation
-                  Framework to modernize Slang while not breaking its complex
-                  dynamic type system, 25 year-old C++ code base, and more than
-                  150 million lines of often mission-critical code. </p>
+        <div data-thumb="/resources/img/home/nvidia.png">
+          <div class="row align-items-center">
+            <div class="col-sm-6">
+              <h5 class="vlog__title">Nvidia grCUDA</h5>
+              <p>Integrating GPU-accelerated libraries into existing
+              software stacks can be challenging, especially for
+              applications written in high-level scripting languages. Built
+              on the GraalVM Language Implementation Framework, grCUDA lets
+              developers efficiently share data between GPUs and GraalVM
+              languages (R, Python, JavaScript) and launch GPU kernels.</p>
+            </div>
+            <div class="col-sm-6">
+              <div class="vlog__video">
+                <div data-title="slide4">
+                  <img src="/resources/img/home/youtube.png" alt="grCUDA">
                 </div>
-                <div class="col-sm-6">
-                  <div class="vlog__video">
-                    <div data-title="slide5">
-                      <img src="/resources/img/home/youtube.png" alt="">
-                    </div>
-                    <a href="" data-video="MUECwHdr07Q" class="btn btn-primary btn-primary--filled js-popup">watch video</a>
-                  </div>
-                </div>
+                <a href="https://devblogs.nvidia.com/grcuda-a-polyglot-language-binding-for-cuda-in-graalvm" target="_blank" data-video="#" class="btn btn-primary btn-primary--filled">read more</a>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div data-thumb="/resources/img/home/politie.png">
-              <div class="row align-items-center">
-                <div class="col-sm-6">
-                  <h5 class="vlog__title">Dutch Police</h5>
-                  <p>GraalVM’s multi-language support allows Dutch Police data
-                  scientists and application developers to collaborate. With
-                  GraalVM, data scientists can focus on building statistical
-                  analysis functions in R that the service development teams can
-                  expose via Spring Boot services written in Scala and Java.
-                  </p>
-                </div>
-                <div class="col-sm-6">
-                  <div class="vlog__video">
-                    <div data-title="slide6">
-                      <img src="/resources/img/home/youtube.png" alt="">
-                    </div>
-                    <a href="#" data-video="poNIwZjoYjs" class="btn btn-primary btn-primary--filled js-popup">watch video</a>
-                  </div>
+        <div data-thumb="/resources/img/home/goldmansachs.png">
+          <div class="row align-items-center">
+            <div class="col-sm-6">
+              <h5 class="vlog__title">Goldman Sachs</h5>
+              <p>Goldman Sachs is reimplementing their in-house Slang
+              programming language used for critical pricing and risk
+              applications on GraalVM. They used the Language Implementation
+              Framework to modernize Slang while not breaking its complex
+              dynamic type system, 25 year-old C++ code base, and more than
+              150 million lines of often mission-critical code. </p>
+            </div>
+            <div class="col-sm-6">
+              <div class="vlog__video">
+                <div data-title="slide5">
+                  <img src="/resources/img/home/youtube.png" alt="goldman_sachs">
+                  <a href="#" data-video="MUECwHdr07Q" class="btn btn-primary btn-primary--filled js-popup">watch video</a>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <div data-thumb="/resources/img/home/politie.png">
+          <div class="row align-items-center">
+            <div class="col-sm-6">
+              <h5 class="vlog__title">Dutch Police</h5>
+              <p>GraalVM’s multi-language support allows Dutch Police data
+              scientists and application developers to collaborate. With
+              GraalVM, data scientists can focus on building statistical
+              analysis functions in R that the service development teams can
+              expose via Spring Boot services written in Scala and Java.
+              </p>
+            </div>
+            <div class="col-sm-6">
+              <div class="vlog__video">
+                <div data-title="slide6">
+                  <img src="/resources/img/home/youtube.png" alt="dutch_police">
+                  <a href="#" data-video="poNIwZjoYjs" class="btn btn-primary btn-primary--filled js-popup">watch video</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         </div>
       </div>
 </section>
