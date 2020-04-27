@@ -572,6 +572,8 @@ architecture. This guide does not replace but rather supplements the Java
 security documentation with aspects unique to GraalVM. It also provides security
 researchers with information on GraalVM’s security model.</p>
 
+<p>All security assumptions only apply to the enterprise version of GraalVM.</p>
+
 <p>This guide does not (yet) cover security aspects specific to a language
 implementation, usage of the Instrument API or any APIs other than the Polyglot
 API.</p>
@@ -594,11 +596,12 @@ example, an embedder writes an application server (the host application) that
 runs JavaScript guest applications from a less trusted source. GraalVM offers
 features to limit the privileges of the guest application to some extent.</p>
 
+<p>These restrictions are currently only supported in Javascript and managed LLVM.
+Ruby, R, Python, WASM are <a href="https://docs.oracle.com/en/graalvm/enterprise/20/guide/overview/license/licensing-information.html">experimental</a> and not recommended for production use at this time.</p>
+
 <p>For every guest language shipped with GraalVM, a launcher, e.g., interactive
 shell, is provided. These launchers behave in the same way and come with the
 same security guarantees as their “original” counterparts.</p>
-
-<p>Note: Ruby, R, Python, Wasm are <a href="https://docs.oracle.com/en/graalvm/enterprise/20/guide/overview/license/licensing-information.html">experimental</a> and not recommended for production use at this time.</p>
 
 <p>We appreciate reports of bugs that break the security model via the process
 outlined in the <a href="https://www.oracle.com/corporate/security-practices/assurance/vulnerability/reporting.html">Reporting Vulnerabilities guide</a>.</p>
@@ -609,12 +612,6 @@ execution context to run code written in one or multiple guest language(s). When
 creating a context, the host application can control which resources the guest
 can access. By default access to all managed resources is denied and needs to be
 granted explicitly.</p>
-
-<p>Beyond controlling access to these resources, the execution context also enables
-timeboxing of guest applications: a watchdog thread that runs in the host
-application can be configured to close a context after a given amount of time
-specified by the host application, freeing up the computing resources used by
-the context.</p>
 
 <h3 id="file-io">File I/O</h3>
 <p>Access to files can be controlled via two means. The <code>allowIO</code> privilege grants
@@ -651,7 +648,7 @@ between the guest and the host:</p>
 <p>The host access policy has three different options:</p>
 
 <ul>
-  <li><code>ALL</code> - all public constructors, methods or fields of public classes of the host can be accessed by the guest.</li>
+  <li><code>ALL</code> - all public constructors, methods or fields of public classes of the host can be accessed by the guest. <strong>Note that this exposes all host functionality to the guest, effectively disabling any security boundary between host and guest.</strong></li>
   <li><code>NONE</code> - no constructors, methods or fields of the host can be accessed by the guest.</li>
   <li><code>EXPLICIT</code> - only public constructors, methods and fields of public classes that are annotated with <code>@HostAccess.Export</code> can be accessed by the guest.</li>
 </ul>
@@ -693,7 +690,7 @@ guest code, application developers need to take care when processing objects
 returned from the guest application – the host application should treat them as
 less trusted input and sanitize accordingly.</p>
 
-<h2 id="managed-execution-of-native-code">Managed Execution of Native Code</h2>
+<h2 id="managed-execution-of-llvm-ir">Managed Execution of LLVM IR</h2>
 <p>The Truffle framework also supports the LLVM intermediate representation (IR) as
 a guest language. Several native system programming languages, above all C/C++,
 can be compiled to LLVM IR with the LLVM compiler toolchain. Typically, these

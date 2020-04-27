@@ -813,10 +813,10 @@ mixing packages loaded in the <em>native</em> mode with packages loaded in the <
 <a href="/docs/reference-manual/languages/llvm/#llvm-toolchain">LLVM toolchain</a>
 to compile R packages native code. This toolchain produces standard executable binaries for
 a given system, but it also embeds the corresponding LLVM bitcode into them.
-The binaries produced by the LLVM Toolchain can be loaded in both modes: <em>native</em> or <em>llvm</em>.</p>
+The binaries produced by the LLVM toolchain can be loaded in both modes: <em>native</em> or <em>llvm</em>.</p>
 
 <p>The GraalVM R engine can be reconfigured to use your system default compilers
-when installing R packages by running</p>
+when installing R packages by running:</p>
 
 <pre><code class="language-shell"># use local installation of GGC:
 $ R -e 'fastr.setToolchain("native")'

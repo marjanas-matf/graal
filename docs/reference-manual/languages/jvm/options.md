@@ -44,10 +44,10 @@ of available configurations, supply the value help to this option.
 ### Performance tuning options
 
 * `-Dgraal.UsePriorityInlining=true`: This can be used to disable use of the advanced inlining
-algorithm that favors throughput over compilation speed. **GraalVM Enterprise feature**.
+algorithm that favors throughput over compilation speed. **GraalVM Enterprise feature**
 * `-Dgraal.Vectorization=true`: This can be used to disable the auto vectorization optimization.
-**GraalVM Enterprise feature**.
-* `-Dgraal.OptDuplication=true`: This can be used to disable the [path duplication optimization](http://ssw.jku.at/General/Staff/Leopoldseder/DBDS_CGO18_Preprint.pdf). **GraalVM Enterprise feature**.
+**GraalVM Enterprise feature**
+* `-Dgraal.OptDuplication=true`: This can be used to disable the [path duplication optimization](http://ssw.jku.at/General/Staff/Leopoldseder/DBDS_CGO18_Preprint.pdf). **GraalVM Enterprise feature**
 <!-- * `-Dgraal.TuneInlinerExploration=0`: This can be used to try tune for better peak performance or faster warmup.
 It automatically adjusts values governing the effort spent during inlining. The value of the option is
 a float clamped between `-1` and `1` inclusive. Anything below

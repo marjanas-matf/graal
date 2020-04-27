@@ -729,7 +729,7 @@ to demonstrate performance of the GraalVM compiler. This example counts the numb
 
 <p>2. Compile it and run as follows:</p>
 <pre><code>$ javac CountUppercase.java
-$ java CountUppercase In 2019 I would like to run ALL languages in one VM.
+$ java CountUppercase In 2020 I would like to run ALL languages in one VM.
 1 (389 ms)
 2 (235 ms)
 3 (216 ms)
@@ -748,7 +748,7 @@ machine does not match the above, run it for more iterations by adding
 <code>-Diterations=N</code> just after <code>java</code> for some <code>N</code> greater than 1.</p>
 
 <p>3. Add the <code>-Dgraal.PrintCompilation=true</code> option to see statistics for the compilations:</p>
-<pre><code>$ java -Dgraal.PrintCompilation=true CountUppercase In 2019 I would like to run ALL languages in one VM.
+<pre><code>$ java -Dgraal.PrintCompilation=true CountUppercase In 2020 I would like to run ALL languages in one VM.
 </code></pre>
 
 <p>This option prints a line after each compilation that shows the method
@@ -757,7 +757,7 @@ of machine code produced, and amount of memory allocated during compilation.</p>
 
 <p>4. Use the <code>-XX:-UseJVMCICompiler</code> option to disable the GraalVM compiler and
 use the native top tier compiler in the VM to compare performance, as follows:</p>
-<pre><code>$ java -XX:-UseJVMCICompiler CountUppercase In 2019 I would like to run ALL languages in one VM.
+<pre><code>$ java -XX:-UseJVMCICompiler CountUppercase In 2020 I would like to run ALL languages in one VM.
 1 (602 ms)
 2 (443 ms)
 3 (429 ms)

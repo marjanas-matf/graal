@@ -664,8 +664,7 @@ to the path, using a command-line shell for Linux:
     <p>Note that your paths are likely to be different depending on the download location.</p>
   </li>
   <li>
-    <p>Make sure the <code>native-image</code> utility is available. Starting from GraalVM 19.0, <a href="/docs/reference-manual/aot-compilation/">Native Image</a> was extracted from the base distribution. This functionality can be added to the core installation with GraalVM Updater tool by running:
-<code>gu install native-image</code>.</p>
+    <p><a href="/docs/reference-manual/native-image/#install-native-image">Install Native Image</a> to make use of the <code>native-image</code> utility.</p>
   </li>
   <li>Then execute:
     <pre><code>./build.sh
@@ -697,14 +696,14 @@ time ./listdir $1
 the parent of the current directory, the one containing all the demos).</p>
 
 <p>Approximately, the following output should be produced:</p>
-<pre><code>+ java ListDir ..
+<pre><code>java ListDir ..
 Walking path: ..
 Total: 141 files, total size = 14448801 bytes
 
 real	0m0.320s
 user	0m0.379s
 sys	0m0.070s
-+ ./listDir ..
+./listDir ..
 Walking path: ..
 Total: 141 files, total size = 14448801 bytes
 
@@ -733,30 +732,30 @@ Note that it takes a bit more time because it needs to include the JavaScript su
 time ./extlistdir $1
 </code></pre>
 
-<h3 id="profile-guided-optimizaitons-for-high-throughput">Profile-Guided Optimizaitons for High Throughput</h3>
+<h3 id="profile-guided-optimizations-for-high-throughput">Profile-Guided Optimizations for High Throughput</h3>
 
 <p>GraalVM Enterprise Edition offers extra benefits for building a native image. These are <strong>profile-guided optimisations</strong> (PGO). As an example we will use a <a href="https://github.com/graalvm/graalvm-demos/blob/master/scala-days-2018/streams/Streams.java">small application</a> demonstrating Java streams.</p>
 
 <p>First, we run the application with <code>java</code> to see the output:</p>
-<pre><code>+ javac Streams.java
-+ $GRAALVM_HOME/bin/native-image Streams
-+ ./streams 1000000 200
+<pre><code>javac Streams.java
+$GRAALVM_HOME/bin/native-image Streams
+./streams 1000000 200
 ...
 Iteration 20 finished in 1955 milliseconds with checksum 6e36c560485cdc01
 </code></pre>
 
 <p>To enable PGO we need to build an instrumented image and run it to collect profiles:</p>
-<pre><code>+ $GRAALVM_HOME/bin/native-image --pgo-instrument Streams
-+ ./streams 1000 200
+<pre><code>$GRAALVM_HOME/bin/native-image --pgo-instrument Streams
+./streams 1000 200
 </code></pre>
 <p>Profiles collected from this run are now stored in the <code>default.iprof</code> file. Note that we run the profiling with a much smaller data size.</p>
 
 <p>Now we can use these profiles to make an optimized image:</p>
-<pre><code>+ $GRAALVM_HOME/bin/native-image --pgo Streams
+<pre><code>$GRAALVM_HOME/bin/native-image --pgo Streams
 </code></pre>
 
 <p>When we run the PGO image with</p>
-<pre><code>+ ./streams 1000000 200
+<pre><code>./streams 1000000 200
 ...
 Iteration 20 finished in 827 milliseconds with checksum 6e36c560485cdc01
 </code></pre>
