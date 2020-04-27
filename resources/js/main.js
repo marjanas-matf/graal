@@ -140,27 +140,32 @@ $(document).ready(function () {
   });
 
   //slick slider init
-  (function () {
-    $('.video-carousel').slick({
-      dots: true,
-      accessibility: true,
-      responsive: [
-        {
-          breakpoint: 900,
-          settings: {
-            arrows: false,
-            adaptiveHeight: true
+    (function () {
+      $('.video-carousel').slick({
+        dots: true,
+        accessibility: true,
+        responsive: [
+          {
+            breakpoint: 900,
+            settings: {
+              arrows: false,
+              adaptiveHeight: true
+            }
           }
+        ],
+        customPaging: function(slider, i) {
+          var thumb = $(slider.$slides[i]).data('thumb');
+          return '<a><img src="' + thumb + '"></a>';
         }
-      ]
-    });
-  }());
+      });
+    }());
+
 
   (function () {
     $('.news-carousel').slick({
       dots: false,
       accessibility: true,
-      slidesToShow: 4,
+      slidesToShow: 3,
       arrows: true,
       slidesToScroll: 1,
       // autoplay: true,
@@ -190,7 +195,7 @@ $(document).ready(function () {
   }());
 
   var configProfile = {
-    "profile": {"screenName": 'thomaswue'},
+    "profile": {"screenName": 'graalvm'},
     "domId": 'tweets',
     "maxTweets": 10,
     "enableLinks": true,
@@ -206,7 +211,7 @@ $(document).ready(function () {
       el.slick({
         dots: false,
         infinite: true,
-        slidesToShow: 3,
+        slidesToShow: 4,
         slidesToScroll: 1,
         arrows: true,
         autoplaySpeed: 3000,
@@ -231,8 +236,50 @@ $(document).ready(function () {
   };
   twitterFetcher.fetch(configProfile);
 
+//Embedded Tweets Styling
+function customizeTweet() {
+
+    if (document.getElementById("twitter-widget-0")) {
+
+        var maxTweets = 10;
+
+        for (i = 0; i < maxTweets; i++) {
+
+            if (document.getElementById("twitter-widget-" + i)) {
+               var tweetCSS = ".EmbeddedTweet{border:none !important}";
+               var tweetStyle = document.createElement("style");
+
+               tweetStyle.setAttribute("id", "tweet-style-" + i);
+               tweetStyle.innerHTML = tweetCSS;
+               tweetStyle.type = "text/css";
+
+               var styleTag = document.getElementById("twitter-widget-" + i).shadowRoot;
+               styleTag.insertBefore(tweetStyle, styleTag.childNodes[0]);
+            }
+        }
+    }
+}
+
+function addLoadEvent(func) {
+  var oldonload = window.onload;
+  if (typeof window.onload != 'function') {
+      window.onload = func;
+  } else {
+      window.onload = function() {
+          if (oldonload) {
+              oldonload();
+          }
+          func();
+      }
+  }
+}
+
+addLoadEvent(customizeTweet);
+
+//Header loading
+(document, 'script', 'twitter-wjs');
 (function () {
-    var topBanner = $('.home-banner');
+    var topBanner = $('.showcase-banner');
     var header = $('.header');
     var topBannerHeight = topBanner.innerHeight();
     var showed = false;
