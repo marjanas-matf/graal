@@ -796,24 +796,6 @@ For example, the finalizer can make the object reachable again by storing it in 
 Therefore, finalizers are not invoked.
 We recommend replacing finalizers with weak references and reference queues for use in any Java VM.</p>
 
-<h2 id="locking-and-synchronization">Locking and Synchronization</h2>
-
-<p>Java offers the <code>synchronized</code> keyword for methods and blocks.
-Every object and every class has an intrinsic lock.
-The base class <code>java.lang.Object</code> provides wait and notify methods for conditional waiting.</p>
-
-<p>The implementation of synchronization in GraalVM Native Image uses <code>java.util.concurrent.locks</code>.
-There are no optimizations such as biased locking that reduce the overhead of <code>synchronized</code>, so code that uses unnecessary synchronization (synchronization on temporary objects that do not escape a single thread) can be slower compared to the Java HotSpot VM.</p>
-
-<h2 id="references">References</h2>
-
-<p>The package <code>java.lang.ref</code> defines the base class <code>Reference</code>, as well as subclasses for weak, soft, and phantom references.
-The object that the reference refers to can be deallocated, in which case the reference is updated to contain the value null.
-With the help of a <code>ReferenceQueue</code>, user code can be executed when a reference gets deallocated.</p>
-
-<p>The current implementation of references in GraalVM Native Image does not distinguish between weak, soft, and phantom references.
-This will be fixed in an upcoming release.</p>
-
 <h2 id="threads">Threads</h2>
 
 <p>SubstrateVM does not implement long-deprecated methods in <code>java.lang.Thread</code> such as <code>Thread.stop()</code>.</p>

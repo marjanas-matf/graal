@@ -1,30 +1,24 @@
-# GraalVM Dashboard
 
-GraalVM Dashboard is a web-based dashboard for visualizing arbitrary aspects of
-compilation in GraalVM, and in particular, in the [GraalVM Native Image](https://www.graalvm.org/docs/reference-manual/native-image). It can be
-found at the following URL: [https://www.graalvm.org/docs/tools/dashboard](https://www.graalvm.org/docs/tools/dashboard).
+## Getting Started Guide
 
-Some examples of visualizations in the GraalVM dashboard are:
-- Code size histogram -- presents a visual summary of the sizes of the different packages,
-  classes and methods that were included into a native image.
-- Heap size histogram -- presents a visual summary of the sizes of the objects
-  of the different classes, which were included into the heap of a native image.
-- Points-to exploration -- this component is used to, starting from a particular method
-  that is included in the native image, illustrate why this particular method of the program
-  was included in the native image.
+The GraalVM dashboard is a tool that visualizes and helps analyze GraalVM compilations.
 
-Here you can find information about the basic usage instructions.
+### Generating Report Files
+The GraalVM dashboard visualizes data taken from report files generated during SVM compilation.
+To generate such report files, you need to pass certain flags when running an SVM compilation.
+Currently, the following flags are available:
+- **-H:+PrintMethodHistogram:** Export a method histogram, which contains the machine code size
+    of every method in the compiled image. The output of this command is printed to `stdout`.
+    Redirect it into a file, to then use as an `SVM Method Histogram` in the dashboard.
+- **-H:+ExportPointstoGraph:** Export the compilation's points-to analysis information into a
+    file, located in the `reports` directory in `substratevm-enterprise`. In the dashboard,
+    this can be used as an `SVM Pointsto Analysis` file, to explore the reachability of a given
+    method and find out why it was included in the image.
 
-## Generating Report Files
-To generate report files for the GraalVM Dashboard, you need to pass certain
-flags when building a native image.
-
-Example usage for compiling a `org.graal.Hello` project:
-```
-mx native-image -H:DashboardDump=dashboard.dump -H:+DashboardAll org.graal.Hello
-```
-
-## Opening Report Files In The Dashboard
-To open the report file in the GraalVM Dashboard, click on the "Add data" button
-on the left, which will open a dialog box. Here you can select the dumped file,
-obtained during a native-image build.
+### Opening Report Files In The Dashboard
+To open a report file in the dashboard, click the "+"-icon on the left, which will open a dialog
+box. Here, you can select the file you want to open and specify its type depending on which flag
+you used during compilation. The file type `SVM Method Histogram` automatically creates a new
+so-called "data source" and can't be added to an existing one in the corresponding dropdown
+menu. Files of type `SVM Pointsto Analysis`, however, can be added to data sources created from
+a file of type `SVM Method Histogram`, to enable exploring a method's reachability information.
