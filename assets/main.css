@@ -5501,7 +5501,8 @@ main.content.content--home .title {
   background: #BADAE0 0% 0% no-repeat padding-box;
   border-radius: 0px 0px 10px 10px;
   opacity: 1;
-  padding: 13px; }
+  padding: 13px;
+  margin-bottom: 10px; }
   @media (min-width: 992px) {
     .benefits .benefit-content {
       padding: 18px; } }
@@ -5547,7 +5548,11 @@ main.content.content--home .title {
   background: #FFFFFF 0% 0% no-repeat padding-box;
   border: 1px solid #BADAE0;
   border-radius: 10px;
-  opacity: 1; }
+  opacity: 1;
+  margin-bottom: 10px; }
+  @media (min-width: 576px) {
+    .chart-content {
+      margin-bottom: 0; } }
 
 .chart-content img {
   padding: 50px; }
@@ -5726,7 +5731,11 @@ section.usecases .carousel-wrapp {
 .latest-news .bottom .inner {
   border-color: transparent;
   box-shadow: 0 4px 10px rgba(210, 213, 223, 0.9);
-  border-radius: 10px; }
+  border-radius: 10px;
+  margin-bottom: 10px; }
+  @media (min-width: 576px) {
+    .latest-news .bottom .inner {
+      margin-bottom: 0; } }
 
 .inner .post-date {
   padding: 10px; }
@@ -6003,13 +6012,13 @@ section.wrap {
             fill: white; } }
     .header--filled .menu__link, .header--content .menu__link {
       color: #00758F; }
-      .header--filled .menu__link:hover, .header--filled .menu__link--current, .header--content .menu__link:hover, .header--content .menu__link--current {
+      .header--filled .menu__link:hover, .header--filled .menu__link:active, .header--content .menu__link:hover, .header--content .menu__link:active {
         color: #f29110; }
     @media (min-width: 768px) {
       .menu__link {
         color: rgba(255, 255, 255, 0.8);
         font-size: 15px; }
-        .menu__link--current, .menu__link--home {
+        .menu__link--home {
           color: #f29110; } }
     .menu__link--iconed + .menu__link--iconed {
       margin-left: 30px; }
@@ -6084,8 +6093,8 @@ section.wrap {
           .header--home .menu__logo.open {
             transform: translateX(40%); } }
 
-a.menu__link.menu__link--current {
-  color: orange; }
+a.menu__link.activeMenuItem {
+  color: #f29110; }
 
 .home-banner {
   position: relative;
