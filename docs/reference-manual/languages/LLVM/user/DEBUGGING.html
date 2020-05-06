@@ -336,13 +336,10 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/js/user/">
+          <a href="/docs/reference-manual/languages/JavaScript/user/README">
             For JavaScript User
           </a>
         </li>
-
-
-        
 
 
         
@@ -353,55 +350,52 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/llvm/user/">
-            For LLVM Languages User
+          <a href="/docs/reference-manual/languages/LLVM/user/README">
+            For LLVM User
           </a>
         </li>
 
 
         
-
-
-        
           
-          <li class="toc-bullets-sub dsdsd">
+          <li class="toc-bullets-sub">
           
             
-            <a href="/docs/reference-manual/languages/LLVM/user/ARCHITECTURE">
-              Architecture Haiku
+            <a href="">
+              
             </a>
           </li>
 
           
         
           
-          <li class="toc-bullets-sub dsdsd">
+          <li class="toc-bullets-sub">
           
             
-            <a href="/docs/reference-manual/languages/LLVM/user/CI">
-              Continuous Integration CI
+            <a href="">
+              
             </a>
           </li>
 
           
         
           
-          <li class="toc-bullets-sub dsdsd">
+          <li class="toc-bullets-sub">
           
             
-            <a href="/docs/reference-manual/languages/LLVM/user/TOOLCHAIN">
-              Toolchain
+            <a href="">
+              
             </a>
           </li>
 
           
         
           
-          <li class="toc-bullets-sub dsdsd">
+          <li class="toc-bullets-sub">
           
             
-            <a href="/docs/reference-manual/languages/LLVM/user/TESTS">
-              Sulong test cases
+            <a href="">
+              
             </a>
           </li>
 
@@ -412,7 +406,7 @@ $(document).ready(function(){
           
             
             <a href="/docs/reference-manual/languages/LLVM/user/DEBUGGING">
-              Source-Level Debugging
+              Debugging on the GraalVM LLVM Runtime
             </a>
           </li>
 
@@ -436,44 +430,44 @@ $(document).ready(function(){
           
         
           
-          <li class="toc-bullets-sub dsdsd">
+          <li class="toc-bullets-sub">
           
             
-            <a href="/docs/reference-manual/languages/LLVM/user/INTEROP">
-              Interoperability
+            <a href="">
+              
             </a>
           </li>
 
           
         
           
-          <li class="toc-bullets-sub dsdsd">
+          <li class="toc-bullets-sub">
           
             
-            <a href="/docs/reference-manual/languages/LLVM/user/PUBLICATIONS">
-              Publications
+            <a href="">
+              
             </a>
           </li>
 
           
         
           
-          <li class="toc-bullets-sub dsdsd">
+          <li class="toc-bullets-sub">
           
             
-            <a href="/docs/reference-manual/languages/LLVM/user/CONTRIBUTING">
-              Contributing
+            <a href="">
+              
             </a>
           </li>
 
           
         
           
-          <li class="toc-bullets-sub dsdsd">
+          <li class="toc-bullets-sub">
           
             
-            <a href="/docs/reference-manual/languages/LLVM/user/FAQ">
-              General
+            <a href="">
+              
             </a>
           </li>
 
@@ -486,16 +480,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/python/user/">
+          <a href="/docs/reference-manual/languages/Python/user/README">
             For Python User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -503,16 +494,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/r/user/">
+          <a href="/docs/reference-manual/languages/R/user/README">
             For R User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -520,16 +508,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/ruby/user/">
+          <a href="/docs/reference-manual/languages/Ruby/user/README">
             For Ruby User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -537,16 +522,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/truffle-framework/user/">
-            For Language Implementer
+          <a href="/docs/reference-manual/languages/Truffle-Framework/user/README">
+            For Truffle Framework User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -554,13 +536,10 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/native-image/user/">
+          <a href="/docs/reference-manual/languages/Native-Image/user/README">
             For Native Image User
           </a>
         </li>
-
-
-        
 
 
         
@@ -593,151 +572,70 @@ $(document).ready(function(){
 
           <div class="col-sm-9">
             <div id="content-wrapper" class="docs-content docs-content--with-sidebar">
-              <h1 id="source-level-debugging">Source-Level Debugging</h1>
+              <h1 id="debugging-on-the-graalvm-llvm-runtime">Debugging on the GraalVM LLVM Runtime</h1>
 
-<p>Sulong supports source-level debugging on the
+<p>The GraalVM LLVM runtime supports source-level (e.g. C language) debugging with the
 <a href="https://developers.google.com/web/tools/chrome-devtools/">Chrome Developer Tools</a> using GraalVM’s
 Chrome Inspector. This includes support for single-stepping, breakpoints and inspection of local
 and global variables.</p>
 
-<h2 id="setup">Setup</h2>
+<p>To start debugging simply run the following in GraalVM’s <code>bin</code> directory:</p>
 
-<p>The Chrome Inspector can be used with both the precompiled GraalVM and Sulong built from source.</p>
-
-<h3 id="graalvm">GraalVM</h3>
-
-<p>The easiest way to use Sulong’s source-level debugging capabilities is to run it from GraalVM.
-To start debugging simply run the following in GraalVM’s <code>bin</code> directory:</p>
-
-<pre><code>lli --inspect --llvm.enableLVI &lt;bitcode file&gt;
+<pre><code>$GRAALVM/bin/lli --inspect &lt;bitcode file&gt;
 </code></pre>
-
-<h3 id="built-from-source">Built from source</h3>
-
-<p>The source code of Chrome Inspector is available as part of the
-<a href="https://github.com/oracle/graal/tree/master/tools">Tools suite in the Graal repository</a>.
-If you followed the instructions in <a href="../README.md">Sulong’s README</a> and already built Sulong the Tools suite
-should be available at <code>sulong-dev/graal/tools</code>.
-You can use following command from the <code>sulong-dev/graal/sulong</code> directory to build the Tools suite.</p>
-
-<pre><code> mx --dynamicimports /tools build
-</code></pre>
-
-<p>See the <a href="https://github.com/oracle/graal/blob/master/tools/README.md">build instructions in Tools’s README</a>
-for more information.</p>
-
-<p>To debug a program you can then use the following command in <code>sulong-dev/graal/sulong</code>:</p>
-
-<pre><code>mx --dynamicimports /tools lli --inspect --llvm.enableLVI &lt;bitcode file&gt;
-</code></pre>
-
-<p>This can also be used in conjunction with the <code>-d</code> option to <code>mx</code>, allowing you to attach a Java
-Debugger for debugging Sulong itself in addition to the source-level debugger.</p>
-
-<h2 id="usage">Usage</h2>
 
 <p>When launched, the inspector will suspend execution at the first instruction of the program and print
 a link to the console. Pasting this link into Chrome’s address bar will open the developer tools for you.</p>
 
-<h3 id="breakpoints">Breakpoints</h3>
+<h2 id="breakpoints">Breakpoints</h2>
 
-<p>Breakpoints can only be set in functions that have already been parsed. Sulong defaults to parsing
+<p>Breakpoints can only be set in functions that have already been parsed. GraalVM defaults to parsing
 functions in LLVM bitcode files only when they are first being executed. To instead parse functions
-eagerly and be able to set breakpoints also in functions not yet executed you can launch Sulong
-with the option <code>--llvm.lazyParsing=false</code>.</p>
+eagerly and be able to set breakpoints also in functions not yet executed you can use the option
+<code>lli --llvm.lazyParsing=false</code>.</p>
 
-<h3 id="program-defined-breakpoints-using-__builtin_debugtrap">Program-defined breakpoints using <code>__builtin_debugtrap()</code></h3>
+<h2 id="program-defined-breakpoints-using-__builtin_debugtrap">Program-defined breakpoints using <code>__builtin_debugtrap()</code></h2>
 
 <p>The <code>__builtin_debugtrap</code> function enables you to mark locations in your program at which you explicitly
-want Sulong to halt the program and switch to the debugger. The debugger automatically halts at each call
+want GraalVM to halt the program and switch to the debugger. The debugger automatically halts at each call
 to this function as if a breakpoint were set on the call. You can use this feature to quickly reach the
 code you are actually trying to debug without having to first find and set a breakpoint on it after
 launching your application. You can also instruct Chrome Inspector not to suspend your program at the first
-source-level statement being executed. When doing so, Sulong will instead execute your program until it
+source-level statement being executed. When doing so, GraalVM will instead execute your program until it
 reaches a call to <code>__builtin_debugtrap()</code> before invoking the debugger. To enable this behaviour you need
-pass the arguments <code>--inspect.Suspend=false</code> and <code>--inspect.WaitAttached=true</code> (or
-<code>-Dpolyglot.inspect.Suspend=false</code> and <code>-Dpolyglot.inspect.WaitAttached=true</code> if you compiled Sulong
-from source).</p>
+pass the arguments <code>lli --inspect.Suspend=false --inspect.WaitAttached=true</code>.</p>
 
 <h2 id="faq">FAQ</h2>
 
 <h3 id="i-am-compiling-my-bitcode-files-on-another-system-can-the-source-level-debugger-find-the-sources-on-my-system">I am compiling my bitcode files on another system. Can the source-level debugger find the sources on my system?</h3>
 
-<p>In general, debug information in LLVM bitcode files uses absolute paths to identify the
-location of source code. Usually this requires you to imitate the compiling system’s
-directory structure in which your sources reside so that the debugger can find them.
-To work around this limitation, in C/C++ code you can use the <code>#line</code> preprocessor
-directive to manually define a path for the source file.</p>
-
-<pre><code>#line &lt;current line number&gt; &lt;filename/path you want to be used by the debugger for the current file&gt;
-</code></pre>
-
-<p>You can also use a Sulong-specific format as filename to make the paths pseudo-relative.</p>
-
-<pre><code>"truffle-relpath://&lt;property&gt;//&lt;relative path/filename&gt;"
-</code></pre>
-
-<p>Sulong will use the system property <code>property</code>, which you can set dynamically, to resolve
-<code>relative path/filename</code> against.</p>
+<p>In general, debug information in LLVM bitcode files contains absolute search paths to identify the
+location of source code. Alternatively, a search path for source files can be specified using
+the <code>--inspect.SourcePath=&lt;path&gt;</code> option (multiple paths can be specified separated by <code>:</code>).</p>
 
 <h3 id="can-i-also-debug-my-program-on-llvm-ir-level">Can I also debug my program on LLVM-IR level?</h3>
 
-<p>Sulong also contains preliminary support for debugging program on the level of LLVM IR.
-This feature is only in the early stages and may contain bugs. To use it, you need to
-replace the option <code>-Dpolyglot.llvm.enableLVI=true</code> with <code>-Dpolyglot.llvm.llDebug=true</code>.
-Please note that both <code>enableLVI</code> and <code>llDebug</code> cannot be used together. Also, to
-debug on LLVM-IR level you need to use <code>llvm-dis</code> to disassemble the <code>*.bc</code> files
-that you want to execute. Sulong expects an equally named <code>*.ll</code> file in the same
-directory as the <code>*.bc</code> files it executes. To disassemble all <code>*.bc</code> files in a
-directory you can use this command:</p>
+<p>GraalVM also contains preliminary support for debugging program on the level of LLVM IR.
+This feature is only in the early stages and may be incomplete. To use it, you need to
+replace add the option <code>--experimental-options --llvm.llDebug</code>.</p>
 
-<pre><code>for f in $(find . -type f -name *.bc) ; do llvm-dis -o ${f::-3}.ll $f ; done
-</code></pre>
+<p>Also, to debug on LLVM-IR level you need to use <code>llvm-dis</code> to disassemble the bitcode
+that you want to execute. GraalVM expects a file with the same name as the bitcode module but
+with the <code>.ll</code> extension in the same directory as the bitcode module it executes.</p>
 
-<p>If you run this command on Sulong’s <code>mxbuild</code> directory you may notice several
-warnings about files with incompatible debug information. These are bitcode files
-that were compiled using DragonEgg, which emits a version of LLVM debug information
-that is incompatible with modern LLVM releases. You can safely ignore those warnings.
-Sulong does not require any debug information to be present in either <code>*.bc</code> or <code>*.ll</code>
-files to debug on the level of LLVM-IR.</p>
-
-<p>You can also specify a separate location for the <code>*.ll</code> file corresponding to a <code>*.bc</code>
-file using the <code>llDebug.Sources</code> argument. When using this option you need to specify
-the path of both the <code>*.ll</code> and the <code>*.bc</code> file which it describes. While the option
+<p>You can also specify a separate location for the <code>*.ll</code> file corresponding to a bitcode
+file using the <code>--llvm.llDebug.Sources</code> argument. When using this option you need to specify
+the path of both the <code>*.ll</code> and the bitcode file which it describes. While the option
 itself can only be specified once, you can pass it an arbitrary number of path mappings.</p>
 
-<pre><code>-Dpolyglot.llvm.llDebug.Sources=&lt;path to *.bc file&gt;=&lt;path to *.ll file&gt;[:&lt;path to *.bc file&gt;=&lt;path to *.ll file&gt;]*
+<pre><code>--llvm.llDebug.Sources=&lt;path to *.bc file&gt;=&lt;path to *.ll file&gt;[:&lt;path to *.bc file&gt;=&lt;path to *.ll file&gt;]*
 </code></pre>
 
-<h3 id="i-am-calling-sulong-from-java-can-i-debug-both-my-java-code-and-the-program-running-on-sulong-at-the-same-time">I am calling Sulong from Java. Can I debug both my Java code and the program running on Sulong at the same time?</h3>
+<h3 id="how-can-i-generate-a-trace-of-how-graalvm-executes-my-program">How can I generate a trace of how GraalVM executes my program?</h3>
 
-<p>You cannot yet debug Java code using the Chrome inspector. However, you can launch the
-Chrome inspector from within your Java code. Please refer to the
-<a href="http://www.graalvm.org/docs/reference-manual/tools/">documentation of the GraalVM Tools</a>
-for details on how to do that. This enables you to debug your Java code using your Java
-debugger of choice while debugging the code executed by Sulong in the Chrome inspector.</p>
-
-<h3 id="how-can-i-generate-a-trace-of-how-sulong-executes-my-program">How can I generate a trace of how Sulong executes my program?</h3>
-
-<p>Sulong can produce an LLVM IR-level trace of its program execution. You can enable
-this feature by passing the <code>--llvm.traceIR&lt;...&gt;</code> option to <code>lli</code>. This option takes a
-single argument denoting the target for the trace output.</p>
-
-<ul>
-  <li>
-    <p><code>stdout</code> or <code>out</code>: prints the trace to <code>stdout</code></p>
-  </li>
-  <li>
-    <p><code>stderr</code> or <code>err</code>: prints the trace to <code>stderr</code></p>
-  </li>
-  <li>
-    <p><code>file://&lt;path&gt;</code>: prints the trace to the file denoted by <code>path</code></p>
-  </li>
-</ul>
-
-<p>Please note that in order to use this feature you also need to enable IR-level
-debugging as described above by setting <code>-Dpolyglot.llvm.llDebug=true</code> and
-ensuring that sulong can find <code>.ll</code> files for the bitcode files it executes.</p>
+<p>GraalVM can produce an LLVM IR-level trace of its program execution. You can enable
+this feature by passing the <code>--experimental-options --llvm.traceIR=&lt;...&gt;</code> option to <code>lli</code>.
+See <code>lli --help:languages --help:expert</code> for more information.</p>
 
             </div>
 

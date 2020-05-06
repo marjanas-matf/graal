@@ -10,7 +10,7 @@
 
   <title>
     
-      Documentation for LLVM User
+      Documentation for Ruby User
     
   </title>
   <meta
@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="/resources/styles/extra.css">
   <link rel="stylesheet" href="https://elocation.oracle.com/mapviewer/jslib/v2.3/css/oraclemapsv2.css>
 
-  <link rel="canonical" href="https://www.graalvm.org/docs/reference-manual/languages/LLVM/user/TESTS">
+  <link rel="canonical" href="https://www.graalvm.org/docs/reference-manual/languages/Ruby/user/README">
   <!-- <script src="/resources/lib/jquery/jquery-3.2.1.min.js"></script> -->
   <script src="https://maps.oracle.com/mapviewer/jslib/v2.3/oraclemapsv2.js"></script>
   <link rel="stylesheet" href="https://elocation.oracle.com/mapviewer/jslib/v2.3/css/oraclemapsv2.css">
@@ -328,6 +328,12 @@ $(document).ready(function(){
   
 
   
+
+  
+
+  
+
+  
     
 
     
@@ -336,16 +342,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/js/user/">
+          <a href="/docs/reference-manual/languages/JavaScript/user/README">
             For JavaScript User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -353,132 +356,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/llvm/user/">
-            For LLVM Languages User
+          <a href="/docs/reference-manual/languages/LLVM/user/README">
+            For LLVM User
           </a>
         </li>
 
 
         
-
-
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/ARCHITECTURE">
-              Architecture Haiku
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/CI">
-              Continuous Integration CI
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/TOOLCHAIN">
-              Toolchain
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub toc-bullets-highlight">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/TESTS">
-              Sulong test cases
-            </a>
-          </li>
-
-          
-            <div>
-    <script>
-      var scriptElement = document.currentScript;
-      var div = $(scriptElement.parentElement);
-      $(window).on("load", function() {
-        $("#content-wrapper h2").each(function() {
-          var li = $("<li></li>", { class: "toc-bullets-sub toc-bullets-sub-3" });
-          var a = $("<a></a>", { href: "#" + $(this).attr("id") });
-          a.text($(this).text());
-          li.append(a);
-          div.append(li);
-        });
-      });
-    </script>
-  </div>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/DEBUGGING">
-              Source-Level Debugging
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/INTEROP">
-              Interoperability
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/PUBLICATIONS">
-              Publications
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/CONTRIBUTING">
-              Contributing
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/FAQ">
-              General
-            </a>
-          </li>
-
-          
-        
       
     
       
@@ -486,16 +370,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/python/user/">
+          <a href="/docs/reference-manual/languages/Python/user/README">
             For Python User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -503,32 +384,224 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/r/user/">
+          <a href="/docs/reference-manual/languages/R/user/README">
             For R User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
         
-          <li class="toc-bullets-main">
+          <li class="toc-bullets-main toc-bullets-highlight">
         
           
-          <a href="/docs/reference-manual/languages/ruby/user/">
+          <a href="/docs/reference-manual/languages/Ruby/user/README">
             For Ruby User
           </a>
         </li>
 
 
         
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/installing-graalvm">
+              Using TruffleRuby with GraalVM
+            </a>
+          </li>
 
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/ruby-managers">
+              Ruby Managers and Installers
+            </a>
+          </li>
 
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/standalone-distribution">
+              Standalone Distribution
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/deploying">
+              Deploying TruffleRuby
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/installing-llvm">
+              Installing LLVM
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/installing-libssl">
+              Installing libssl
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/installing-zlib">
+              Installing zlib
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/utf8-locale">
+              Setting up a UTF-8 locale
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/compatibility">
+              Compatibility
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/jruby-migration">
+              Migration from JRuby to TruffleRuby
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/options">
+              TruffleRuby Options and Command Line
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/polyglot">
+              Polyglot Programming
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/optcarrot">
+              Playing Optcarrot
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/truffleruby-additions">
+              TruffleRuby Additional Functionality
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/tools">
+              Development Tools for Ruby
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/reporting-performance-problems">
+              Reporting Performance Problems
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/security">
+              Security
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/reference-manual/languages/Ruby/user/faq">
+              User Frequently Asked Questions
+            </a>
+          </li>
+
+          
         
       
     
@@ -537,16 +610,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/truffle-framework/user/">
-            For Language Implementer
+          <a href="/docs/reference-manual/languages/Truffle-Framework/user/README">
+            For Truffle Framework User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -554,24 +624,15 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/native-image/user/">
+          <a href="/docs/reference-manual/languages/Native-Image/user/README">
             For Native Image User
           </a>
         </li>
 
 
         
-
-
-        
       
     
-  
-
-  
-
-  
-
   
 
   
@@ -593,272 +654,221 @@ $(document).ready(function(){
 
           <div class="col-sm-9">
             <div id="content-wrapper" class="docs-content docs-content--with-sidebar">
-              <h1 id="sulong-test-cases">Sulong test cases</h1>
+              <h1 id="for-ruby-user">For Ruby User</h1>
 
-<p>Sulong is tested using both self-maintained testsuites and select tests
-from external suites. You can run all available testsuites using <code>mx gate</code>.
-Please note that this command aborts as soon as one testsuite has failed.</p>
+<p><img src="/docs/reference-manual/languages/ruby/user/logo/png/truffleruby_logo_horizontal_medium.png" alt="TruffleRuby logo" /></p>
 
-<h2 id="testsuites">Testsuites</h2>
+<p>TruffleRuby is the <a href="http://graalvm.org/">GraalVM</a> high-performance implementation
+of the <a href="https://www.ruby-lang.org/en/">Ruby programming language</a> built by
+<a href="https://labs.oracle.com">Oracle Labs</a>.</p>
 
-<table>
-  <thead>
-    <tr>
-      <th>Tag</th>
-      <th>Class name</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>sulong</td>
-      <td>SulongSuite</td>
-      <td>Sulong’s internal tests</td>
-    </tr>
-    <tr>
-      <td>interop</td>
-      <td>LLVMInteropTest</td>
-      <td>Truffle Language interoperability tests</td>
-    </tr>
-    <tr>
-      <td>debug</td>
-      <td>LLVMDebugTest</td>
-      <td>Debug support test suite</td>
-    </tr>
-    <tr>
-      <td>llvm</td>
-      <td>LLVMSuite</td>
-      <td>LLVM 3.2 test suite</td>
-    </tr>
-    <tr>
-      <td>parser</td>
-      <td>ParserTortureSuite</td>
-      <td>Parser test using GCC suite</td>
-    </tr>
-    <tr>
-      <td>nwcc</td>
-      <td>NWCCSuite</td>
-      <td>Test suite of the NWCC compiler v0.8.3</td>
-    </tr>
-    <tr>
-      <td>assembly</td>
-      <td>InlineAssemblyTest</td>
-      <td>Inline assembler tests</td>
-    </tr>
-    <tr>
-      <td>gcc_c</td>
-      <td>GCCSuite</td>
-      <td>GCC 5.2 test suite (C tests)</td>
-    </tr>
-    <tr>
-      <td>gcc_cpp</td>
-      <td>GCCSuite</td>
-      <td>GCC 5.2 test suite (C++ tests)</td>
-    </tr>
-    <tr>
-      <td>gcc_fortran</td>
-      <td>GCCSuite</td>
-      <td>GCC 5.2 test suite (Fortran tests)</td>
-    </tr>
-    <tr>
-      <td>args</td>
-      <td>MainArgsTest</td>
-      <td>Tests main args passing</td>
-    </tr>
-    <tr>
-      <td>benchmarks</td>
-      <td>ShootoutsSuite</td>
-      <td>Language Benchmark game tests</td>
-    </tr>
-    <tr>
-      <td>vaargs</td>
-      <td>VAArgsTest</td>
-      <td>Varargs tests</td>
-    </tr>
-    <tr>
-      <td>pipe</td>
-      <td>CaptureOutputTest</td>
-      <td>Test output capturing</td>
-    </tr>
-    <tr>
-      <td>callback</td>
-      <td>CallbackTest</td>
-      <td>Test calling native functions</td>
-    </tr>
-    <tr>
-      <td>type</td>
-      <td>-</td>
-      <td>Test floating point arithmetic</td>
-    </tr>
-  </tbody>
-</table>
+<h2 id="getting-started">Getting started</h2>
 
-<p>The test cases consist of LLVM IR, C, C++, and Fortran files. While
-Sulong’s Truffle LLVM IR interpreter can directly execute the LLVM IR
-files it uses Clang and/or GCC to compile the other source files to LLVM IR
-before executing them.</p>
-
-<h3 id="testgate">Testgate</h3>
-
-<p>You can run specific testsuites by invoking <code>mx gate --tags [tags]</code>. For Sulong’s
-external test suites this command will download all neccessary files to
-<code>&lt;Sulong base dir&gt;/tests</code> and compile them using Clang. The compiled files are
-stored in <code>&lt;Sulong base dir&gt;/cache/tests</code>. Sulong’s internal testsuites are compiled
-together with Sulong. To recompile them one needs to do a complete rebuild of Sulong
-using <code>mx clean &amp;&amp; mx build</code> or <code>mx build -c</code>. You can find the sources in
-<code>&lt;Sulong base dir&gt;/tests/com.oracle.truffle.llvm.tests.*</code> and the compiled files
-in <code>&lt;Sulong base dir&gt;/mxbuild/&lt;os&gt;-&lt;arch&gt;/SULONG_TEST_SUITES</code>.</p>
-
-<p>For easier use there are also some compound tags to execute smaller testsuites together.</p>
-
-<table>
-  <thead>
-    <tr>
-      <th>Tag</th>
-      <th>Contained tags</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>sulongBasic</td>
-      <td>sulong, interop, debug</td>
-    </tr>
-    <tr>
-      <td>sulongMisc</td>
-      <td>benchmarks, type, pipe, assembly, args, callback, vaargs</td>
-    </tr>
-  </tbody>
-</table>
-
-<p>The full <code>mx gate</code> command also performs various code quality checks.</p>
-
-<table>
-  <thead>
-    <tr>
-      <th>Tag</th>
-      <th>Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>fullbuild</td>
-      <td>Run Findbugs and create a clean build of Sulong using ECJ</td>
-    </tr>
-    <tr>
-      <td>style</td>
-      <td>Use various static anylsis tools to ensure code quality</td>
-    </tr>
-  </tbody>
-</table>
-
-<h4 id="options">Options</h4>
-
-<p>In order to pass polyglot options to Sulong one needs to specify them as JVM
-arguments since <code>mx gate</code> does not support passing them directly.</p>
-
-<pre><code>mx -A-Dpolyglot.llvm.&lt;option&gt; gate
-</code></pre>
-
-<h3 id="unittests">Unittests</h3>
-
-<p>The testsuites can also be executed using <code>mx unittest &lt;classname&gt;</code>. This
-command expects the selected testsuites to have already been compiled using either
-<code>mx build</code> for the internal testsuites or <code>mx gate</code> for the external ones.</p>
-
-<p><code>mx unittest</code> also supports running only selected tests of a specific suite. For
-example, <code>test[c/max-unsigned-short-to-float-cast.c]</code> is part of the SulongSuite.
-You can run only this test using
-<code>mx unittest SulongSuite#test[c/max-unsigned-short-to-float-cast.c]</code>.</p>
-
-<h4 id="options-1">Options</h4>
-
-<p>For some testsuites it is necessary to specify required libraries, e.g. <code>libgfortran.so.3</code>
-which is needed by the fortan tests of the <code>gcc_fortran</code> testsuite, manually using the
-<code>polyglot.llvm.libraries</code> option. Since the <code>gate</code> command also uses <code>unittest</code>
-to actually run the compiled tests you can find the full command it uses when running
-<code>mx</code> with the <code>-v</code> option.</p>
-
-<p>Another useful option to <code>unittest</code> is <code>--very-verbose</code>. This always prints the
-test’s name to the screen before it is started which can be a great tool to
-identify tests are stuck.</p>
-
-<p>Options need to be specified before the selected tests.</p>
-
-<pre><code>mx &lt;mx options&gt; unittest &lt;unittest/polyglot options&gt; &lt;tests&gt;
-</code></pre>
-
-<h3 id="debugging">Debugging</h3>
-
-<p>To attach a debugger to Sulong tests, run <code>mx</code> with the <code>-d</code> argument, e.g.
-<code>mx -d unittest SulongSuite</code> or <code>mx -d gate --tags sulong</code>.</p>
-
-<p>It is also possible to trace Sulong’s execution of the LLVM IR by using the
-<code>-Dpolyglot.llvm.debug=true</code> option. This will print the value name
-and the corresponding basic block number of each assignment as Sulong executes
-the LLVM IR.</p>
-
-<h2 id="fortran">Fortran</h2>
-
-<p>Some of our tests are Fortran files. Make sure you have GCC, G++, and GFortran
-in version 4.5, 4.6 or 4.7 available.</p>
-
-<p>On the Mac you can use Homebrew:</p>
-
-<pre><code>brew tap homebrew/versions
-brew install gcc46 --with-fortran
-brew link --force gmp4
-</code></pre>
-
-<p>For the Fortran tests you also need to provide
-<a href="http://dragonegg.llvm.org/">DragonEgg</a> 3.2 and Clang 3.2.</p>
-
-<p><a href="http://dragonegg.llvm.org/">DragonEgg</a> is a GCC plugin with which we
-can use GCC to compile a source language to LLVM IR. Sulong uses
-DragonEgg in its test cases to compile Fortran files to LLVM IR.
-Sulong also uses DragonEgg for the C/C++ test cases besides Clang to get
-additional “free” test cases for a given C/C++ file. DragonEgg requires
-a GCC in the aforementioned versions.</p>
+<p>There are three ways to install TruffleRuby releases and nightly builds:</p>
 
 <ul>
-  <li>Sulong expects to find Clang 3.2 in <code>$DRAGONEGG_LLVM/bin</code></li>
-  <li>Sulong expects to find GCC 4.5, 4.6 or 4.7 in <code>$DRAGONEGG_GCC/bin</code></li>
-  <li>Sulong expects to find <code>dragonegg.so</code> under <code>$DRAGONEGG</code> or in <code>$DRAGONEGG_GCC/lib</code></li>
+  <li>
+    <p>Via <a href="/docs/reference-manual/languages/Ruby/user/installing-graalvm">GraalVM</a>, which includes support for
+other languages such as JavaScript, R and Python and supports both the
+<a href="#truffleruby-configurations"><em>native</em> and <em>JVM</em> configurations</a>.
+Inside GraalVM will then be a <code>bin/ruby</code> command that runs TruffleRuby.
+We recommend that you use a <a href="/docs/reference-manual/languages/Ruby/user/ruby-managers#configuring-ruby-managers-for-the-full-graalvm-distribution">Ruby manager</a>
+to use TruffleRuby inside GraalVM.</p>
+  </li>
+  <li>
+    <p>Via your <a href="/docs/reference-manual/languages/Ruby/user/ruby-managers">Ruby manager/installer</a> (RVM, rbenv,
+chruby, ruby-build, ruby-install). This contains only TruffleRuby, in the
+<a href="#truffleruby-configurations"><em>native</em> configuration</a>, making it a smaller
+download. It is meant for users just wanting a Ruby implementation and already
+using a Ruby manager.</p>
+  </li>
+  <li>
+    <p>Using the <a href="/docs/reference-manual/languages/Ruby/user/standalone-distribution">standalone distribution</a>
+as a simple binary tarball. This distribution is also useful for
+<a href="/docs/reference-manual/languages/Ruby/user/standalone-distribution">testing TruffleRuby in CI</a>.
+On <a href="https://docs.travis-ci.com/user/languages/ruby#truffleruby">TravisCI</a>, you can simply use:
+```yaml
+language: ruby
+rvm:</p>
+    <ul>
+      <li>truffleruby
+<code>
+And on GitHub Actions:
+</code>yaml</li>
+      <li>uses: ruby/setup-ruby@v1
+with:
+  ruby-version: truffleruby
+```</li>
+    </ul>
+  </li>
 </ul>
 
-<p>On some versions of Mac OS X, <code>gcc46</code> may fail to install with a segmentation
-fault. You can find more details and suggestions on how to fix this here.</p>
+<p>You can use <code>gem</code> and <code>bundle</code> to install Gems as normal.</p>
 
-<p>However you install GCC on the Mac, you may then need to manually link the
-gcc libraries we use into a location where they can be found, as
-DYLD_LIBRARY_PATH cannot normally be set on the Mac.</p>
+<p>Please report any issue you might find on <a href="https://github.com/oracle/truffleruby/issues">GitHub</a>.</p>
 
-<pre><code>ln -s /usr/local/Cellar/gcc46/4.6.4/lib/gcc/4.6/libgfortran.3.dylib /usr/local/lib
-</code></pre>
+<h2 id="aim">Aim</h2>
 
-<h2 id="reference-output">Reference output</h2>
+<p>TruffleRuby aims to:</p>
 
-<p>For most test cases, Sulong obtains the reference output (return value and/or
-process output) by compiling the source file (or its LLVM IR version)
-to machine code. An exception is the LLVM test suite, which offers
-<code>.reference_output</code> files that we use as reference output.</p>
+<ul>
+  <li>Run idiomatic Ruby code faster</li>
+  <li>Run Ruby code in parallel</li>
+  <li>Boot Ruby applications in less time</li>
+  <li>Execute C extensions in a managed environment</li>
+  <li>Add fast and low-overhead interoperability with languages like Java, JavaScript, Python and R</li>
+  <li>Provide new tooling such as debuggers and monitoring that work across languages</li>
+  <li>All while maintaining very high compatibility with the standard implementation of Ruby</li>
+</ul>
 
-<h2 id="configuration-files">Configuration files</h2>
+<h2 id="truffleruby-configurations">TruffleRuby Configurations</h2>
 
-<p>Some of the test suites have configuration files that include test cases
-contained in a directory of that test suite. Sulong uses these configuration
-files (ending with <code>.include</code>) mainly for external test suites, for which
-not all test cases are supported, to select only a subset of these tests.
-The table below shows in <code>config</code> which test suites use such configuration
-files.</p>
+<p>There are two main configurations of TruffleRuby: <em>Native</em> and <em>JVM</em> which make different trade-offs.</p>
 
-<h2 id="test-case-discovery">Test case discovery</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Configuration:</th>
+      <th style="text-align: right">Native (<code>--native</code>, default)</th>
+      <th style="text-align: right">JVM (<code>--jvm</code>)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Time to start TruffleRuby</td>
+      <td style="text-align: right">about as fast as MRI startup</td>
+      <td style="text-align: right">slower</td>
+    </tr>
+    <tr>
+      <td>Time to get to peak performance</td>
+      <td style="text-align: right">faster</td>
+      <td style="text-align: right">slower</td>
+    </tr>
+    <tr>
+      <td>Peak performance (also considering GC)</td>
+      <td style="text-align: right">good</td>
+      <td style="text-align: right">best</td>
+    </tr>
+    <tr>
+      <td>Java host interoperability</td>
+      <td style="text-align: right">needs reflection configuration</td>
+      <td style="text-align: right">just works</td>
+    </tr>
+  </tbody>
+</table>
 
-<p>The test suites which have configuration files usually offer an option
-to execute all test cases that are not included in the <code>.include</code> files,
-in order to find newly supported test cases. To
-exclude files from this discovery, there are also <code>.exclude</code> files in
-the suite configuration, which are useful for test cases that crash the
-JVM process or which will not be supported by Sulong in the near future.</p>
+<p>To find out which configuration is used, run <code>ruby --version</code> on the command line
+or check the value of <code>RUBY_DESCRIPTION</code> or <code>TruffleRuby.native?</code> in Ruby code.
+Configurations are further detailed in <a href="/docs/reference-manual/languages/Ruby/user/deploying">Deploying TruffleRuby</a>.</p>
+
+<h2 id="system-compatibility">System compatibility</h2>
+
+<p>TruffleRuby is actively tested on these systems:</p>
+
+<ul>
+  <li>Oracle Linux 7</li>
+  <li>Ubuntu 18.04 LTS</li>
+  <li>Ubuntu 16.04 LTS</li>
+  <li>Fedora 28</li>
+  <li>macOS 10.14 (Mojave)</li>
+  <li>macOS 10.15 (Catalina)</li>
+</ul>
+
+<p>You may find that TruffleRuby will not work if you severely restrict the
+environment, for example by unmounting system filesystems such as <code>/dev/shm</code>.</p>
+
+<h2 id="dependencies">Dependencies</h2>
+
+<ul>
+  <li><a href="/docs/reference-manual/languages/Ruby/user/installing-llvm">make and gcc</a> for building C and C++ extensions.</li>
+  <li><a href="/docs/reference-manual/languages/Ruby/user/installing-libssl">libssl</a> for the <code>openssl</code> C extension</li>
+  <li><a href="/docs/reference-manual/languages/Ruby/user/installing-zlib">zlib</a> for the <code>zlib</code> C extension</li>
+</ul>
+
+<p>Without these dependencies, many libraries including RubyGems will not work.
+TruffleRuby will try to print a nice error message if a dependency is missing,
+but this can only be done on a best effort basis.</p>
+
+<p>You may also need to set up a <a href="/docs/reference-manual/languages/Ruby/user/utf8-locale">UTF-8 locale</a>.</p>
+
+<h2 id="current-status">Current status</h2>
+
+<p>We recommend that people trying TruffleRuby on their gems and applications
+<a href="#contact">get in touch with us</a> for help.</p>
+
+<p>TruffleRuby is progressing fast but is currently probably not ready for you to
+try running your full Rails application on. However it is ready for
+experimentation and curious end-users to try on their gems and smaller
+applications, and to send us reports of issues they find.</p>
+
+<h2 id="migration-from-mri">Migration from MRI</h2>
+
+<p>TruffleRuby should in most cases work as a drop-in replacement for MRI, but you
+should read about our <a href="/docs/reference-manual/languages/Ruby/user/compatibility">compatibility</a>.</p>
+
+<h2 id="migration-from-jruby">Migration from JRuby</h2>
+
+<p>For many use cases TruffleRuby should work as a drop-in replacement for JRuby.
+However, our approach to integration with Java is different to JRuby so you
+should read our <a href="/docs/reference-manual/languages/Ruby/user/jruby-migration">migration guide</a>.</p>
+
+<h2 id="documentation">Documentation</h2>
+
+<p>Extensive user documentation is available in <a href="doc/user"><code>doc/user</code></a>.</p>
+
+<p>See our <a href="https://github.com/oracle/truffleruby">source code repository</a> and
+<a href="https://github.com/oracle/truffleruby/tree/master/doc/contributor">contributor
+documentation</a>
+to contribute to TruffleRuby.</p>
+
+<h2 id="contact">Contact</h2>
+
+<p>The best way to get in touch with us is to join the channel <code>#truffleruby</code> of the
+<a href="https://www.graalvm.org/community/#community-support">GraalVM Slack</a>.
+You can also Tweet to <a href="https://twitter.com/truffleruby">@TruffleRuby</a>, or email
+benoit.daloze@oracle.com.</p>
+
+<p>Please report security vulnerabilities via the process outlined at <a href="https://www.oracle.com/corporate/security-practices/assurance/vulnerability/reporting.html">reporting
+vulnerabilities
+guide</a>,
+rather than by something public such as a GitHub issue or a Gitter
+conversation.</p>
+
+<h2 id="mailing-list">Mailing list</h2>
+
+<p>Announcements about GraalVM, including TruffleRuby, are made on the
+<a href="http://mail.openjdk.java.net/mailman/listinfo/graal-dev">graal-dev</a> mailing list.</p>
+
+<h2 id="authors">Authors</h2>
+
+<p>The main authors of TruffleRuby ordered by first contribution are:
+Chris Seaton, Benoit Daloze, Kevin Menard, Petr Chalupa, Brandon Fish, Duncan
+MacGregor, Christian Wirth, Rafael França, Alan Wu, Nicolas Laurent, Carol Chen.</p>
+
+<h2 id="security">Security</h2>
+
+<p>See the <a href="/docs/reference-manual/languages/Ruby/user/security">security documentation</a>.</p>
+
+<h2 id="licence">Licence</h2>
+
+<p>TruffleRuby is copyright (c) 2013-2019 Oracle and/or its affiliates, and is made
+available to you under the terms of any one of the following three licenses:</p>
+
+<ul>
+  <li>Eclipse Public License version 2.0, or</li>
+  <li>GNU General Public License version 2, or</li>
+  <li>GNU Lesser General Public License version 2.1.</li>
+</ul>
+
+<p>See <a href="LICENCE.md">LICENCE.md</a>, <a href="3rd_party_licenses.txt">3rd_party_licenses.txt</a> and
+<a href="doc/legal/legal.md">doc/legal/legal.md</a>.</p>
+
+<h2 id="attribution">Attribution</h2>
+
+<p>TruffleRuby is a fork of <a href="https://github.com/jruby/jruby">JRuby</a>, combining it
+with code from the <a href="https://github.com/rubinius/rubinius">Rubinius</a> project, and
+also containing code from the standard implementation of Ruby,
+<a href="https://github.com/ruby/ruby">MRI</a>.</p>
 
             </div>
 

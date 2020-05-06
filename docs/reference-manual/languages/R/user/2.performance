@@ -10,7 +10,7 @@
 
   <title>
     
-      Documentation for LLVM User
+      Documentation for R User
     
   </title>
   <meta
@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="/resources/styles/extra.css">
   <link rel="stylesheet" href="https://elocation.oracle.com/mapviewer/jslib/v2.3/css/oraclemapsv2.css>
 
-  <link rel="canonical" href="https://www.graalvm.org/docs/reference-manual/languages/LLVM/user/ARCHITECTURE">
+  <link rel="canonical" href="https://www.graalvm.org/docs/reference-manual/languages/R/user/2.performance">
   <!-- <script src="/resources/lib/jquery/jquery-3.2.1.min.js"></script> -->
   <script src="https://maps.oracle.com/mapviewer/jslib/v2.3/oraclemapsv2.js"></script>
   <link rel="stylesheet" href="https://elocation.oracle.com/mapviewer/jslib/v2.3/css/oraclemapsv2.css">
@@ -328,6 +328,10 @@ $(document).ready(function(){
   
 
   
+
+  
+
+  
     
 
     
@@ -336,16 +340,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/js/user/">
+          <a href="/docs/reference-manual/languages/JavaScript/user/README">
             For JavaScript User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -353,132 +354,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/llvm/user/">
-            For LLVM Languages User
+          <a href="/docs/reference-manual/languages/LLVM/user/README">
+            For LLVM User
           </a>
         </li>
 
 
         
-
-
-        
-          
-          <li class="toc-bullets-sub toc-bullets-highlight">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/ARCHITECTURE">
-              Architecture Haiku
-            </a>
-          </li>
-
-          
-            <div>
-    <script>
-      var scriptElement = document.currentScript;
-      var div = $(scriptElement.parentElement);
-      $(window).on("load", function() {
-        $("#content-wrapper h2").each(function() {
-          var li = $("<li></li>", { class: "toc-bullets-sub toc-bullets-sub-3" });
-          var a = $("<a></a>", { href: "#" + $(this).attr("id") });
-          a.text($(this).text());
-          li.append(a);
-          div.append(li);
-        });
-      });
-    </script>
-  </div>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/CI">
-              Continuous Integration CI
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/TOOLCHAIN">
-              Toolchain
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/TESTS">
-              Sulong test cases
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/DEBUGGING">
-              Source-Level Debugging
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/INTEROP">
-              Interoperability
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/PUBLICATIONS">
-              Publications
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/CONTRIBUTING">
-              Contributing
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/FAQ">
-              General
-            </a>
-          </li>
-
-          
-        
       
     
       
@@ -486,16 +368,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/python/user/">
+          <a href="/docs/reference-manual/languages/Python/user/README">
             For Python User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -503,16 +382,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/r/user/">
+          <a href="/docs/reference-manual/languages/R/user/README">
             For R User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -520,16 +396,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/ruby/user/">
+          <a href="/docs/reference-manual/languages/Ruby/user/README">
             For Ruby User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -537,16 +410,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/truffle-framework/user/">
-            For Language Implementer
+          <a href="/docs/reference-manual/languages/Truffle-Framework/user/README">
+            For Truffle Framework User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -554,22 +424,15 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/native-image/user/">
+          <a href="/docs/reference-manual/languages/Native-Image/user/README">
             For Native Image User
           </a>
         </li>
 
 
         
-
-
-        
       
     
-  
-
-  
-
   
 
   
@@ -593,76 +456,65 @@ $(document).ready(function(){
 
           <div class="col-sm-9">
             <div id="content-wrapper" class="docs-content docs-content--with-sidebar">
-              <h1 id="architecture-haiku">Architecture Haiku</h1>
+              <h1 id="high-performance">High Performance</h1>
+<p>GraalVM runtime optimizes R code that runs for extended periods of time.
+The speculative optimizations based on the runtime behavior of the R code and dynamic compilation employed by GraalVM runtime are capable of removing most of the abstraction penalty incurred by the dynamism and complexity of the R language.</p>
 
-<p>An Architecture Haiku is <a href="http://www.neverletdown.net/2015/03/architecture-haiku.html">“a one-page, quick-to-build, uber-terse design description.”</a></p>
+<p>Let us look at an algorithm in R code. The following example calculates the
+mutual information of a large matrix:</p>
+<pre><code>x &lt;- matrix(runif(1000000), 1000, 1000)
+mutual_R &lt;- function(joint_dist) {
+ joint_dist &lt;- joint_dist/sum(joint_dist)
+ mutual_information &lt;- 0
+ num_rows &lt;- nrow(joint_dist)
+ num_cols &lt;- ncol(joint_dist)
+ colsums &lt;- colSums(joint_dist)
+ rowsums &lt;- rowSums(joint_dist)
+ for(i in seq_along(1:num_rows)){
+  for(j in seq_along(1:num_cols)){
+   temp &lt;- log((joint_dist[i,j]/(colsums[j]*rowsums[i])))
+   if(!is.finite(temp)){
+    temp = 0
+   }
+   mutual_information &lt;-
+    mutual_information + joint_dist[i,j] * temp
+  }
+ }
+ mutual_information
+}
+system.time(mutual_R(x))
+#   user  system elapsed
+#  1.321   0.010   1.279
+</code></pre>
 
-<h2 id="solution-description">Solution description</h2>
+<p>Algorithms such as this one usually require C/C++ code to run efficiently:<a href="#note-2"><sup>2</sup></a></p>
+<pre><code>if (!require('RcppArmadillo')) {
+    install.packages('RcppArmadillo')
+    library(RcppArmadillo)
+}
+library(Rcpp)
+sourceCpp("r_mutual.cpp")
+x &lt;- matrix(runif(1000000), 1000, 1000)
+system.time(mutual_cpp(x))
+#   user  system elapsed
+#  0.037   0.003   0.040
+</code></pre>
+<p>(Uses <a href="http://graalvm.org/docs/examples/r_mutual.cpp">r_mutual.cpp</a>.)
+However, after a few iterations, GraalVM runs the R code efficiently enough to
+make the performance advantage of C/C++ negligible:</p>
+<pre><code>system.time(mutual_R(x))
+#   user  system elapsed
+#  0.063   0.001   0.077
+</code></pre>
 
-<p>Sulong is an LLVM bitcode interpreter that allows you to run C, Fortran,
-and other native languages on the GraalVM.
-Use LLVM frontends to compile languages to LLVM bitcode.
-Sulong execute LLVM bitcode using a Truffle language implementation.
-Sulong uses the GraalVM compiler to compile frequently executed functions
-to machine code.</p>
+<p>GraalVM implementation of R is primarily aimed at long-running applications. Therefore, the peak performance is usually only achieved after a warmup period. While startup time is currently slower than GNUR’s, due to the overhead from Java class loading and compilation, future releases will contain a native image of R with improved startup.</p>
 
-<h2 id="technical-constraints">Technical Constraints</h2>
-
-<p>Sulong must run on 64-bit Mac and Linux systems supported by both LLVM and Graal.</p>
-
-<h2 id="functional-requirements">Functional Requirements</h2>
-
-<p>Sulong should be able to execute all LLVM bitcode on GraalVM.
-The current focus is on single-threaded C and Fortran programs.
-Other languages are not fully supported, and, e.g., C++ exception handling
-is not yet implemented.</p>
-
-<h2 id="tradeoffs">Tradeoffs</h2>
-
-<ul>
-  <li>Truffle interoperability over standalone Sulong:
-Sulong’s main use case is to be used by other Truffle languages and thus
-needs to implement the Truffle interoperability API. Design decisions are
-made in favor of the interoperability use case, rather than for standalone
-Sulong.</li>
-  <li>Peak performance over other types of performance: Sulong focuses on
-long running server processes and thus aims to achieve the best possible
-run-time peak performance. It does not focus on start-up time, warm-up time,
-or memory consumption.</li>
-</ul>
-
-<h2 id="design-rationales">Design rationales</h2>
-
-<ul>
-  <li>Since Truffle interoperability is important, Sulong complies with the
-Truffle API and provides interoperability intrinsics
-(see <code>include/truffle.h</code>).</li>
-  <li>Since peak performance is important, Truffle nodes performs profiling
-(e.g, in <code>LLVMValueProfilingNode</code> and <code>LLVMBasicBlockNode</code>) in the
-interpreter, and are otherwise kept simple to be compiled to efficient
-machine code.</li>
-  <li>Since extensibility is important, the parser (<code>com.oracle.truffle.llvm.parser</code>)
-does not import the node implementations (<code>com.oracle.truffle.llvm.nodes</code>)
-to directly instantiate the Truffle nodes. Instead, the <code>NodeFactory</code>
-facade class provides an abstraction to transparently construct Truffle nodes
-for LLVM IR constructs. Sulong loads different node factory facades with a
-<code>ServiceLoader</code> in the <code>Sulong</code> class.</li>
-  <li>Since native code interoperability is important, Sulong uses the
-Truffle Native Function interface to call native functions. It allocates unmanaged
-memory for the stack (<code>LLVMStack</code>) with <code>sun.misc.Unsafe</code> and unmanaged heap
-memory by directly calling <code>malloc</code> and other standard library allocation
-functions.</li>
-</ul>
-
-<h2 id="architectural-styles-and-patterns">Architectural styles and patterns</h2>
-
-<ul>
-  <li>Interpreter pattern implemented by the Truffle nodes in <code>com.oracle.truffle.llvm.nodes</code></li>
-  <li>Adapted facade pattern combined with factory pattern in <code>NodeFactory</code>
-to simplify the instantiation of the nodes</li>
-  <li>Adapted visitor pattern in <code>LLVMParserRuntime</code> and other classes to traverse
-the AST produced from the LLVM IR file and construct Truffle nodes for it.</li>
-</ul>
+<p><br />
+<br />
+<br />
+<sup id="note-2">2</sup> When this example is run for the first time, it installs the <code>RcppArmadillo</code> package,
+which may take few minutes. Note that this example can be run in both R executed
+with GraalVM and GNU R.</p>
 
             </div>
 

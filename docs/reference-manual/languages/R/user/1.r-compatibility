@@ -10,7 +10,7 @@
 
   <title>
     
-      Documentation for LLVM Languages User
+      Documentation for R User
     
   </title>
   <meta
@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="/resources/styles/extra.css">
   <link rel="stylesheet" href="https://elocation.oracle.com/mapviewer/jslib/v2.3/css/oraclemapsv2.css>
 
-  <link rel="canonical" href="https://www.graalvm.org/docs/reference-manual/languages/llvm/user/">
+  <link rel="canonical" href="https://www.graalvm.org/docs/reference-manual/languages/R/user/1.r-compatibility">
   <!-- <script src="/resources/lib/jquery/jquery-3.2.1.min.js"></script> -->
   <script src="https://maps.oracle.com/mapviewer/jslib/v2.3/oraclemapsv2.js"></script>
   <link rel="stylesheet" href="https://elocation.oracle.com/mapviewer/jslib/v2.3/css/oraclemapsv2.css">
@@ -328,6 +328,10 @@ $(document).ready(function(){
   
 
   
+
+  
+
+  
     
 
     
@@ -336,148 +340,26 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/js/user/">
+          <a href="/docs/reference-manual/languages/JavaScript/user/README">
             For JavaScript User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
         
-        <li class="toc-bullets-main toc-bullets-highlight">
+          <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/llvm/user/">
-            For LLVM Languages User
+          <a href="/docs/reference-manual/languages/LLVM/user/README">
+            For LLVM User
           </a>
         </li>
 
 
-        
-          <div>
-  <script>
-    var scriptElement = document.currentScript;
-    var div = $(scriptElement.parentElement);
-    $(window).on("load", function() {
-      $("#content-wrapper h1, #content-wrapper h2").each(function() {
-        var li = $("<li></li>", { class: "toc-bullets-sub" });
-        var a = $("<a></a>", { href: "#" + $(this).attr("id") });
-        a.text($(this).text());
-        li.append(a);
-        div.append(li);
-      });
-    });
-  </script>
-</div>
-
-        
-
-
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/ARCHITECTURE">
-              Architecture Haiku
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/CI">
-              Continuous Integration CI
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/TOOLCHAIN">
-              Toolchain
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/TESTS">
-              Sulong test cases
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/DEBUGGING">
-              Source-Level Debugging
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/INTEROP">
-              Interoperability
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/PUBLICATIONS">
-              Publications
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/CONTRIBUTING">
-              Contributing
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/FAQ">
-              General
-            </a>
-          </li>
-
-          
         
       
     
@@ -486,16 +368,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/python/user/">
+          <a href="/docs/reference-manual/languages/Python/user/README">
             For Python User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -503,16 +382,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/r/user/">
+          <a href="/docs/reference-manual/languages/R/user/README">
             For R User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -520,16 +396,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/ruby/user/">
+          <a href="/docs/reference-manual/languages/Ruby/user/README">
             For Ruby User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -537,16 +410,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/truffle-framework/user/">
-            For Language Implementer
+          <a href="/docs/reference-manual/languages/Truffle-Framework/user/README">
+            For Truffle Framework User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -554,22 +424,15 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/native-image/user/">
+          <a href="/docs/reference-manual/languages/Native-Image/user/README">
             For Native Image User
           </a>
         </li>
 
 
         
-
-
-        
       
     
-  
-
-  
-
   
 
   
@@ -593,7 +456,46 @@ $(document).ready(function(){
 
           <div class="col-sm-9">
             <div id="content-wrapper" class="docs-content docs-content--with-sidebar">
-              
+              <h1 id="graalvm-r-engine-compatibility">GraalVM R Engine Compatibility</h1>
+
+<p>GraalVM implementation of R, known as <strong>FastR</strong>, is based on GNU R and reuses
+the base packages. It is currently based on GNU-R 3.6.1, and moves to new major
+versions of R as they become available and stable. The <a href="https://github.com/oracle/fastr">FastR project</a>, maintains an extensive set of unit
+tests for all aspects of the R language and the builtin functionality, and these
+tests are available as part of the R source code. GraalVM R engine aims to be
+fully compatible with GNU R, including its native interface as used by <a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html">R extensions</a>. It
+can install and run unmodified complex R packages like <code>ggplot2</code>, <code>Shiny</code>, or
+<code>Rcpp</code>. As some packages rely on unspecified behavior or implementation details
+of GNU-R, support for packages is work in progress, and some packages might not
+install successfully or work as expected.</p>
+
+<p>Packages can be installed using the <code>install.packages</code> function or the <code>R CMD INSTALL</code> shell command.
+By default, R uses fixed snapshot of the CRAN repository<a href="#note-1"><sup>1</sup></a>.
+This behavior can be overridden by explicitly setting the <code>repos</code> argument of the <code>install.packages</code> function.
+This functionality does not interfere with the <code>checkpoint</code> package. If you are behind a proxy server, make
+sure to configure the proxy either with environment variables or using the JVM options,
+e.g., <code>--vm.Djava.net.useSystemProxies=true</code>.</p>
+
+<p>Versions of some packages specifically patched for GraalVM implementation of R can be installed using the <code>install.fastr.packages</code>
+function that downloads them from the <a href="https://github.com/oracle/fastr/tree/master/com.oracle.truffle.r.pkgs">GitHub repository</a>.
+Currently, those are <code>rJava</code> and <code>data.table</code>.</p>
+
+<p>Known limitations of GraalVM implementation of R compared to GNU R:</p>
+<ul>
+  <li>Only small parts of the low-level <code>graphics</code> package are functional. However, the <code>grid</code> package is supported and R can install and run packages based on it like <code>ggplot2</code>.
+   Support for the <code>graphics</code> package in R is planned for future releases.</li>
+  <li>Encoding of character vectors. Related builtins (e.g., <code>Encoding</code>) are available,
+   but do not execute any useful code. Character vectors are represented as Java Strings and therefore encoded in UTF-16 format. GraalVM implementation of R will add support for encoding in future releases.</li>
+  <li>Some parts of the native API (e.g., <code>DATAPTR</code>) expose implementation details that are hard to emulate for alternative implementations of R. These are implemented as needed while testing the GraalVM implementation of R with various CRAN packages.</li>
+</ul>
+
+<p>You can use the <a href="http://graalvm.org/docs/reference-manual/compatibility">compatibility checker</a> to find whether the CRAN packages you are interested in are tested on GraalVM and whether the tests pass successfully.</p>
+
+<p><br />
+<br />
+<br />
+<sup id="note-1">1</sup> More technically, GraalVM implementation of R uses a fixed MRAN URL from <code>$R_HOME/etc/DEFAULT_CRAN_MIRROR</code>, which is a snapshot of the
+CRAN repository as it was visible at a given date from the URL string.</p>
 
             </div>
 

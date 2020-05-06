@@ -10,7 +10,7 @@
 
   <title>
     
-      Documentation for LLVM User
+      Documentation for R User
     
   </title>
   <meta
@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="/resources/styles/extra.css">
   <link rel="stylesheet" href="https://elocation.oracle.com/mapviewer/jslib/v2.3/css/oraclemapsv2.css>
 
-  <link rel="canonical" href="https://www.graalvm.org/docs/reference-manual/languages/LLVM/user/CONTRIBUTING">
+  <link rel="canonical" href="https://www.graalvm.org/docs/reference-manual/languages/R/user/4.parallel">
   <!-- <script src="/resources/lib/jquery/jquery-3.2.1.min.js"></script> -->
   <script src="https://maps.oracle.com/mapviewer/jslib/v2.3/oraclemapsv2.js"></script>
   <link rel="stylesheet" href="https://elocation.oracle.com/mapviewer/jslib/v2.3/css/oraclemapsv2.css">
@@ -328,6 +328,10 @@ $(document).ready(function(){
   
 
   
+
+  
+
+  
     
 
     
@@ -336,16 +340,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/js/user/">
+          <a href="/docs/reference-manual/languages/JavaScript/user/README">
             For JavaScript User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -353,132 +354,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/llvm/user/">
-            For LLVM Languages User
+          <a href="/docs/reference-manual/languages/LLVM/user/README">
+            For LLVM User
           </a>
         </li>
 
 
         
-
-
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/ARCHITECTURE">
-              Architecture Haiku
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/CI">
-              Continuous Integration CI
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/TOOLCHAIN">
-              Toolchain
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/TESTS">
-              Sulong test cases
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/DEBUGGING">
-              Source-Level Debugging
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/INTEROP">
-              Interoperability
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/PUBLICATIONS">
-              Publications
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub toc-bullets-highlight">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/CONTRIBUTING">
-              Contributing
-            </a>
-          </li>
-
-          
-            <div>
-    <script>
-      var scriptElement = document.currentScript;
-      var div = $(scriptElement.parentElement);
-      $(window).on("load", function() {
-        $("#content-wrapper h2").each(function() {
-          var li = $("<li></li>", { class: "toc-bullets-sub toc-bullets-sub-3" });
-          var a = $("<a></a>", { href: "#" + $(this).attr("id") });
-          a.text($(this).text());
-          li.append(a);
-          div.append(li);
-        });
-      });
-    </script>
-  </div>
-
-          
-        
-          
-          <li class="toc-bullets-sub dsdsd">
-          
-            
-            <a href="/docs/reference-manual/languages/LLVM/user/FAQ">
-              General
-            </a>
-          </li>
-
-          
-        
       
     
       
@@ -486,16 +368,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/python/user/">
+          <a href="/docs/reference-manual/languages/Python/user/README">
             For Python User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -503,16 +382,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/r/user/">
+          <a href="/docs/reference-manual/languages/R/user/README">
             For R User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -520,16 +396,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/languages/ruby/user/">
+          <a href="/docs/reference-manual/languages/Ruby/user/README">
             For Ruby User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -537,16 +410,13 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/truffle-framework/user/">
-            For Language Implementer
+          <a href="/docs/reference-manual/languages/Truffle-Framework/user/README">
+            For Truffle Framework User
           </a>
         </li>
 
 
         
-
-
-        
       
     
       
@@ -554,22 +424,15 @@ $(document).ready(function(){
           <li class="toc-bullets-main">
         
           
-          <a href="/docs/reference-manual/native-image/user/">
+          <a href="/docs/reference-manual/languages/Native-Image/user/README">
             For Native Image User
           </a>
         </li>
 
 
         
-
-
-        
       
     
-  
-
-  
-
   
 
   
@@ -593,59 +456,34 @@ $(document).ready(function(){
 
           <div class="col-sm-9">
             <div id="content-wrapper" class="docs-content docs-content--with-sidebar">
-              <h1 id="contributing">Contributing</h1>
+              <h1 id="parallel-execution">Parallel Execution</h1>
 
-<p>To submit pull requests for Sulong, you need to sign the Oracle
-Contributor Agreement. There is a white-list for contributors who have
-signed the OCA so please add a comment to your first pull request
-indicating the name you used to sign the OCA if it isn’t clear from
-your github profile.</p>
+<p>GraalVM R engine adds a new cluster type <code>SHARED</code> for the <code>parallel</code> package. This cluster starts new jobs as new threads inside the same process. Example:</p>
 
-<p>Pull requests can only be merged by committers and a committer cannot
-merge his or her own pull requests.</p>
+<pre><code>library(parallel)
+cl0 &lt;- makeCluster(7, 'SHARED')
+clusterApply(cl0, seq_along(cl0), function(i) i)
+</code></pre>
 
-<p>When creating a pull request, make sure you designate an assignee to
-ensure the request is processed in a timely manner.</p>
+<p>Worker nodes inherit the attached packages from the parent node with copy-on-write semantics, but not the global environment.
+This means that you do not need to load again R libraries on the worker nodes but values (including functions) from the global
+environment have to be transferred to the worker nodes, e.g., using <code>clusterExport</code>.</p>
 
-<p>Before submitting a pull request please run <code>mx gate</code> to validate that
-your changes do not break tests and conform with the coding conventions.</p>
-
-<h2 id="commit-messages">Commit messages</h2>
+<p>Note that unlike with the <code>FORK</code> or <code>PSOCK</code> clusters the child nodes in <code>SHARED</code> cluster are running in
+the same process, therefore, e.g., locking files with <code>lockfile</code> or <code>flock</code> will not work. Moreover,
+the <code>SHARED</code> cluster is based on some assumptions about used R packages:</p>
 
 <ul>
-  <li>Each commit (message) should contain (and describe) one logical change.</li>
+  <li>The native code must not mutate shared vectors (which is a discouraged practice).</li>
+  <li>The native code must be re-entrant (it can be executed from multiple threads,
+but for compatibility FastR allows only one thread to be executing native code).</li>
+  <li>If the package contains some global data other than R functions,
+these must not be mutated after the package was loaded.</li>
 </ul>
 
-<h3 id="pr-request">PR request</h3>
-
-<ul>
-  <li>You should only address one feature or change per PR request.</li>
-  <li>You do not need to explain self-explanatory changes such as updates of
-the GraalVM version.</li>
-  <li>For other changes describe at least why (1) the change or feature is
-needed, (2) how the change or feature is implemented, and optionally (3)
-what further implications the change has. You can either use the PR
-request description field or the commit message.</li>
-</ul>
-
-<h3 id="both-pr-request-titles-and-commit-messages">Both PR request titles and commit messages</h3>
-
-<ul>
-  <li>Write the summary line and description of what you have done in the
-imperative mode, that is as if you were commanding someone. Start the
-line with “Fix”, “Add”, “Change” instead of “Fixed”, “Added”, “Changed”.</li>
-  <li>Don’t end the summary line with a period - it’s a title and titles
-don’t end with a period.</li>
-  <li>Start each title and commit message with a capital letter.</li>
-</ul>
-
-<h2 id="links">Links</h2>
-
-<ul>
-  <li><a href="https://github.com/erlang/otp/wiki/writing-good-commit-messages">https://github.com/erlang/otp/wiki/writing-good-commit-messages</a></li>
-  <li><a href="http://who-t.blogspot.co.at/2009/12/on-commit-messages.html">http://who-t.blogspot.co.at/2009/12/on-commit-messages.html</a></li>
-  <li><a href="http://chris.beams.io/posts/git-commit/">http://chris.beams.io/posts/git-commit/</a></li>
-</ul>
+<p>If the code that you want to parallelize does not match these expectations,
+you can still use the <code>PSOCK</code> cluster with the GraalVM R engine.
+The <code>FORK</code> cluster and functions depending solely on forking (e.g., <code>mcparallel</code>) are not supported at the moment.</p>
 
             </div>
 
