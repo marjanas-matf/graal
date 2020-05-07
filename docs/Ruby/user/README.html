@@ -684,24 +684,22 @@ using a Ruby manager.</p>
   </li>
   <li>
     <p>Using the <a href="/docs/Ruby/user/standalone-distribution">standalone distribution</a>
-as a simple binary tarball. This distribution is also useful for
-<a href="/docs/Ruby/user/standalone-distribution">testing TruffleRuby in CI</a>.
-On <a href="https://docs.travis-ci.com/user/languages/ruby#truffleruby">TravisCI</a>, you can simply use:
-```yaml
-language: ruby
-rvm:</p>
-    <ul>
-      <li>truffleruby
-<code>
-And on GitHub Actions:
-</code>yaml</li>
-      <li>uses: ruby/setup-ruby@v1
-with:
-  ruby-version: truffleruby
-```</li>
-    </ul>
+as a simple binary tarball.</p>
   </li>
 </ul>
+
+<p>Testing TruffleRuby in CI is easy:
+on <a href="https://docs.travis-ci.com/user/languages/ruby#truffleruby">TravisCI</a>, you can use:</p>
+<pre><code class="language-yaml">language: ruby
+rvm:
+  - truffleruby # or truffleruby-head
+</code></pre>
+<p>And on GitHub Actions:</p>
+<pre><code class="language-yaml">- uses: ruby/setup-ruby@v1
+  with:
+    ruby-version: truffleruby # or truffleruby-head
+</code></pre>
+<p>See <a href="/docs/Ruby/user/standalone-distribution">Testing TruffleRuby in CI</a> for more details and other CIs.</p>
 
 <p>You can use <code>gem</code> and <code>bundle</code> to install Gems as normal.</p>
 
