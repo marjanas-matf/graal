@@ -677,6 +677,8 @@ $(document).ready(function(){
 encourage you to contact us so we can help you understand what is possible at
 the moment and to help solve any issues for you.</p>
 
+<p>This document details TruffleRuby’s different <em>runtime</em> configurations.</p>
+
 <h2 id="truffleruby-configurations">TruffleRuby Configurations</h2>
 
 <p>There are two main configurations of TruffleRuby - <em>Native</em> and <em>JVM</em>. It’s
@@ -696,6 +698,9 @@ and it becomes fast in less time than the <em>JVM</em> configuration. The disadv
 are that you can’t use Java tools like VisualVM, it is less convenient for Java
 interoperability, and <em>peak performance may be lower than on the JVM</em>. You can
 select the Native configuration by passing <code>--native</code>.</p>
+
+<p>When building from source, you’ll need to select the <code>--native</code> <a href="../contributor/workflow.md#building">build configuration</a>
+to be able to use the runtime native configuration.</p>
 
 <h3 id="jvm-configuration">JVM Configuration</h3>
 
