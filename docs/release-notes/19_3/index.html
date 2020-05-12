@@ -632,7 +632,26 @@ $(document).ready(function(){
 
             <div class="col-sm-9">
               <div id="content-wrapper" class="docs-content docs-content--with-sidebar">
-                <h2 id="1931">19.3.1</h2>
+                <h2 id="1932">19.3.2</h2>
+<p>(2020-05-12)</p>
+
+<p>GraalVM Community Edition 19.3.2 is a Critical Patch Update (CPU) that only contains security and bug fixes, and supersedes all previous releases of GraalVM 19.3.</p>
+
+<p>The release includes:</p>
+<ul>
+  <li>Java update to 8u252 for Java 8 based GraalVM, please see <a href="https://adoptopenjdk.net/release_notes.html#jdk8u252">OpenJDK 8u252 Release notes</a>.</li>
+  <li>Java update to 11.0.7 for Java 11 based GraalVM, please see <a href="https://adoptopenjdk.net/release_notes.html#jdk11_0_7">OpenJDK 11.0.7 Release notes</a>.</li>
+</ul>
+
+<p>Other critical bug fixes that went into this version:</p>
+<ul>
+  <li>Made Chrome debugger call getter functions several times to test for side-effects.</li>
+  <li>Fixed a problem when LLVM context could send user directory information into the image heap by not caching <code>System.getenv()</code> for a single usage.</li>
+  <li>Substitute missing native methods in <code>DynamicHub</code> with <code>@Delete</code> (see <a href="https://github.com/oracle/graal/issues/2054">#2054</a>).</li>
+  <li>Added tests for JNI <code>getFieldID</code> and <code>getMethodID</code> method to ensure the class is initialized.</li>
+</ul>
+
+<h2 id="1931">19.3.1</h2>
 <p>(2020-01-14)</p>
 
 <p>This is a Critical Patch Update (CPU) for GraalVM Enterprise and Community
