@@ -28,7 +28,7 @@
   <link rel="stylesheet" href="/resources/styles/extra.css">
   <link rel="stylesheet" href="https://elocation.oracle.com/mapviewer/jslib/v2.3/css/oraclemapsv2.css>
 
-  <link rel="canonical" href="https://www.graalvm.org/docs/R/user/0.r-extensions">
+  <link rel="canonical" href="https://www.graalvm.org/docs/R/user/2_performance">
   <!-- <script src="/resources/lib/jquery/jquery-3.2.1.min.js"></script> -->
   <script src="https://maps.oracle.com/mapviewer/jslib/v2.3/oraclemapsv2.js"></script>
   <link rel="stylesheet" href="https://elocation.oracle.com/mapviewer/jslib/v2.3/css/oraclemapsv2.css">
@@ -390,11 +390,33 @@ $(document).ready(function(){
 
         
           
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/R/user/0_r-extensions">
+              R Extensions Support
+            </a>
+          </li>
+
+          
+        
+          
+          <li class="toc-bullets-sub">
+          
+            
+            <a href="/docs/R/user/1_r-compatibility">
+              GraalVM R Engine Compatibility
+            </a>
+          </li>
+
+          
+        
+          
           <li class="toc-bullets-sub toc-bullets-highlight">
           
             
-            <a href="/docs/R/user/0.r-extensions">
-              R Extensions Support
+            <a href="/docs/R/user/2_performance">
+              High Performance
             </a>
           </li>
 
@@ -421,29 +443,7 @@ $(document).ready(function(){
           <li class="toc-bullets-sub">
           
             
-            <a href="/docs/R/user/1.r-compatibility">
-              GraalVM R Engine Compatibility
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub">
-          
-            
-            <a href="/docs/R/user/2.performance">
-              High Performance
-            </a>
-          </li>
-
-          
-        
-          
-          <li class="toc-bullets-sub">
-          
-            
-            <a href="/docs/R/user/3.interop">
+            <a href="/docs/R/user/3_interop">
               Interoperability
             </a>
           </li>
@@ -454,7 +454,7 @@ $(document).ready(function(){
           <li class="toc-bullets-sub">
           
             
-            <a href="/docs/R/user/4.parallel">
+            <a href="/docs/R/user/4_parallel">
               Parallel Execution
             </a>
           </li>
@@ -528,77 +528,65 @@ $(document).ready(function(){
 
           <div class="col-sm-9">
             <div id="content-wrapper" class="docs-content docs-content--with-sidebar">
-              <h1 id="r-extensions-support">R Extensions Support</h1>
+              <h1 id="high-performance">High Performance</h1>
+<p>GraalVM runtime optimizes R code that runs for extended periods of time.
+The speculative optimizations based on the runtime behavior of the R code and dynamic compilation employed by GraalVM runtime are capable of removing most of the abstraction penalty incurred by the dynamism and complexity of the R language.</p>
 
-<p>The GraalVM R engine can run <a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html">R extensions</a> in two modes:</p>
-
-<ul>
-  <li><strong>native</strong>: the native machine code is run directly on your CPU, this is the same as how GNU-R runs R extensions.</li>
-  <li><strong>llvm</strong>: if the LLVM bitcode is available, it can be interpreted by <a href="/docs/reference-manual/languages/llvm">GraalVM LLVM</a>.</li>
-</ul>
-
-<p>The <em>native</em> mode is better suited for code that does not extensively interact with the R API, for example,
-plain C or Fortran numerical computations working on primitive arrays. The <em>llvm</em> mode provides significantly
-better performance for extensions that frequently call between R and the C/C++ code, because GraalVM LLVM
-engine is also partially evaluated by the <a href="https://github.com/oracle/graal/tree/master/truffle">Truffle compiler</a> like the R code, both can be inlined and optimized
-as one compilation unit. Moreover, GraalVM LLVM is supported by
-<a href="http://graalvm.org/docs/reference-manual/tools/">GraalVM tools</a> which allows to, for instance,
-debug R and C code together.</p>
-
-<p>In one GraalVM R process, any R package can be loaded in either mode. That is, GraalVM R supports
-mixing packages loaded in the <em>native</em> mode with packages loaded in the <em>llvm</em> mode in one process.</p>
-
-<h2 id="generating-llvm-bitcode">Generating LLVM Bitcode</h2>
-
-<p>As of version 19.3.0, the GraalVM R engine is configured to use the
-<a href="http://graalvm.org/docs/reference-manual/languages/llvm/#llvm-toolchain">LLVM toolchain</a>
-to compile R packages native code. This toolchain produces standard executable binaries for
-a given system, but it also embeds the corresponding LLVM bitcode into them.
-The binaries produced by the LLVM Toolchain can be loaded in both modes: <em>native</em> or <em>llvm</em>.</p>
-
-<p>The GraalVM R engine can be reconfigured to use your system default compilers
-when installing R packages by running</p>
-
-<pre><code class="language-shell"># use local installation of GGC:
-$ R -e 'fastr.setToolchain("native")'
-# to revert back to using the GraalVM's LLVM toolchain:
-$ R -e 'fastr.setToolchain("llvm")'
+<p>Let us look at an algorithm in R code. The following example calculates the
+mutual information of a large matrix:</p>
+<pre><code>x &lt;- matrix(runif(1000000), 1000, 1000)
+mutual_R &lt;- function(joint_dist) {
+ joint_dist &lt;- joint_dist/sum(joint_dist)
+ mutual_information &lt;- 0
+ num_rows &lt;- nrow(joint_dist)
+ num_cols &lt;- ncol(joint_dist)
+ colsums &lt;- colSums(joint_dist)
+ rowsums &lt;- rowSums(joint_dist)
+ for(i in seq_along(1:num_rows)){
+  for(j in seq_along(1:num_cols)){
+   temp &lt;- log((joint_dist[i,j]/(colsums[j]*rowsums[i])))
+   if(!is.finite(temp)){
+    temp = 0
+   }
+   mutual_information &lt;-
+    mutual_information + joint_dist[i,j] * temp
+  }
+ }
+ mutual_information
+}
+system.time(mutual_R(x))
+#   user  system elapsed
+#  1.321   0.010   1.279
 </code></pre>
 
-<p>Using the system default compilers may be more reliable, but you loose the
-ability to load the R packages built with the LLVM toolchain in the <em>llvm</em> mode,
-because they will not contain the embedded bitcode. Moreover, mixing packages
-built by the local system default compilers and packages built by the LLVM
-toolchain in one GraalVM R process may cause linking issues.</p>
+<p>Algorithms such as this one usually require C/C++ code to run efficiently:<a href="#note-2"><sup>2</sup></a></p>
+<pre><code>if (!require('RcppArmadillo')) {
+    install.packages('RcppArmadillo')
+    library(RcppArmadillo)
+}
+library(Rcpp)
+sourceCpp("r_mutual.cpp")
+x &lt;- matrix(runif(1000000), 1000, 1000)
+system.time(mutual_cpp(x))
+#   user  system elapsed
+#  0.037   0.003   0.040
+</code></pre>
+<p>(Uses <a href="http://graalvm.org/docs/examples/r_mutual.cpp">r_mutual.cpp</a>.)
+However, after a few iterations, GraalVM runs the R code efficiently enough to
+make the performance advantage of C/C++ negligible:</p>
+<pre><code>system.time(mutual_R(x))
+#   user  system elapsed
+#  0.063   0.001   0.077
+</code></pre>
 
-<h2 id="fortran-compiler">Fortran compiler</h2>
+<p>GraalVM implementation of R is primarily aimed at long-running applications. Therefore, the peak performance is usually only achieved after a warmup period. While startup time is currently slower than GNUR’s, due to the overhead from Java class loading and compilation, future releases will contain a native image of R with improved startup.</p>
 
-<p>As of version 20.1.0, the GraalVM R engine uses <code>gfortran</code> as the default Fortran
-compiler when installing R packages. Since <code>gfortran</code> cannot produce bitcode,
-packages that contain Fortran code will not work in the LLVM mode.</p>
-
-<p>The GraalVM R engine distribution contains tool F2C, which can convert Fortran code to C
-and then compile it with the Labs LLVM Toolchain. One can configure The GraalVM R engine
-to use this tool by editing configuration file <code>R_HOME/etc/Makeconf</code>, variable <code>FC</code>.</p>
-
-<h2 id="choosing-the-running-mode">Choosing the Running Mode</h2>
-
-<p>Starting from the version 19.3.0, the GraalVM R engine uses the following defaults:</p>
-<ul>
-  <li><strong>native</strong> mode to load the packages</li>
-  <li><strong>llvm</strong> toolchain to build their sources</li>
-</ul>
-
-<p>To enable the <em>llvm</em> mode for loading the packages, use <code>--R.BackEnd=llvm</code>.
-You can also enable each mode selectively for given R packages by using:</p>
-<ul>
-  <li><code>--R.BackEndLLVM=package1,package2</code></li>
-  <li><code>--R.BackEndNative=package1,package2</code></li>
-</ul>
-
-<p>Moreover, you can configure which packages will be always run in the native mode
-in file <code>R_HOME/etc/native-packages</code>. FastR comes with a default configuration that
-covers some popular R packages that are known to not work yet in the LLVM mode.</p>
+<p><br />
+<br />
+<br />
+<sup id="note-2">2</sup> When this example is run for the first time, it installs the <code>RcppArmadillo</code> package,
+which may take few minutes. Note that this example can be run in both R executed
+with GraalVM and GNU R.</p>
 
             </div>
 
