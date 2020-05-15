@@ -27,6 +27,8 @@ package com.oracle.svm.hosted.phases;
 import java.util.HashMap;
 import java.util.Map;
 
+import jdk.vm.ci.meta.JavaKind;
+import jdk.vm.ci.meta.JavaType;
 import org.graalvm.compiler.core.common.type.StampPair;
 import org.graalvm.compiler.graph.Node;
 import org.graalvm.compiler.java.BytecodeParser;
@@ -67,7 +69,7 @@ import jdk.vm.ci.meta.ResolvedJavaMethod;
 public class HostedGraphBuilderPhase extends SubstrateGraphBuilderPhase {
 
     public HostedGraphBuilderPhase(Providers providers, GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext,
-                    WordTypes wordTypes) {
+                                   WordTypes wordTypes) {
         super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes);
     }
 
@@ -127,8 +129,19 @@ class HostedBytecodeParser extends SubstrateBytecodeParser {
     }
 
     @Override
+    protected Invoke createNonInlinedInvoke(ExceptionEdgeAction exceptionEdge, int invokeBci, ValueNode[] invokeArgs, ResolvedJavaMethod targetMethod,
+                                            InvokeKind invokeKind, JavaKind resultType, JavaType returnType, JavaTypeProfile profile) {
+
+        return super.createNonInlinedInvoke(exceptionEdge, invokeBci, invokeArgs, targetMethod, invokeKind, resultType, returnType, profile);
+    }
+
+    @Override
     public MethodCallTargetNode createMethodCallTarget(InvokeKind invokeKind, ResolvedJavaMethod targetMethod, ValueNode[] args, StampPair returnStamp, JavaTypeProfile profile) {
-        return new SubstrateMethodCallTargetNode(invokeKind, targetMethod, args, returnStamp, getMethod().getProfilingInfo(), bci());
+        HostedBytecodeParser outermostScope = this;
+        while (outermostScope.getParent() != null) {
+            outermostScope = (HostedBytecodeParser) outermostScope.getParent();
+        }
+        return new SubstrateMethodCallTargetNode(invokeKind, targetMethod, args, returnStamp, outermostScope.getMethod().getProfilingInfo(), outermostScope.bci());
     }
 
     private void insertProxies(FixedNode deoptTarget, FrameStateBuilder state) {

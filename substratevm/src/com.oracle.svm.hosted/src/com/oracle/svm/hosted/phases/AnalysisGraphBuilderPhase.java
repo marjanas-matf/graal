@@ -24,11 +24,14 @@
  */
 package com.oracle.svm.hosted.phases;
 
+import com.oracle.graal.pointsto.BigBang;
 import org.graalvm.compiler.api.replacements.Fold;
 import org.graalvm.compiler.graph.Node;
 import org.graalvm.compiler.java.BytecodeParser;
 import org.graalvm.compiler.java.GraphBuilderPhase;
+import org.graalvm.compiler.nodes.CallTargetNode;
 import org.graalvm.compiler.nodes.CallTargetNode.InvokeKind;
+import org.graalvm.compiler.nodes.Invoke;
 import org.graalvm.compiler.nodes.StructuredGraph;
 import org.graalvm.compiler.nodes.ValueNode;
 import org.graalvm.compiler.nodes.graphbuilderconf.GeneratedInvocationPlugin;
@@ -45,21 +48,26 @@ import jdk.vm.ci.meta.JavaKind;
 import jdk.vm.ci.meta.ResolvedJavaMethod;
 
 public class AnalysisGraphBuilderPhase extends SharedGraphBuilderPhase {
+    protected final BigBang bb;
 
-    public AnalysisGraphBuilderPhase(Providers providers,
-                    GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes) {
+    public AnalysisGraphBuilderPhase(BigBang bb, Providers providers,
+                                     GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes) {
         super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes);
+        this.bb = bb;
     }
 
     @Override
     protected BytecodeParser createBytecodeParser(StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI, IntrinsicContext intrinsicContext) {
-        return new AnalysisBytecodeParser(this, graph, parent, method, entryBCI, intrinsicContext);
+        return new AnalysisBytecodeParser(bb,this, graph, parent, method, entryBCI, intrinsicContext);
     }
 
     public static class AnalysisBytecodeParser extends SharedBytecodeParser {
-        protected AnalysisBytecodeParser(GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI,
-                        IntrinsicContext intrinsicContext) {
+        protected final BigBang bb;
+
+        protected AnalysisBytecodeParser(BigBang bb, GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI,
+                                         IntrinsicContext intrinsicContext) {
             super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, true);
+            this.bb = bb;
         }
 
         @Override
@@ -87,6 +95,11 @@ public class AnalysisGraphBuilderPhase extends SharedGraphBuilderPhase {
         @Override
         public boolean canDeferPlugin(GeneratedInvocationPlugin plugin) {
             return plugin.getSource().equals(Fold.class) || plugin.getSource().equals(Node.NodeIntrinsic.class);
+        }
+
+        @Override
+        protected Invoke createNonInlinedInvoke(ExceptionEdgeAction exceptionEdge, int invokeBci, CallTargetNode callTarget, JavaKind resultType){
+            return super.createNonInlinedInvoke(exceptionEdge, invokeBci, callTarget, resultType);
         }
     }
 }
