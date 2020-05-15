@@ -3,4 +3,4 @@ DYNAMIC_IMPORTS=/substratevm
 DISABLE_INSTALLABLES=true
 FORCE_BASH_LAUNCHERS=true
 EXCLUDE_COMPONENTS=nju,nic,LibGraal
-SKIP_LIBRARIES=polyglot
+SKIP_LIBRARIES=polyglot,native-image-agent
