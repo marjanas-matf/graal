@@ -54,6 +54,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin;
 import org.graalvm.collections.EconomicSet;
 import org.graalvm.collections.Pair;
 import org.graalvm.compiler.api.replacements.Fold;
@@ -1117,6 +1118,13 @@ public class NativeImageGenerator {
         plugins.appendTypePlugin(wordOperationPlugin);
         plugins.appendTypePlugin(new TrustedInterfaceTypePlugin());
         plugins.appendNodePlugin(wordOperationPlugin);
+
+        if (NativeImageInlineDuringParsingPlugin.Options.InlineBeforeAnalysis.getValue()) {
+            System.out.println("Point to add NativeImageInlineDuringParsingPlugin " + analysis + " " + hosted);
+            plugins.appendInlineInvokePlugin(new NativeImageInlineDuringParsingPlugin(analysis, providers));
+            System.out.println("NativeImageInlineDuringParsingPlugin added");
+            NativeImageInlineDuringParsingPlugin.printDataInline();
+        }
 
         plugins.setClassInitializationPlugin(classInitializationPlugin);
 

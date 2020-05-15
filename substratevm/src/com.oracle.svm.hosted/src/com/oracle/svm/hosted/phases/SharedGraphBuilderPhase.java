@@ -24,6 +24,7 @@
  */
 package com.oracle.svm.hosted.phases;
 
+import com.oracle.graal.pointsto.BigBang;
 import org.graalvm.compiler.core.common.calc.Condition;
 import org.graalvm.compiler.core.common.type.StampPair;
 import org.graalvm.compiler.java.BytecodeParser;
@@ -79,6 +80,7 @@ public abstract class SharedGraphBuilderPhase extends GraphBuilderPhase.Instance
 
         private final boolean explicitExceptionEdges;
         private final boolean allowIncompleteClassPath;
+        protected NativeImageInlineDuringParsingPlugin.InvocationResultInline inlineDuringParsingState;
 
         protected SharedBytecodeParser(GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI,
                         IntrinsicContext intrinsicContext, boolean explicitExceptionEdges) {
@@ -90,6 +92,10 @@ public abstract class SharedGraphBuilderPhase extends GraphBuilderPhase.Instance
             super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext);
             this.explicitExceptionEdges = explicitExceptionEdges;
             this.allowIncompleteClassPath = allowIncompleteClasspath;
+        }
+
+        public GraphBuilderConfiguration getGraphBuilderConfig() {
+            return graphBuilderConfig;
         }
 
         @Override
