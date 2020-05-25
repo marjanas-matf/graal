@@ -263,7 +263,6 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         InvocationResult inline;
 
         if (b.getDepth() > 0) {
-            System.out.println("Depth: method: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
             /*
              * We already decided to inline the first callee into the root method, so now
              * recursively inline everything.
@@ -272,7 +271,6 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
             //inline = ((SharedBytecodeParser) b.getParent()).inlineDuringParsingState != null ? ((SharedBytecodeParser) b.getParent()).inlineDuringParsingState.children.get(callSite) : null;
         } else {
             if (analysis) {
-                System.out.println("Analiza: method: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
                 InvocationResult newResult;
                 newResult = analyzeMethod(b, (AnalysisMethod) method, callSite);
                 /*if (newResult instanceof InvocationResultInline) {
@@ -288,7 +286,6 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
                 dataInline.putIfAbsent((AnalysisMethod) method, newResult);
                 inline = newResult;
             } else {
-                System.out.println("Uzimanje: method: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
                 InvocationResult existingResult = getResult(method);
                 /*if (existingResult == null) {
                     throw VMError.shouldNotReachHere("No analysis result present: " + method.format("%n, %H, caller") + b.getMethod().format("%n, %H"));
@@ -351,10 +348,10 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         }
         MethodAnalysis methodAnalysis = new MethodAnalysis();
         graphConfig.getPlugins().appendInlineInvokePlugin(methodAnalysis);
-        System.out.println("Dodavanje plugina: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
+
         AnalysisGraphBuilderPhase graphbuilder = new AnalysisGraphBuilderPhase(((AnalysisBytecodeParser) b).bb, providers, graphConfig, OptimisticOptimizations.NONE, null, providers.getWordTypes());
         graphbuilder.apply(graph);
-        System.out.println("Izlazak: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
+
         int countFrameStates = 0;
         FrameState frameState = null;
         boolean hasLoadField = false;
@@ -404,17 +401,15 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         @Override
         public InlineInfo shouldInlineInvoke(GraphBuilderContext b, ResolvedJavaMethod method, ValueNode[] args) {
             if (method.getAnnotation(NeverInline.class) != null || method.getAnnotation(NeverInlineTrivial.class) != null) {
-                System.out.println("never inline: method: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
                 return null;
             }
             if (b.getDepth() > 3){//BytecodeParserOptions.InlineDuringParsingMaxDepth.getValue(b.getOptions())) {
-                System.out.println("Dubina: method: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
                 return null;
             }
 
             InvocationResult newResult = analyzeMethod(b, (AnalysisMethod) method, new CallSite((AnalysisMethod) b.getMethod(), b.bci()));
             dataInline.putIfAbsent((AnalysisMethod) method, newResult);
-            System.out.println("ubacen: method: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
+
             if (newResult instanceof InvocationResultInline) {
                 /*InvocationResultInline inlineData = (InvocationResultInline) newResult;
                 if (((SharedBytecodeParser) b).inlineDuringParsingState == null) {
@@ -424,7 +419,6 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
                     Object previous = ((SharedBytecodeParser) b).inlineDuringParsingState.children.putIfAbsent(inlineData.site, inlineData);
                     //VMError.guarantee(previous == null || previous.equals(nonNullElement), "Newly inlined element (" + nonNullElement + ") different than the previous (" + previous + ")");
                 }*/
-                System.out.println("info u analizi: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
                 return InlineInfo.createStandardInlineInfo(method);
             } else {
                 return null;
