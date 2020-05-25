@@ -43,6 +43,7 @@ import jdk.vm.ci.meta.ResolvedJavaMethod;
 import org.graalvm.compiler.api.replacements.Snippet;
 import org.graalvm.compiler.debug.DebugContext;
 import org.graalvm.compiler.graph.Node;
+import org.graalvm.compiler.java.BytecodeParserOptions;
 import org.graalvm.compiler.nodes.FrameState;
 import org.graalvm.compiler.nodes.StructuredGraph;
 import org.graalvm.compiler.nodes.ValueNode;
@@ -55,6 +56,8 @@ import org.graalvm.compiler.nodes.java.StoreFieldNode;
 import org.graalvm.compiler.nodes.type.StampTool;
 import org.graalvm.compiler.options.Option;
 import org.graalvm.compiler.phases.OptimisticOptimizations;
+import org.graalvm.compiler.replacements.AllocationSnippets;
+import org.graalvm.compiler.replacements.Snippets;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -232,6 +235,10 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
             return null;
         }
 
+        if (b.getMethod().isAnnotationPresent(SubstrateForeignCallTarget.class)) {
+            return null;
+        }
+
         if (b.getMethod().getAnnotation(SubstrateForeignCallTarget.class) != null ||
                 method.getAnnotation(SubstrateForeignCallTarget.class) != null) {
             return null;
@@ -254,30 +261,34 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         CallSite callSite = new CallSite(toAnalysisMethod(b.getMethod()), b.bci());
 
         InvocationResult inline;
+
         if (b.getDepth() > 0) {
+            System.out.println("Depth: method: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
             /*
              * We already decided to inline the first callee into the root method, so now
              * recursively inline everything.
              */
-            // inline = getResult(method);
-            inline = ((SharedBytecodeParser) b.getParent()).inlineDuringParsingState != null ? ((SharedBytecodeParser) b.getParent()).inlineDuringParsingState.children.get(callSite) : null;
+            inline = getResult(method);
+            //inline = ((SharedBytecodeParser) b.getParent()).inlineDuringParsingState != null ? ((SharedBytecodeParser) b.getParent()).inlineDuringParsingState.children.get(callSite) : null;
         } else {
             if (analysis) {
+                System.out.println("Analiza: method: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
                 InvocationResult newResult;
                 newResult = analyzeMethod(b, (AnalysisMethod) method, callSite);
-                if (newResult instanceof InvocationResultInline) {
+                /*if (newResult instanceof InvocationResultInline) {
                     InvocationResultInline inlineData = (InvocationResultInline) newResult;
                     if (((SharedBytecodeParser) b).inlineDuringParsingState == null) {
                         ((SharedBytecodeParser) b).inlineDuringParsingState = inlineData;
                     } else {
-                       /* Object nonNullElement = inlineData != null ? inlineData : NULL_MARKER;
+                        Object nonNullElement = inlineData != null ? inlineData : NULL_MARKER;
                         Object previous = ((SharedBytecodeParser) b).inlineDuringParsingState.children.putIfAbsent(inlineData.site, inlineData);
-                        VMError.guarantee(previous == null || previous.equals(nonNullElement), "Newly inlined element (" + nonNullElement + ") different than the previous (" + previous + ")"); */
+                        //VMError.guarantee(previous == null || previous.equals(nonNullElement), "Newly inlined element (" + nonNullElement + ") different than the previous (" + previous + ")");
                     }
-                }
+                }*/
                 dataInline.putIfAbsent((AnalysisMethod) method, newResult);
                 inline = newResult;
             } else {
+                System.out.println("Uzimanje: method: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
                 InvocationResult existingResult = getResult(method);
                 /*if (existingResult == null) {
                     throw VMError.shouldNotReachHere("No analysis result present: " + method.format("%n, %H, caller") + b.getMethod().format("%n, %H"));
@@ -338,10 +349,12 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
                 graphConfig.getPlugins().appendInlineInvokePlugin(inlineInvokePlugin);
             }
         }
-
+        MethodAnalysis methodAnalysis = new MethodAnalysis();
+        graphConfig.getPlugins().appendInlineInvokePlugin(methodAnalysis);
+        System.out.println("Dodavanje plugina: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
         AnalysisGraphBuilderPhase graphbuilder = new AnalysisGraphBuilderPhase(((AnalysisBytecodeParser) b).bb, providers, graphConfig, OptimisticOptimizations.NONE, null, providers.getWordTypes());
         graphbuilder.apply(graph);
-
+        System.out.println("Izlazak: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
         int countFrameStates = 0;
         FrameState frameState = null;
         boolean hasLoadField = false;
@@ -383,6 +396,39 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
             return (AnalysisMethod) method;
         } else {
             return ((HostedMethod) method).getWrapped();
+        }
+    }
+
+    class MethodAnalysis implements InlineInvokePlugin {
+
+        @Override
+        public InlineInfo shouldInlineInvoke(GraphBuilderContext b, ResolvedJavaMethod method, ValueNode[] args) {
+            if (method.getAnnotation(NeverInline.class) != null || method.getAnnotation(NeverInlineTrivial.class) != null) {
+                System.out.println("never inline: method: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
+                return null;
+            }
+            if (b.getDepth() > 3){//BytecodeParserOptions.InlineDuringParsingMaxDepth.getValue(b.getOptions())) {
+                System.out.println("Dubina: method: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
+                return null;
+            }
+
+            InvocationResult newResult = analyzeMethod(b, (AnalysisMethod) method, new CallSite((AnalysisMethod) b.getMethod(), b.bci()));
+            dataInline.putIfAbsent((AnalysisMethod) method, newResult);
+            System.out.println("ubacen: method: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
+            if (newResult instanceof InvocationResultInline) {
+                /*InvocationResultInline inlineData = (InvocationResultInline) newResult;
+                if (((SharedBytecodeParser) b).inlineDuringParsingState == null) {
+                    ((SharedBytecodeParser) b).inlineDuringParsingState = inlineData;
+                } else {
+                    Object nonNullElement = inlineData != null ? inlineData : NULL_MARKER;
+                    Object previous = ((SharedBytecodeParser) b).inlineDuringParsingState.children.putIfAbsent(inlineData.site, inlineData);
+                    //VMError.guarantee(previous == null || previous.equals(nonNullElement), "Newly inlined element (" + nonNullElement + ") different than the previous (" + previous + ")");
+                }*/
+                System.out.println("info u analizi: " + method.format("%n, %H") + ", caller: " + b.getMethod().format("%n, %H"));
+                return InlineInfo.createStandardInlineInfo(method);
+            } else {
+                return null;
+            }
         }
     }
 }

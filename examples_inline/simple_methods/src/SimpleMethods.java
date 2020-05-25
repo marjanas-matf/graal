@@ -19,9 +19,7 @@ public class SimpleMethods {
     public int getY() { return y; }
 
     public int getAverage(){
-        int sum = getX() + getY();
-        sum /= 2;
-        return sum;
+        return getX();
     }
 
     public int callAverage(){
@@ -37,6 +35,8 @@ public class SimpleMethods {
     }
 
     public static void empty(){ }
+
+    public static void callEmpty(){ empty(); }
 
     public static double sumOfTwo(double x, double y){
         return x+y;
@@ -55,17 +55,18 @@ public class SimpleMethods {
 
     public static void main(String[] args){
         SimpleMethods obj = new SimpleMethods(10,20);
-        obj.setX(obj.getX()+5);
-        obj.setY(obj.getY()+10);
-        obj.getX();
+        //obj.setX(obj.getX()+5);
+        //obj.setY(obj.getY()+10);
+        //obj.getX();
         two();
         SimpleMethods.number = 2;
         getNumber();
-        System.out.println(obj.callAverage());
-        empty();
+        obj.getAverage();
+        System.out.println(obj.getX());
+        callEmpty();
         double sum = SimpleMethods.sumOfTwo(10,10.1);
         System.out.println(sum);
-        obj.setY(obj.getY()+30);
+        //obj.setY(obj.getY()+30);
         System.out.println(SimpleMethods.sumOfTen(1,2,3,4,5,6,7,8,9,10));
         System.out.println(SimpleMethods.sumOfTenWithLocal(1,2,3,4,5,6,7,8,9,10));
     }
