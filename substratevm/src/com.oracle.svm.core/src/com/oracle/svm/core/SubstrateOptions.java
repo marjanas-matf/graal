@@ -29,9 +29,13 @@ import static org.graalvm.compiler.core.common.SpeculativeExecutionAttacksMitiga
 import static org.graalvm.compiler.core.common.SpeculativeExecutionAttacksMitigations.Options.MitigateSpeculativeExecutionAttacks;
 import static org.graalvm.compiler.options.OptionType.User;
 
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Predicate;
 
+import com.oracle.svm.core.util.UserError;
 import org.graalvm.collections.EconomicMap;
 import org.graalvm.collections.UnmodifiableEconomicMap;
 import org.graalvm.compiler.api.replacements.Fold;
@@ -435,9 +439,6 @@ public class SubstrateOptions {
     @Option(help = "Provide java.lang.Terminator exit handlers for executable images", type = User)//
     public static final HostedOptionKey<Boolean> InstallExitHandlers = new HostedOptionKey<>(false);
 
-    @Option(help = "file:doc-files/UseMuslCHelp.txt", type = OptionType.Expert)//
-    public static final HostedOptionKey<String> UseMuslC = new HostedOptionKey<>(null);
-
     @Option(help = "When set to true, the image generator verifies that the image heap does not contain a home directory as a substring", type = User)//
     public static final HostedOptionKey<Boolean> DetectUserDirectoriesInImageHeap = new HostedOptionKey<>(false);
 
@@ -472,4 +473,19 @@ public class SubstrateOptions {
     @Option(help = "Search path for source files for Application or GraalVM classes (list of comma-separated directories or jar files)")//
     public static final HostedOptionKey<String[]> DebugInfoSourceSearchPath = new HostedOptionKey<String[]>(null) {
     };
+    @Option(help = "Directory under which to create source file cache for Application or GraalVM classes")//
+    public static final HostedOptionKey<String> DebugInfoSourceCacheRoot = new HostedOptionKey<>("sources");
+
+    public static Path getDebugInfoSourceCacheRoot() {
+        try {
+            Path sourceRoot = Paths.get(DebugInfoSourceCacheRoot.getValue());
+            return sourceRoot;
+        } catch (InvalidPathException ipe) {
+            throw UserError.abort("Invalid path provided for option DebugInfoSourceCacheRoot " + DebugInfoSourceCacheRoot.getValue());
+        }
+    }
+
+    /** Command line option to disable image build server. */
+    public static final String NO_SERVER = "--no-server";
+
 }
