@@ -45,6 +45,7 @@ import org.graalvm.compiler.debug.DebugContext;
 import org.graalvm.compiler.graph.Node;
 import org.graalvm.compiler.java.BytecodeParserOptions;
 import org.graalvm.compiler.nodes.FrameState;
+import org.graalvm.compiler.nodes.InvokeNode;
 import org.graalvm.compiler.nodes.StructuredGraph;
 import org.graalvm.compiler.nodes.ValueNode;
 import org.graalvm.compiler.nodes.extended.ForeignCallNode;
@@ -271,8 +272,9 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
             //inline = ((SharedBytecodeParser) b.getParent()).inlineDuringParsingState != null ? ((SharedBytecodeParser) b.getParent()).inlineDuringParsingState.children.get(callSite) : null;
         } else {
             if (analysis) {
-                InvocationResult newResult;
-                newResult = analyzeMethod(b, (AnalysisMethod) method, callSite);
+                InvocationResult newResult = getResult(method);
+                if (newResult == null) {
+                    newResult = analyzeMethod(b, (AnalysisMethod) method, callSite);
                 /*if (newResult instanceof InvocationResultInline) {
                     InvocationResultInline inlineData = (InvocationResultInline) newResult;
                     if (((SharedBytecodeParser) b).inlineDuringParsingState == null) {
@@ -283,7 +285,8 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
                         //VMError.guarantee(previous == null || previous.equals(nonNullElement), "Newly inlined element (" + nonNullElement + ") different than the previous (" + previous + ")");
                     }
                 }*/
-                dataInline.putIfAbsent((AnalysisMethod) method, newResult);
+                    dataInline.putIfAbsent((AnalysisMethod) method, newResult);
+                }
                 inline = newResult;
             } else {
                 InvocationResult existingResult = getResult(method);
@@ -352,24 +355,24 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         AnalysisGraphBuilderPhase graphbuilder = new AnalysisGraphBuilderPhase(((AnalysisBytecodeParser) b).bb, providers, graphConfig, OptimisticOptimizations.NONE, null, providers.getWordTypes());
         graphbuilder.apply(graph);
 
+        int countInvokes = 0;
         int countFrameStates = 0;
         FrameState frameState = null;
         boolean hasLoadField = false;
         boolean hasStoreField = false;
 
         for (Node node : graph.getNodes()) {
-            if (node instanceof LoadFieldNode) {
-                hasLoadField = true;
-            }
-            if (node instanceof StoreFieldNode) {
-                hasStoreField = true;
-            }
-            if (node instanceof FrameState) {
-                countFrameStates++;
-                frameState = (FrameState) node;
-            }
             if (node instanceof ForeignCallNode) {
                 return InvocationResult.ANALYSIS_TOO_COMPLICATED;
+            } else if (node instanceof InvokeNode) {
+                return InvocationResult.ANALYSIS_TOO_COMPLICATED;
+            } else if (node instanceof LoadFieldNode) {
+                hasLoadField = true;
+            } else if (node instanceof StoreFieldNode) {
+                hasStoreField = true;
+            } else if (node instanceof FrameState) {
+                countFrameStates++;
+                frameState = (FrameState) node;
             }
         }
 
@@ -403,7 +406,7 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
             if (method.getAnnotation(NeverInline.class) != null || method.getAnnotation(NeverInlineTrivial.class) != null) {
                 return null;
             }
-            if (b.getDepth() > 3){//BytecodeParserOptions.InlineDuringParsingMaxDepth.getValue(b.getOptions())) {
+            if (b.getDepth() > 3) {//BytecodeParserOptions.InlineDuringParsingMaxDepth.getValue(b.getOptions())) {
                 return null;
             }
 
