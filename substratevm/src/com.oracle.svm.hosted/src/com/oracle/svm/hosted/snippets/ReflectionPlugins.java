@@ -32,6 +32,7 @@ import java.lang.reflect.Method;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.oracle.svm.hosted.phases.SharedGraphBuilderPhase;
 import org.graalvm.compiler.api.replacements.SnippetReflectionProvider;
 import org.graalvm.compiler.nodes.ConstantNode;
 import org.graalvm.compiler.nodes.ValueNode;
@@ -320,6 +321,10 @@ public class ReflectionPlugins {
             /* We are analyzing the static initializers and should always intrinsify. */
             return element;
         }
+        if (((SharedGraphBuilderPhase.SharedBytecodeParser) context).getGraphBuilderConfig().getPlugins().getParameterPlugins().length > 0) {
+            return element;
+        }
+
         if (analysis) {
             if (NativeImageOptions.ReportUnsupportedElementsAtRuntime.getValue()) {
                 AnnotatedElement annotated = null;

@@ -210,8 +210,8 @@ public class MethodTypeFlowBuilder {
 
                     if (needParsing) {
                         GraphBuilderConfiguration config = GraphBuilderConfiguration.getDefault(bb.getProviders().getGraphBuilderPlugins()).withEagerResolving(true)
-                                        .withUnresolvedIsError(PointstoOptions.UnresolvedIsError.getValue(bb.getOptions()))
-                                        .withNodeSourcePosition(true).withBytecodeExceptionMode(BytecodeExceptionMode.CheckAll);
+                                .withUnresolvedIsError(PointstoOptions.UnresolvedIsError.getValue(bb.getOptions()))
+                                .withNodeSourcePosition(true).withBytecodeExceptionMode(BytecodeExceptionMode.CheckAll);
 
                         /*
                          * We want to always disable the liveness analysis, since we want the
@@ -220,7 +220,7 @@ public class MethodTypeFlowBuilder {
                          */
                         config = config.withRetainLocalVariables(true);
 
-                        bb.getHostVM().createGraphBuilderPhase(bb.getProviders(), config, OptimisticOptimizations.NONE, null).apply(graph);
+                        bb.getHostVM().createGraphBuilderPhase(bb, bb.getProviders(), config, OptimisticOptimizations.NONE, null).apply(graph);
                     }
                 } catch (PermanentBailoutException ex) {
                     bb.getUnsupportedFeatures().addMessage(method.format("%H.%n(%p)"), method, ex.getLocalizedMessage(), null, ex);
@@ -1013,7 +1013,7 @@ public class MethodTypeFlowBuilder {
                 TypeFlowBuilder<?> objectBuilder = state.lookup(node.object());
                 TypeFlowBuilder<?> unsafeLoadBuilder = TypeFlowBuilder.create(bb, node, UnsafePartitionLoadTypeFlow.class, () -> {
                     UnsafePartitionLoadTypeFlow loadTypeFlow = new UnsafePartitionLoadTypeFlow(node, objectType, componentType, objectBuilder.get(), methodFlow,
-                                    node.unsafePartitionKind(), partitionType);
+                            node.unsafePartitionKind(), partitionType);
                     methodFlow.addMiscEntry(loadTypeFlow);
                     return loadTypeFlow;
                 });
@@ -1044,7 +1044,7 @@ public class MethodTypeFlowBuilder {
 
                 TypeFlowBuilder<?> unsafeStoreBuilder = TypeFlowBuilder.create(bb, node, UnsafePartitionStoreTypeFlow.class, () -> {
                     UnsafePartitionStoreTypeFlow storeTypeFlow = new UnsafePartitionStoreTypeFlow(node, objectType, componentType, objectBuilder.get(), valueBuilder.get(),
-                                    node.partitionKind(), partitionType);
+                            node.partitionKind(), partitionType);
                     methodFlow.addMiscEntry(storeTypeFlow);
                     return storeTypeFlow;
                 });
@@ -1291,7 +1291,7 @@ public class MethodTypeFlowBuilder {
             } else if (n instanceof InvokeNode || n instanceof InvokeWithExceptionNode) {
                 Invoke invoke = (Invoke) n;
                 if (invoke.callTarget() instanceof MethodCallTargetNode) {
-                    guarantee(invoke.stateAfter().outerFrameState() == null, "Outer FrameState must not be null.");
+                    // guarantee(invoke.stateAfter().outerFrameState() == null, "Outer FrameState must not be null.");
 
                     MethodCallTargetNode target = (MethodCallTargetNode) invoke.callTarget();
 
@@ -1440,7 +1440,7 @@ public class MethodTypeFlowBuilder {
 
         /**
          * Model an unsafe-read-and-write operation.
-         *
+         * <p>
          * In the analysis this is used to model both {@link AtomicReadAndWriteNode}, i.e., an
          * atomic read-and-write operation like
          * {@link sun.misc.Unsafe#getAndSetObject(Object, long, Object)}, and a
@@ -1526,13 +1526,22 @@ public class MethodTypeFlowBuilder {
      */
     protected static Object uniqueKey(Node node) {
         NodeSourcePosition position = node.getNodeSourcePosition();
-        // If the 'position' has a 'caller' then it is inlined, case in which the BCI is
-        // probably not unique.
-        if (position != null && position.getCaller() == null) {
+
+        if (position != null) {
+            while (position.getCaller() != null) {
+                position = position.getCaller();
+            }
             if (position.getBCI() >= 0) {
                 return position.getBCI();
             }
         }
+        // If the 'position' has a 'caller' then it is inlined, case in which the BCI is
+        // probably not unique.
+        //if (position != null && position.getCaller() == null) {
+        //    if (position.getBCI() >= 0) {
+        //        return position.getBCI();
+        //    }
+        //}
         return new Object();
     }
 
@@ -1575,7 +1584,9 @@ public class MethodTypeFlowBuilder {
         return new NewInstanceTypeFlow(node, type, allocationLabel);
     }
 
-    /** Hook for unsafe offset value checks. */
+    /**
+     * Hook for unsafe offset value checks.
+     */
     protected void checkUnsafeOffset(@SuppressWarnings("unused") ValueNode base, @SuppressWarnings("unused") ValueNode offset) {
     }
 

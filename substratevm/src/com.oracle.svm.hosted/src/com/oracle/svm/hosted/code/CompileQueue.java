@@ -206,15 +206,17 @@ public class CompileQueue {
     public static class DirectCallReason extends CompileReason {
 
         private final HostedMethod caller;
+        private final Object callData;
 
-        public DirectCallReason(HostedMethod caller, CompileReason prevReason) {
+        public DirectCallReason(HostedMethod caller, CompileReason prevReason, Object callData) {
             super(prevReason);
             this.caller = caller;
+            this.callData = callData;
         }
 
         @Override
         public String toString() {
-            return "Direct call from " + caller.format("%r %h.%n(%p)");
+            return "Direct call from " + caller.format("%r %h.%n(%p)") + ", callData " + callData;
         }
     }
 
@@ -222,16 +224,18 @@ public class CompileQueue {
 
         private final HostedMethod caller;
         private final HostedMethod callTarget;
+        private final Object callData;
 
-        public VirtualCallReason(HostedMethod caller, HostedMethod callTarget, CompileReason prevReason) {
+        public VirtualCallReason(HostedMethod caller, HostedMethod callTarget, CompileReason prevReason, Object callData) {
             super(prevReason);
             this.caller = caller;
             this.callTarget = callTarget;
+            this.callData = callData;
         }
 
         @Override
         public String toString() {
-            return "Virtual call from " + caller.format("%r %h.%n(%p)") + ", callTarget " + callTarget.format("%r %h.%n(%p)");
+            return "Virtual call from " + caller.format("%r %h.%n(%p)") + ", callTarget " + callTarget.format("%r %h.%n(%p)") + ", callData " + callData;
         }
     }
 
@@ -723,7 +727,7 @@ public class CompileQueue {
             try {
                 if (needParsing) {
                     GraphBuilderConfiguration gbConf = createHostedGraphBuilderConfiguration(providers, method);
-                    new HostedGraphBuilderPhase(providers, gbConf, getOptimisticOpts(), null, providers.getWordTypes()).apply(graph);
+                    new HostedGraphBuilderPhase(providers, gbConf, getOptimisticOpts(), null, providers.getWordTypes(), universe.hostVM().getInlineInvocationData()).apply(graph);
 
                 } else {
                     graph.setGuardsStage(GuardsStage.FIXED_DEOPTS);
@@ -770,7 +774,7 @@ public class CompileQueue {
         if (isIndirect) {
             for (HostedMethod invokeImplementation : invokeTarget.getImplementations()) {
                 handleSpecialization(method, targetNode, invokeTarget, invokeImplementation);
-                ensureParsed(invokeImplementation, new VirtualCallReason(method, invokeImplementation, reason));
+                ensureParsed(invokeImplementation, new VirtualCallReason(method, invokeImplementation, reason, targetNode));
             }
         } else {
             /*
@@ -785,7 +789,7 @@ public class CompileQueue {
              */
             if (invokeTarget.wrapped.isSimplyImplementationInvoked()) {
                 handleSpecialization(method, targetNode, invokeTarget, invokeTarget);
-                ensureParsed(invokeTarget, new DirectCallReason(method, reason));
+                ensureParsed(invokeTarget, new DirectCallReason(method, reason, targetNode));
             }
         }
     }
@@ -996,10 +1000,10 @@ public class CompileQueue {
                         Call call = (Call) infopoint;
                         HostedMethod callTarget = (HostedMethod) call.target;
                         if (call.direct) {
-                            ensureCompiled(callTarget, new DirectCallReason(method, reason));
+                            ensureCompiled(callTarget, new DirectCallReason(method, reason, call));
                         } else if (callTarget != null && callTarget.getImplementations() != null) {
                             for (HostedMethod impl : callTarget.getImplementations()) {
-                                ensureCompiled(impl, new VirtualCallReason(method, callTarget, reason));
+                                ensureCompiled(impl, new VirtualCallReason(method, callTarget, reason, call));
                             }
                         }
                     }
