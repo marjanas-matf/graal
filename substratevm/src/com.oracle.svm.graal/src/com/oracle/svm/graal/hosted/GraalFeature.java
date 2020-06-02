@@ -42,6 +42,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import com.oracle.svm.hosted.SVMHost;
+import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin;
 import org.graalvm.compiler.api.replacements.Fold;
 import org.graalvm.compiler.api.runtime.GraalRuntime;
 import org.graalvm.compiler.core.common.spi.MetaAccessExtensionProvider;
@@ -134,6 +136,8 @@ import jdk.vm.ci.meta.ResolvedJavaField;
 import jdk.vm.ci.meta.ResolvedJavaMethod;
 import jdk.vm.ci.meta.ResolvedJavaType;
 
+import javax.lang.model.element.Name;
+
 /**
  * The main handler for running Graal in the Substrate VM at run time. This feature (and features it
  * depends on like {@link FieldsOffsetsFeature}) encodes Graal graphs for runtime compilation,
@@ -153,7 +157,8 @@ public final class GraalFeature implements Feature {
         @Option(help = "Maximum number of methods allowed for runtime compilation.")//
         public static final HostedOptionKey<Integer[]> MaxRuntimeCompileMethods = new HostedOptionKey<>(new Integer[]{});
 
-        @Option(help = "Enforce checking of maximum number of methods allowed for runtime compilation. Useful for checking in the gate that the number of methods does not go up without a good reason.")//
+        @Option(help = "Enforce checking of maximum number of methods allowed for runtime compilation. Useful for checking in the gate that the number of methods does not go up without a good reason.")
+//
         public static final HostedOptionKey<Boolean> EnforceMaxRuntimeCompileMethods = new HostedOptionKey<>(false);
     }
 
@@ -240,23 +245,23 @@ public final class GraalFeature implements Feature {
         final CallTreeNode node;
 
         RuntimeGraphBuilderPhase(Providers providers,
-                        GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes,
-                        CallTreeNode node) {
-            super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes);
+                                 GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes,
+                                 NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData, CallTreeNode node) {
+            super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, inlineInvocationData);
             this.node = node;
         }
 
         @Override
         protected BytecodeParser createBytecodeParser(StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI, IntrinsicContext intrinsicContext) {
-            return new RuntimeBytecodeParser(this, graph, parent, method, entryBCI, intrinsicContext);
+            return new RuntimeBytecodeParser(this, graph, parent, method, entryBCI, intrinsicContext, inlineInvocationData);
         }
     }
 
     public static class RuntimeBytecodeParser extends SubstrateGraphBuilderPhase.SubstrateBytecodeParser {
 
         RuntimeBytecodeParser(GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI,
-                        IntrinsicContext intrinsicContext) {
-            super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, false);
+                              IntrinsicContext intrinsicContext, NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
+            super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, false, inlineInvocationData);
         }
 
         @Override
@@ -346,16 +351,16 @@ public final class GraalFeature implements Feature {
         ClassInitializationSupport classInitializationSupport = config.getHostVM().getClassInitializationSupport();
         Providers originalProviders = GraalAccess.getOriginalProviders();
         runtimeConfigBuilder = ImageSingletons.lookup(RuntimeGraalSetup.class)
-                        .createRuntimeConfigurationBuilder(RuntimeOptionValues.singleton(), config.getHostVM(), config.getUniverse(), config.getMetaAccess(),
-                                        originalProviders.getConstantReflection(), backendProvider, config.getNativeLibraries(), classInitializationSupport)
-                        .build();
+                .createRuntimeConfigurationBuilder(RuntimeOptionValues.singleton(), config.getHostVM(), config.getUniverse(), config.getMetaAccess(),
+                        originalProviders.getConstantReflection(), backendProvider, config.getNativeLibraries(), classInitializationSupport)
+                .build();
         RuntimeConfiguration runtimeConfig = runtimeConfigBuilder.getRuntimeConfig();
 
         Providers runtimeProviders = runtimeConfig.getProviders();
         WordTypes wordTypes = runtimeConfigBuilder.getWordTypes();
         hostedProviders = new HostedProviders(runtimeProviders.getMetaAccess(), runtimeProviders.getCodeCache(), runtimeProviders.getConstantReflection(), runtimeProviders.getConstantFieldProvider(),
-                        runtimeProviders.getForeignCalls(), runtimeProviders.getLowerer(), runtimeProviders.getReplacements(), runtimeProviders.getStampProvider(),
-                        runtimeConfig.getSnippetReflection(), wordTypes, runtimeProviders.getPlatformConfigurationProvider(), new GraphPrepareMetaAccessExtensionProvider());
+                runtimeProviders.getForeignCalls(), runtimeProviders.getLowerer(), runtimeProviders.getReplacements(), runtimeProviders.getStampProvider(),
+                runtimeConfig.getSnippetReflection(), wordTypes, runtimeProviders.getPlatformConfigurationProvider(), new GraphPrepareMetaAccessExtensionProvider());
 
         SubstrateGraalRuntime graalRuntime = new SubstrateGraalRuntime();
         objectReplacer.setGraalRuntime(graalRuntime);
@@ -364,8 +369,8 @@ public final class GraalFeature implements Feature {
 
         FeatureHandler featureHandler = config.getFeatureHandler();
         NativeImageGenerator.registerGraphBuilderPlugins(featureHandler, runtimeConfig, hostedProviders, config.getMetaAccess(), config.getUniverse(), null, null, config.getNativeLibraries(),
-                        config.getImageClassLoader(), false, false, ((Inflation) config.getBigBang()).getAnnotationSubstitutionProcessor(), new SubstrateClassInitializationPlugin(config.getHostVM()),
-                        classInitializationSupport, ConfigurationValues.getTarget());
+                config.getImageClassLoader(), false, false, ((Inflation) config.getBigBang()).getAnnotationSubstitutionProcessor(), new SubstrateClassInitializationPlugin(config.getHostVM()),
+                classInitializationSupport, ConfigurationValues.getTarget());
         DebugContext debug = DebugContext.forCurrentThread();
         NativeImageGenerator.registerReplacements(debug, featureHandler, runtimeConfig, runtimeConfig.getProviders(), runtimeConfig.getSnippetReflection(), false, true);
         featureHandler.forEachGraalFeature(feature -> feature.registerCodeObserver(runtimeConfig));
@@ -411,7 +416,7 @@ public final class GraalFeature implements Feature {
     }
 
     public void initializeRuntimeCompilationConfiguration(HostedProviders newHostedProviders, GraphBuilderConfiguration newGraphBuilderConfig, IncludeCalleePredicate newIncludeCalleePredicate,
-                    Predicate<ResolvedJavaMethod> newDeoptimizeOnExceptionPredicate) {
+                                                          Predicate<ResolvedJavaMethod> newDeoptimizeOnExceptionPredicate) {
         guarantee(initialized == false, "runtime compilation configuration already initialized");
         initialized = true;
 
@@ -511,7 +516,7 @@ public final class GraalFeature implements Feature {
 
             try (DebugContext.Scope scope = debug.scope("RuntimeCompile", graph)) {
                 if (parse) {
-                    RuntimeGraphBuilderPhase builderPhase = new RuntimeGraphBuilderPhase(hostedProviders, graphBuilderConfig, optimisticOpts, null, hostedProviders.getWordTypes(), node);
+                    RuntimeGraphBuilderPhase builderPhase = new RuntimeGraphBuilderPhase(hostedProviders, graphBuilderConfig, optimisticOpts, null, hostedProviders.getWordTypes(), ((SVMHost) bb.getHostVM()).getInlineInvocationData(), node);
                     builderPhase.apply(graph);
                 }
 
@@ -752,7 +757,7 @@ public final class GraalFeature implements Feature {
         CallTreeNode node = maxLevelCallTreeNode;
         while (node != null) {
             System.out.format("%5d ; %s ; %s", node.graph == null ? -1 : node.graph.getNodeCount(), node.sourceReference, node.implementationMethod == null ? ""
-                            : node.implementationMethod.format("%H.%n(%p)"));
+                    : node.implementationMethod.format("%H.%n(%p)"));
             if (node.targetMethod != null && !node.targetMethod.equals(node.implementationMethod)) {
                 System.out.print(" ; " + node.targetMethod.format("%H.%n(%p)"));
             }
@@ -805,7 +810,7 @@ public final class GraalFeature implements Feature {
         }
 
         System.out.format("%4d ; %-80s  ;%5d ; %s ; %s", node.level, indent, node.graph == null ? -1 : node.graph.getNodeCount(), node.sourceReference,
-                        node.implementationMethod == null ? "" : node.implementationMethod.format("%H.%n(%p)"));
+                node.implementationMethod == null ? "" : node.implementationMethod.format("%H.%n(%p)"));
         if (node.targetMethod != null && !node.targetMethod.equals(node.implementationMethod)) {
             System.out.print(" ; " + node.targetMethod.format("%H.%n(%p)"));
         }

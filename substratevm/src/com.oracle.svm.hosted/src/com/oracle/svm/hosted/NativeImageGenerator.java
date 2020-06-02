@@ -55,6 +55,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import com.oracle.svm.core.c.libc.TemporaryBuildDirectoryProvider;
+import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin;
 import org.graalvm.collections.EconomicSet;
 import org.graalvm.collections.Pair;
 import org.graalvm.compiler.api.replacements.Fold;
@@ -1099,6 +1100,10 @@ public class NativeImageGenerator {
 
         SubstrateReplacements replacements = (SubstrateReplacements) providers.getReplacements();
         plugins.appendInlineInvokePlugin(replacements);
+
+        if (NativeImageInlineDuringParsingPlugin.Options.InlineBeforeAnalysis.getValue()) {
+            plugins.appendInlineInvokePlugin(new NativeImageInlineDuringParsingPlugin(analysis, providers));
+        }
 
         plugins.appendNodePlugin(new IntrinsifyMethodHandlesInvocationPlugin(analysis, providers, aUniverse, hUniverse));
         plugins.appendNodePlugin(new DeletedFieldsPlugin());
