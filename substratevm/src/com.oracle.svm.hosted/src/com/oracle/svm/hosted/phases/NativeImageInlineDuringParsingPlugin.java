@@ -28,7 +28,6 @@ package com.oracle.svm.hosted.phases;
 import com.oracle.graal.pointsto.meta.AnalysisMethod;
 import com.oracle.graal.pointsto.meta.AnalysisType;
 import com.oracle.graal.pointsto.meta.HostedProviders;
-import com.oracle.graal.pointsto.util.CompletionExecutor.DebugContextRunnable;
 import com.oracle.svm.core.annotate.NeverInline;
 import com.oracle.svm.core.annotate.NeverInlineTrivial;
 import com.oracle.svm.core.annotate.RestrictHeapAccess;
@@ -36,14 +35,11 @@ import com.oracle.svm.core.annotate.Uninterruptible;
 import com.oracle.svm.core.jdk.InternalVMMethod;
 import com.oracle.svm.core.option.HostedOptionKey;
 import com.oracle.svm.core.snippets.SubstrateForeignCallTarget;
-import com.oracle.svm.core.util.VMError;
 import com.oracle.svm.hosted.meta.HostedMethod;
 import com.oracle.svm.hosted.phases.AnalysisGraphBuilderPhase.AnalysisBytecodeParser;
 import jdk.vm.ci.meta.ResolvedJavaMethod;
 import org.graalvm.compiler.api.replacements.Snippet;
-import org.graalvm.compiler.debug.DebugContext;
 import org.graalvm.compiler.graph.Node;
-import org.graalvm.compiler.java.BytecodeParserOptions;
 import org.graalvm.compiler.nodes.FrameState;
 import org.graalvm.compiler.nodes.InvokeNode;
 import org.graalvm.compiler.nodes.StructuredGraph;
@@ -57,13 +53,10 @@ import org.graalvm.compiler.nodes.java.StoreFieldNode;
 import org.graalvm.compiler.nodes.type.StampTool;
 import org.graalvm.compiler.options.Option;
 import org.graalvm.compiler.phases.OptimisticOptimizations;
-import org.graalvm.compiler.replacements.AllocationSnippets;
-import org.graalvm.compiler.replacements.Snippets;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import static com.oracle.graal.pointsto.infrastructure.GraphProvider.Purpose;
 import static com.oracle.svm.hosted.phases.SharedGraphBuilderPhase.SharedBytecodeParser;
@@ -140,53 +133,9 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         }
     }
 
-    public static class InvocationData {
-        private final ConcurrentMap<AnalysisMethod, ConcurrentMap<Integer, InvocationResult>> data = new ConcurrentHashMap<>();
-
-        private ConcurrentMap<Integer, InvocationResult> bciMap(ResolvedJavaMethod method) {
-            AnalysisMethod key;
-            if (method instanceof AnalysisMethod) {
-                key = (AnalysisMethod) method;
-            } else {
-                key = ((HostedMethod) method).getWrapped();
-            }
-
-            return data.computeIfAbsent(key, unused -> new ConcurrentHashMap<>());
-        }
-
-        InvocationResult get(ResolvedJavaMethod method, int bci) {
-            return bciMap(method).get(bci);
-        }
-
-        InvocationResult putIfAbsent(ResolvedJavaMethod method, int bci, InvocationResult value) {
-            return bciMap(method).putIfAbsent(bci, value);
-        }
-
-        public void onCreateInvoke(GraphBuilderContext b, int invokeBci, boolean analysis, ResolvedJavaMethod callee) {
-            if (b.getDepth() == 0) {
-
-                if (callee != null && callee.equals(b.getMetaAccess().lookupJavaMethod(SubstrateClassInitializationPlugin.ENSURE_INITIALIZED_METHOD))) {
-                    return;
-                }
-
-                ConcurrentMap<Integer, InvocationResult> map = bciMap(b.getMethod());
-                if (analysis) {
-                    map.putIfAbsent(invokeBci, InvocationResult.NO_ANALYSIS);
-                } else {
-                    InvocationResult state = map.get(invokeBci);
-                    if (state != InvocationResult.ANALYSIS_TOO_COMPLICATED && state != InvocationResult.NO_ANALYSIS) {
-                        throw VMError.shouldNotReachHere("Missing information for call site: " + b.getMethod().asStackTraceElement(invokeBci));
-                    }
-                }
-            }
-        }
-    }
-
-
     private final boolean analysis;
     private final HostedProviders providers;
     private static final ConcurrentHashMap<AnalysisMethod, InvocationResult> dataInline = new ConcurrentHashMap<>();
-    private static final Object NULL_MARKER = new Object();
 
     public NativeImageInlineDuringParsingPlugin(boolean analysis, HostedProviders providers) {
         this.analysis = analysis;
@@ -289,23 +238,14 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
                 }
                 inline = newResult;
             } else {
-                InvocationResult existingResult = getResult(method);
-                /*if (existingResult == null) {
-                    throw VMError.shouldNotReachHere("No analysis result present: " + method.format("%n, %H, caller") + b.getMethod().format("%n, %H"));
-                }*/
-                inline = existingResult;
+                inline = getResult(method);
             }
         }
         if (inline instanceof InvocationResultInline) {
             if (analysis) {
                 AnalysisMethod aMethod = (AnalysisMethod) method;
                 aMethod.registerAsImplementationInvoked(null);
-                ((AnalysisBytecodeParser) b).bb.postTask(new DebugContextRunnable() {
-                    @Override
-                    public void run(DebugContext ignore) {
-                        aMethod.getTypeFlow().ensureParsed(((AnalysisBytecodeParser) b).bb, null);
-                    }
-                });
+                ((AnalysisBytecodeParser) b).bb.postTask(ignore -> aMethod.getTypeFlow().ensureParsed(((AnalysisBytecodeParser) b).bb, null));
                 if (!aMethod.isStatic() && args[0].isConstant()) {
                     AnalysisType receiverType = (AnalysisType) StampTool.typeOrNull(args[0]);
                     receiverType.registerAsInHeap();
@@ -355,7 +295,6 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         AnalysisGraphBuilderPhase graphbuilder = new AnalysisGraphBuilderPhase(((AnalysisBytecodeParser) b).bb, providers, graphConfig, OptimisticOptimizations.NONE, null, providers.getWordTypes());
         graphbuilder.apply(graph);
 
-        int countInvokes = 0;
         int countFrameStates = 0;
         FrameState frameState = null;
         boolean hasLoadField = false;
