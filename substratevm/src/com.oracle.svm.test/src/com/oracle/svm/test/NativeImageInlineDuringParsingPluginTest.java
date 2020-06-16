@@ -24,15 +24,14 @@
  */
 package com.oracle.svm.test;
 
+import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin;
 import jdk.vm.ci.meta.ResolvedJavaMethod;
 import org.graalvm.compiler.core.test.GraalCompilerTest;
 import org.graalvm.compiler.graph.Node;
+import org.graalvm.compiler.java.BytecodeParserOptions;
 import org.graalvm.compiler.nodes.Invoke;
 import org.graalvm.compiler.nodes.StructuredGraph;
-import org.graalvm.compiler.phases.OptimisticOptimizations;
-import org.graalvm.compiler.phases.PhaseSuite;
-import org.graalvm.compiler.phases.common.DeadCodeEliminationPhase;
-import org.graalvm.compiler.phases.tiers.HighTierContext;
+import org.graalvm.compiler.options.OptionValues;
 import org.junit.Test;
 
 /*
@@ -259,28 +258,28 @@ public class NativeImageInlineDuringParsingPluginTest extends GraalCompilerTest 
         assertInlined(getGraph(SourceCodeForTests.class, "getPackageName"));
     }
 
+    @SuppressWarnings("try")
+    private StructuredGraph getGraph(Class<?> clazz, String methodName) {
+        ResolvedJavaMethod method = getResolvedJavaMethod(clazz, methodName);
+        StructuredGraph graph = parseForCompile(method, enableInlineBeforeAnalysis());
+        createInliningPhase().apply(graph, getDefaultHighTierContext());
+        return graph;
+
+    }
+
     private static StructuredGraph assertInlined(StructuredGraph graph) {
-        // invoke is not in the graph
+        // number of invoke nodes must be 0
         for (Node node : graph.getNodes()) {
             if (node instanceof Invoke) {
-              fail(node.toString());
+                fail(node.toString());
             }
         }
         return graph;
     }
 
-    @SuppressWarnings("try")
-    private StructuredGraph getGraph(Class<?> clazz, String methodName) {
-        ResolvedJavaMethod method = getResolvedJavaMethod(clazz, methodName);
-        StructuredGraph.Builder builder = builder(method, StructuredGraph.AllowAssumptions.YES);
-        StructuredGraph graph = parse(builder, getEagerGraphBuilderSuite());
-        PhaseSuite<HighTierContext> graphBuilderSuite = getDefaultGraphBuilderSuite();
-        HighTierContext context = new HighTierContext(getProviders(), graphBuilderSuite, OptimisticOptimizations.ALL);
-        createCanonicalizerPhase().apply(graph, context);
-        createInliningPhase().apply(graph, context);
-        new DeadCodeEliminationPhase().apply(graph);
-        return graph;
-
+    private static OptionValues enableInlineBeforeAnalysis() {
+        return new OptionValues(getInitialOptions(), NativeImageInlineDuringParsingPlugin.Options.InlineBeforeAnalysis, true,
+                BytecodeParserOptions.InlineDuringParsing, false, BytecodeParserOptions.InlineIntrinsicsDuringParsing, false);
     }
 
 }
