@@ -547,6 +547,8 @@ suite = {
             "dependencies": [
                 "mx:JUNIT_TOOL",
                 "sdk:GRAAL_SDK",
+                "com.oracle.svm.hosted",
+                "compiler:GRAAL_TEST",
             ],
             "checkstyle": "com.oracle.svm.core",
             "workingSets": "SVM",
@@ -1082,6 +1084,11 @@ suite = {
           "dependencies" : [
             "com.oracle.svm.test",
             "com.oracle.svm.test.jdk11",
+            "compiler:GRAAL",
+            "com.oracle.svm.util",
+            "com.oracle.svm.core",
+            "com.oracle.svm.hosted",
+            "compiler:GRAAL_TEST",
           ],
           "distDependencies": [
             "mx:JUNIT_TOOL",

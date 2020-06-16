@@ -2191,6 +2191,7 @@ suite = {
         "org.graalvm.compiler.replacements.jdk12.test",
         "org.graalvm.compiler.core.jdk9.test",
         "org.graalvm.compiler.hotspot.jdk9.test",
+        "org.graalvm.compiler.core.test",
       ],
       "distDependencies" : [
         "GRAAL_ONLY_TEST",
