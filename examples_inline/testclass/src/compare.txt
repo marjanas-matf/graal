@@ -1,0 +1,21 @@
+[TestClass]
+
+without plugin:
+
+[testclass:8638]        image:     858.15 ms,  2.13 GB
+[testclass:8638]        write:     140.81 ms,  2.13 GB
+[testclass:8638]      [total]:  33,305.26 ms,  2.13 GB
+
+size of image: 6,9 MB (6914160 bytes)
+
+.......................................................
+with plugin:
+
+[testclass:8852]        image:     782.77 ms,  1.54 GB
+[testclass:8852]        write:     128.88 ms,  1.54 GB
+[testclass:8852]      [total]:  35,074.03 ms,  1.54 GB
+
+size of image: 7,0 MB (7029232 bytes)
+
+.......................................................
+
