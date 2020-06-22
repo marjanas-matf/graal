@@ -183,6 +183,29 @@ public class TestClass {
         return result;
     }
 
+    public static void callSwitch3(int a, int b, int c){
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+        switch3(a,b,c);
+    }
+
     public static double switch3(int a, int b, int c) {
         double result = 100;
         if (a < b) {
@@ -312,12 +335,86 @@ public class TestClass {
         return numberOf1;
     }
 
+    public static double switch4(int a, int b, int c, int d) {
+        double result = 100;
+        if (a < b) {
+            switch (a) {
+                case 1:
+                    result += 1;
+                    break;
+                case 2:
+                    result += 2;
+                    break;
+                case 3:
+                    result += 3;
+                    break;
+            }
+        } else if (b < c) {
+            switch (b) {
+                case 1:
+                    result *= 1;
+                    break;
+                case 2:
+                    result *= 2;
+                    break;
+                case 3:
+                    result *= 3;
+                    break;
+            }
+        } else if (c<d){
+            switch (c) {
+                case 1:
+                    result /= 1;
+                    break;
+                case 2:
+                    result /= 2;
+                    break;
+                case 3:
+                    result /= 3;
+                    break;
+            }
+        } else {
+            switch (d) {
+                case 1:
+                    result -= 1;
+                    break;
+                case 2:
+                    result -= 2;
+                    break;
+                case 3:
+                    result -= 3;
+                    break;
+            }
+        }
+        return result;
+    }
+
+    public static void callSwitch(int a, int b, int c) {
+        switch1(a);
+        switch2(a,b);
+        switch3(a,b,c);
+        switch1(b);
+        switch2(b,c);
+        switch3(c,b,a);
+        switch1(c);
+        switch2(a,c);
+        switch3(b,c,a);
+        switch4(a,a,b,b);
+        switch4(b,b,c,c);
+        switch4(c,c,a,a);
+
+    }
+
     public static String getNameOfClass() {
         return "SimpleClass";
     }
 
     public static String getPackageName() {
         return "org.graalvm.compiler.core.test.inlining;";
+    }
+
+    public static void printLine(int a) {
+        System.out.println("This is one number, " + a);
     }
 
     public static void main(String[] args){
@@ -328,6 +425,10 @@ public class TestClass {
         two();
         getNumber();
         switch3(2,3,4);
+        callSwitch3(5,6,7);
+        switch4(1,2,3,4);
+        callSwitch(5,6,7);
+        printLine(10);
         System.out.println(obj.getAverage());
     }
 
