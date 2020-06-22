@@ -24,6 +24,7 @@
  */
 package com.oracle.svm.test;
 
+import com.oracle.svm.core.log.RealLog;
 import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin;
 import jdk.vm.ci.meta.ResolvedJavaMethod;
 import org.graalvm.compiler.core.test.GraalCompilerTest;
@@ -40,13 +41,14 @@ These tests will be run by the command:
 
 mx --dy /substratevm unittest --suite=substratevm  NativeImageInlineDuringParsingPluginTest
 
-........................................
+............................................................
 MxJUnitCore
 JUnit version 4.12
-........................................
-Time: 0.492
+............................................................
+Time: 1.747
 
-OK (40 tests)
+OK (60 tests)
+
 
  */
 
@@ -55,6 +57,16 @@ public class NativeImageInlineDuringParsingPluginTest extends GraalCompilerTest 
     @Test
     public void testEmpty() {
         assertInlined(getGraph(SourceCodeForTests.class, "empty"));
+    }
+
+    @Test
+    public void testEmpty2() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "empty2"));
+    }
+
+    @Test
+    public void testCallEmpty() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "callEmpty"));
     }
 
     @Test
@@ -68,8 +80,33 @@ public class NativeImageInlineDuringParsingPluginTest extends GraalCompilerTest 
     }
 
     @Test
-    public void testSunOfTenWithLocal() {
+    public void testSumOfTenWithLocal() {
         assertInlined(getGraph(SourceCodeForTests.class, "sumOfTenWithLocal"));
+    }
+
+    @Test
+    public void testSum() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "sum"));
+    }
+
+    @Test
+    public void testTailSum() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "tailSum"));
+    }
+
+    @Test
+    public void testIterativeSum() {
+        assertInlined(getGraph(SourceCodeForTests.class, "iterativeSum"));
+    }
+
+    @Test
+    public void testPowerOf10() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "powerOf10"));
+    }
+
+    @Test
+    public void testIterativePowerOf10() {
+        assertInlined(getGraph(SourceCodeForTests.class, "iterativePowerOf10"));
     }
 
     @Test
@@ -154,6 +191,43 @@ public class NativeImageInlineDuringParsingPluginTest extends GraalCompilerTest 
     }
 
     @Test
+    public void testIsOdd() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "isOdd"));
+    }
+
+    @Test
+    public void testIsEven() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "isEven"));
+    }
+
+    @Test
+    public void testFibonacci() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "fibonacci"));
+    }
+
+    @Test
+    public void testFactorial() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "factorial"));
+    }
+
+    @Test
+    public void testRecursion1() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "recursion1"));
+    }
+
+    @Test
+    public void testRecursion2() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "recursion2"));
+    }
+
+
+    @Test
+    public void testRecursion3() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "recursion3"));
+    }
+
+
+    @Test
     public void testSwitch1() {
         assertInlined(getGraph(SourceCodeForTests.class, "switch1"));
     }
@@ -165,7 +239,22 @@ public class NativeImageInlineDuringParsingPluginTest extends GraalCompilerTest 
 
     @Test
     public void testSwitch3() {
-        assertInlined(getGraph(SourceCodeForTests.class, "switch3"));
+        assertNotInlined(getGraph(SourceCodeForTests.class, "switch3"));
+    }
+
+    @Test
+    public void testSwitch4() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "switch4"));
+    }
+
+    @Test
+    public void testCallSwitch() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "callSwitch"));
+    }
+
+    @Test
+    public void testCallSwitches() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "callSwitches"));
     }
 
     @Test
@@ -258,13 +347,22 @@ public class NativeImageInlineDuringParsingPluginTest extends GraalCompilerTest 
         assertInlined(getGraph(SourceCodeForTests.class, "getPackageName"));
     }
 
+    @Test
+    public void testPrintLine() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "printLine"));
+    }
+
+    @Test
+    public void testGetString() {
+        assertNotInlined(getGraph(SourceCodeForTests.class, "getString"));
+    }
+
     @SuppressWarnings("try")
     private StructuredGraph getGraph(Class<?> clazz, String methodName) {
         ResolvedJavaMethod method = getResolvedJavaMethod(clazz, methodName);
         StructuredGraph graph = parseForCompile(method, enableInlineBeforeAnalysis());
         createInliningPhase().apply(graph, getDefaultHighTierContext());
         return graph;
-
     }
 
     private static StructuredGraph assertInlined(StructuredGraph graph) {
@@ -274,6 +372,17 @@ public class NativeImageInlineDuringParsingPluginTest extends GraalCompilerTest 
                 fail(node.toString());
             }
         }
+        return graph;
+    }
+
+    private static StructuredGraph assertNotInlined(StructuredGraph graph) {
+        // there must be invoke node
+        for (Node node : graph.getNodes()) {
+            if (node instanceof Invoke) {
+                return graph;
+            }
+        }
+        fail("Graph does not contain a node of class Invoke");
         return graph;
     }
 
@@ -288,6 +397,15 @@ class SourceCodeForTests {
     public static void empty() {
     }
 
+    public static void empty2() {
+        callEmpty(5);
+    }
+
+    public static void callEmpty(int count) {
+        if (count <= 10)
+            empty2();
+    }
+
     public static double sumOfTwo(double var0, double var2) {
         return var0 + var2;
     }
@@ -299,6 +417,56 @@ class SourceCodeForTests {
     public static int sumOfTenWithLocal(int var0, int var1, int var2, int var3, int var4, int var5, int var6, int var7, int var8, int var9) {
         int var10 = var0 + var1 + var2 + var3 + var4 + var5 + var6 + var7 + var8 + var9;
         return var10;
+    }
+
+    public static int sum(int n) {
+        if (n >= 1) {
+            return sum(n - 1) + n;
+        }
+        return n;
+    }
+
+    public static int tailSum(int currentSum, int n) {
+        if (n <= 1) {
+            return currentSum + n;
+        }
+        return tailSum(currentSum + n, n - 1);
+    }
+
+    static public int iterativeSum(int n) {
+        if(n < 0) {
+            return -1;
+        }
+        int sum = 0;
+        for(int i=0; i<=n; i++) {
+            sum += i;
+        }
+        return sum;
+    }
+
+    static public int powerOf10(int n) {
+        if (n == 0) {
+            return 1;
+        }
+        return powerOf10(n-1) * 10;
+    }
+
+    static public int iterativePowerOf10(int n) {
+        if(n < 0) {
+            return -1;
+        }
+        int result = 1;
+        for(int i=0; i<=n; i++) {
+            result *= 10;
+        }
+        return result;
+    }
+
+    static public String toBinary(int n) {
+        if (n <= 1 ) {
+            return String.valueOf(n);
+        }
+        return toBinary(n / 2) + String.valueOf(n % 2);
     }
 
     public static int two() {
@@ -508,9 +676,84 @@ class SourceCodeForTests {
                     break;
             }
         }
+        switch4(a, b, c, (int) result);
         return result;
     }
 
+    public static double switch4(int a, int b, int c, int d) {
+        switch3(a, b, c);
+        double result = 100;
+        if (a < b) {
+            switch (a) {
+                case 1:
+                    result += 1;
+                    break;
+                case 2:
+                    result += 2;
+                    break;
+                case 3:
+                    result += 3;
+                    break;
+            }
+        } else if (b < c) {
+            switch (b) {
+                case 1:
+                    result *= 1;
+                    break;
+                case 2:
+                    result *= 2;
+                    break;
+                case 3:
+                    result *= 3;
+                    break;
+            }
+        } else if (c < d) {
+            switch (c) {
+                case 1:
+                    result /= 1;
+                    break;
+                case 2:
+                    result /= 2;
+                    break;
+                case 3:
+                    result /= 3;
+                    break;
+            }
+        } else {
+            switch (d) {
+                case 1:
+                    result -= 1;
+                    break;
+                case 2:
+                    result -= 2;
+                    break;
+                case 3:
+                    result -= 3;
+                    break;
+            }
+        }
+        return result;
+    }
+
+    public static void callSwitch(int a, int b, int c) {
+        switch4(c, c, a, a);
+    }
+
+    public static void callSwitches(int a, int b, int c) {
+        switch1(a);
+        switch2(a, b);
+        switch3(a, b, c);
+        switch1(b);
+        switch2(b, c);
+        switch3(c, b, a);
+        switch1(c);
+        switch2(a, c);
+        switch3(b, c, a);
+        switch4(a, a, b, b);
+        switch4(b, b, c, c);
+        switch4(c, c, a, a);
+
+    }
 
     public static int min(int a, int b) {
         if (a < b) {
@@ -526,6 +769,22 @@ class SourceCodeForTests {
 
     public static int max2(int a, int b) {
         return a >= b ? a : b;
+    }
+
+    public static int fibonacci(int n) {
+        if (n <= 1)
+            return n;
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+
+    public static boolean isOdd(int n) {
+        if (n<0) throw new IllegalArgumentException("Can't accept negative arguments");
+        return (n == 0) ? false : isEven(n-1);
+    }
+
+    public static boolean isEven(int n) {
+        if (n<0) throw new IllegalArgumentException("Can't accept negative arguments");
+        return (n == 0) ? true : isOdd(n-1);
     }
 
     public static boolean boolean1() {
@@ -604,6 +863,42 @@ class SourceCodeForTests {
 
     public static String getPackageName() {
         return "org.graalvm.compiler.core.test.inlining;";
+    }
+
+    public static void printLine(int a) {
+        System.out.println("This is number, " + a);
+    }
+
+    public static void getString(int a) {
+        RealLog.log().toString();
+    }
+
+    public static void recursion1(int count) {
+        if (count <= 5) {
+            System.out.println(count);
+            recursion1(count + 1);
+        }
+    }
+
+    public static void recursion2(int count) {
+        if (count <= 10) {
+            System.out.println(count);
+            recursion2(count + 1);
+        }
+    }
+
+    public static void recursion3(int count) {
+        if (count <= 20) {
+            System.out.println(count);
+            recursion3(count + 1);
+        }
+    }
+
+    public static int factorial(int n) {
+        if (n == 1)
+            return 1;
+        else
+            return (n * factorial(n - 1));
     }
 
 }
