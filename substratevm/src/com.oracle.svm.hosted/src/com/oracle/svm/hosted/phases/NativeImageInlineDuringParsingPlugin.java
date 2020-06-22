@@ -63,6 +63,8 @@ import org.graalvm.compiler.nodes.java.StoreFieldNode;
 import org.graalvm.compiler.nodes.spi.UncheckedInterfaceProvider;
 import org.graalvm.compiler.nodes.type.StampTool;
 import org.graalvm.compiler.options.Option;
+import org.graalvm.compiler.options.OptionKey;
+import org.graalvm.compiler.options.OptionType;
 import org.graalvm.compiler.options.OptionValues;
 import org.graalvm.compiler.phases.OptimisticOptimizations;
 import org.graalvm.compiler.phases.util.Providers;
@@ -94,8 +96,10 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
 
     public static class Options {
         @Option(help = "Inline methods during parsing before the static analysis.")//
-        public static final HostedOptionKey<Boolean> InlineBeforeAnalysis = new HostedOptionKey<>(true);
+        public static final HostedOptionKey<Boolean> InlineBeforeAnalysis = new HostedOptionKey<>(false);
 
+        @Option(help = "Inlining is explored up to this number of nonparametric nodes in the graph.")
+        public static final HostedOptionKey<Integer> InlineBeforeAnalysisMaxNumberOfNodes = new HostedOptionKey<>(100);
     }
 
     static final class CallSite {
@@ -208,6 +212,9 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
 
     @Override
     public InlineInfo shouldInlineInvoke(GraphBuilderContext b, ResolvedJavaMethod method, ValueNode[] args) {
+
+        if (method.format("%n").equals("printLine"))
+            System.out.println("Print line call");
         InvocationData data = ((SharedBytecodeParser) b).inlineInvocationData;
         if (data == null) {
             throw VMError.shouldNotReachHere("must not use NativeImageInlineDuringParsingPlugin when bytecode parser does not have InvocationData");
@@ -275,7 +282,7 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
                     receiverType.registerAsInHeap();
                 }
             }
-            System.out.println(method.format("%n, %H"));
+            System.out.println(method.format("Inline method: %n, %H"));
             return InlineInfo.createStandardInlineInfo(method);
         } else {
             return null;
@@ -410,23 +417,43 @@ class TrivialMethodDetector {
     }
 
     class MethodState extends NodeEventListener implements InlineInvokePlugin {
-        final InvocationResultInline result;
 
+        final InvocationResultInline result;
+        private int allNodeCount;
+        private int parameterNodeCount;
         Object singleAllowedElement;
 
         MethodState(InvocationResultInline result, Object existingSingleAllowedElement) {
             this.result = result;
             this.singleAllowedElement = existingSingleAllowedElement;
+            this.allNodeCount = 1; // root node
+            this.parameterNodeCount = 0;
+        }
+
+        public int getAllNodeCount() {
+            return allNodeCount;
+        }
+
+        public int getParameterNodeCount() {
+            return parameterNodeCount;
+        }
+
+        public int getNonParameterNodeCount() {
+            return getAllNodeCount() - getParameterNodeCount();
         }
 
         @Override
         public void nodeAdded(Node node) {
+
+            allNodeCount += 1;
+
             if (node instanceof ConstantNode) {
                 /* Nothing to do, an unlimited amount of constants is allowed. We like constants. */
             } else if (node instanceof FrameState) {
                 /* Nothing to do. */
             } else if (node instanceof ParameterNode) {
                 /* Nothing to do. */
+                parameterNodeCount += 1;
             } else if (node instanceof ReturnNode) {
                 /*
                  * Nothing to do, returning a value is fine. We don't allow control flow so there
@@ -448,17 +475,18 @@ class TrivialMethodDetector {
 
         @Override
         public InlineInfo shouldInlineInvoke(GraphBuilderContext b, ResolvedJavaMethod method, ValueNode[] args) {
+
+            if (getNonParameterNodeCount() > NativeImageInlineDuringParsingPlugin.Options.InlineBeforeAnalysisMaxNumberOfNodes.getValue()) {
+                /* Node limit is exceed */
+                return null;
+            }
+
             if (method.getAnnotation(NeverInline.class) != null || method.getAnnotation(NeverInlineTrivial.class) != null) {
                 return null;
             }
             if (b.getDepth() > BytecodeParserOptions.InlineDuringParsingMaxDepth.getValue(b.getOptions())) {
                 return null;
             }
-
-// if (singleAllowedElement != null) {
-// throw new TrivialMethodDetectorBailoutException("Only a single element is allowed: new invoke of
-// " + method + ", existing element " + singleAllowedElement);
-// }
 
             InvocationResult state = analyzeMethod(new CallSite((AnalysisMethod) b.getMethod(), b.bci()), (AnalysisMethod) method, args, singleAllowedElement);
 
@@ -471,8 +499,6 @@ class TrivialMethodDetector {
                     }
                     result.children.put(inlineState.site, inlineState);
                 }
-
-                // singleAllowedElement = method;
                 return InlineInfo.createStandardInlineInfo(method);
             } else {
                 return null;
