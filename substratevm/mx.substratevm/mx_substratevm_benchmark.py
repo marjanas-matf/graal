@@ -79,14 +79,14 @@ def _bench_result(benchmark, metric_name, metric_value, metric_unit, better="low
         extra = {}
     unit = {"metric.unit": metric_unit} if metric_unit else {}
     return dict(list({
-                    "benchmark": benchmark,
-                    "metric.name": metric_name,
-                    "metric.type": m_type,
-                    "metric.value": metric_value,
-                    "metric.score-function": "id",
-                    "metric.better": better,
-                    "metric.iteration": m_iteration
-                }.items()) + list(unit.items()) + list(extra.items()))
+                         "benchmark": benchmark,
+                         "metric.name": metric_name,
+                         "metric.type": m_type,
+                         "metric.value": metric_value,
+                         "metric.score-function": "id",
+                         "metric.better": better,
+                         "metric.iteration": m_iteration
+                     }.items()) + list(unit.items()) + list(extra.items()))
 
 
 def _get_bench_conf(args):
@@ -541,12 +541,12 @@ class BaseDaCapoNativeImageBenchmarkSuite():
 
 _DACAPO_EXTRA_VM_ARGS = {
     'avrora':     ['-Dnative-image.benchmark.extra-image-build-argument=--initialize-at-build-time=org.apache.derby.jdbc.ClientDriver,'
-                    'org.h2.Driver,org.apache.derby.jdbc.AutoloadedDriver,'
-                    'org.apache.derby.client.am.Configuration,org.apache.derby.iapi.services.info.ProductVersionHolder'],
+                   'org.h2.Driver,org.apache.derby.jdbc.AutoloadedDriver,'
+                   'org.apache.derby.client.am.Configuration,org.apache.derby.iapi.services.info.ProductVersionHolder'],
     'h2':         ['-Dnative-image.benchmark.extra-image-build-argument=--initialize-at-run-time=java.sql.DriverManager,org.apache.derby.jdbc.AutoloadedDriver,org.h2.Driver,org.apache.derby.jdbc.ClientDriver',
-                    '-Dnative-image.benchmark.extra-image-build-argument=--allow-incomplete-classpath'],
+                   '-Dnative-image.benchmark.extra-image-build-argument=--allow-incomplete-classpath'],
     'pmd':        ['-Dnative-image.benchmark.extra-image-build-argument=--initialize-at-run-time=org.apache.derby.jdbc.ClientDriver,org.h2.Driver,java.sql.DriverManager,org.apache.derby.jdbc.AutoloadedDriver,'
-                    'org.apache.derby.iapi.services.info.ProductVersionHolder', '-Dnative-image.benchmark.extra-image-build-argument=--allow-incomplete-classpath'],
+                   'org.apache.derby.iapi.services.info.ProductVersionHolder', '-Dnative-image.benchmark.extra-image-build-argument=--allow-incomplete-classpath'],
     'xalan':      ['-Dnative-image.benchmark.extra-image-build-argument=--initialize-at-build-time=org.apache.xml.utils.res.CharArrayWrapper', '-Dnative-image.benchmark.extra-image-build-argument=--report-unsupported-elements-at-runtime'],
     'sunflow':    ['-Dnative-image.benchmark.extra-image-build-argument=--initialize-at-run-time=sun.awt.dnd.SunDropTargetContextPeer$EventDispatcher'],
     'fop':        ['-Dnative-image.benchmark.extra-image-build-argument=--initialize-at-build-time=com.sun.proxy.$Proxy188,com.sun.proxy.$Proxy187',

@@ -63,8 +63,6 @@ import org.graalvm.compiler.nodes.java.StoreFieldNode;
 import org.graalvm.compiler.nodes.spi.UncheckedInterfaceProvider;
 import org.graalvm.compiler.nodes.type.StampTool;
 import org.graalvm.compiler.options.Option;
-import org.graalvm.compiler.options.OptionKey;
-import org.graalvm.compiler.options.OptionType;
 import org.graalvm.compiler.options.OptionValues;
 import org.graalvm.compiler.phases.OptimisticOptimizations;
 import org.graalvm.compiler.phases.util.Providers;
@@ -204,17 +202,19 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
 
     private final boolean analysis;
     private final HostedProviders providers;
+    private static int numberForInline = 0;
 
     public NativeImageInlineDuringParsingPlugin(boolean analysis, HostedProviders providers) {
         this.analysis = analysis;
         this.providers = providers;
     }
 
+    public static int getNumberForInline() {
+        return numberForInline;
+    }
+
     @Override
     public InlineInfo shouldInlineInvoke(GraphBuilderContext b, ResolvedJavaMethod method, ValueNode[] args) {
-
-        if (method.format("%n").equals("printLine"))
-            System.out.println("Print line call");
         InvocationData data = ((SharedBytecodeParser) b).inlineInvocationData;
         if (data == null) {
             throw VMError.shouldNotReachHere("must not use NativeImageInlineDuringParsingPlugin when bytecode parser does not have InvocationData");
@@ -282,7 +282,8 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
                     receiverType.registerAsInHeap();
                 }
             }
-            System.out.println(method.format("Inline method: %n, %H"));
+            //System.out.println(method.format("INLINE: %n, %H"));
+            numberForInline++;
             return InlineInfo.createStandardInlineInfo(method);
         } else {
             return null;
