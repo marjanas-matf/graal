@@ -769,7 +769,8 @@ class ScalaDaCapoNativeImageBenchmarkSuite(mx_graal_benchmark.ScalaDaCapoBenchma
 
     @staticmethod
     def substitution_path():
-        bench_suite = mx.suite('nativeimage-benchmarks')
+        # non-enterprise edition
+        bench_suite = mx.suite('vm')
         root_dir = mx.join(bench_suite.dir, "mxbuild")
         return os.path.abspath(mx.join(root_dir, 'java/com.oracle.svm.bench.scaladacapo/bin/'))
 

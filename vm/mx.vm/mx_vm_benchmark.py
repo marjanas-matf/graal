@@ -31,12 +31,14 @@ import mx, mx_benchmark
 import mx_sdk_vm, mx_sdk_vm_impl
 import os
 import re
+import json
 from os.path import dirname, join
 
 
 _suite = mx.suite('vm')
 _native_image_vm_registry = mx_benchmark.VmRegistry('NativeImage', 'ni-vm')
 _gu_vm_registry = mx_benchmark.VmRegistry('GraalUpdater', 'gu-vm')
+
 
 class GraalVm(mx_benchmark.OutputCapturingJavaVm):
     def __init__(self, name, config_name, extra_java_args, extra_launcher_args):
@@ -87,7 +89,6 @@ class GraalVm(mx_benchmark.OutputCapturingJavaVm):
         dims = self.dimensions(cwd, args, code, out)
         return code, out, dims
 
-
 class NativeImageVM(GraalVm):
     """
     This is a VM that should be used for running all Native Image benchmarks. This VM should support all the benchmarks
@@ -113,6 +114,7 @@ class NativeImageVM(GraalVm):
             self.pgo_iteration_num = None
             self.only_prepare_native_image = False
             self.only_run_prepared_image = False
+            self.print_statistics = False
 
         def parse(self, args):
             def add_to_list(arg, name, arg_list):
@@ -150,6 +152,9 @@ class NativeImageVM(GraalVm):
                         found = True
                     if trimmed_arg.startswith('prepare-native-image='):
                         self.only_prepare_native_image = trimmed_arg[len('prepare-native-image=') :] == 'true'
+                        found = True
+                    if trimmed_arg.startswith('print-statistics='):
+                        self.print_statistics = trimmed_arg[len('print-statistics=') :] == 'true'
                         found = True
                     if trimmed_arg.startswith('run-prepared-image='):
                         self.only_run_prepared_image = trimmed_arg[len('run-prepared-image=') :] == 'true'
@@ -225,6 +230,23 @@ class NativeImageVM(GraalVm):
 
         return executable, classpath_arguments, system_properties, image_vm_args + image_run_args
 
+    def print_statistics(self, benchmark_name, image_name, image_size, plugin):
+        mx.log('Print-statistics')
+        try:
+            with open('statistics.json','r') as in_file:
+                data = json.load(in_file)
+        except:
+            data = []
+        newdata = {
+            "benchmark-name": benchmark_name,
+            "image-name": image_name,
+            "image-size":image_size,
+            "plugin-on": plugin
+        }
+        data.append(newdata)
+        with open('statistics.json','w') as outfile:
+            json.dump(data, outfile)
+
     def run_java(self, args, out=None, err=None, cwd=None, nonZeroIsFatal=False):
         if '-version' in args:
             return super(NativeImageVM, self).run_java(args, out=out, err=err, cwd=cwd, nonZeroIsFatal=nonZeroIsFatal)
@@ -240,7 +262,7 @@ class NativeImageVM(GraalVm):
             non_tmp_dir = os.path.abspath(config.benchmark_output_dir) if config.benchmark_output_dir else None
 
             if config.only_prepare_native_image or config.only_run_prepared_image:
-                bench_suite = mx.suite('vm-enterprise')
+                bench_suite = mx.suite('vm')
                 root_dir = mx.join(bench_suite.dir, "mxbuild")
                 output_dir_path = mx.join(os.path.abspath(root_dir), 'native-image-bench-' + executable_name + '-' + self.config_name())
                 if config.only_prepare_native_image:
@@ -366,8 +388,14 @@ class NativeImageVM(GraalVm):
                     image_path = mx.join(config.output_dir, final_image_name)
                     image_size = os.stat(image_path).st_size
                     mx.log('Final image size is ' + str(image_size) + ' B')
+                    if config.print_statistics:
+                        plugin = False
+                        if "-H:+InlineBeforeAnalysis" in config.extra_image_build_arguments:
+                            plugin = True
+                        self.print_statistics(config.benchmark_name,final_image_name, image_size, plugin)
                 else:
                     mx.log('\n\n\nImage ' + image_path + ' doesn\'t exist\n\n\n')
+
 
 
 class NativeImageBuildVm(GraalVm):

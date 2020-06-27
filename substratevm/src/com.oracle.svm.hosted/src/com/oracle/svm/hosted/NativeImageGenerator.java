@@ -79,7 +79,6 @@ import org.graalvm.compiler.nodes.StructuredGraph;
 import org.graalvm.compiler.nodes.gc.BarrierSet;
 import org.graalvm.compiler.nodes.graphbuilderconf.ClassInitializationPlugin;
 import org.graalvm.compiler.nodes.graphbuilderconf.GraphBuilderConfiguration;
-import org.graalvm.compiler.nodes.graphbuilderconf.InlineInvokePlugin;
 import org.graalvm.compiler.nodes.graphbuilderconf.InvocationPlugin;
 import org.graalvm.compiler.nodes.graphbuilderconf.InvocationPlugins;
 import org.graalvm.compiler.nodes.graphbuilderconf.NodeIntrinsicPluginFactory;
@@ -1104,6 +1103,8 @@ public class NativeImageGenerator {
 
         if(NativeImageInlineDuringParsingPlugin.Options.InlineBeforeAnalysis.getValue()) {
             plugins.appendInlineInvokePlugin(new NativeImageInlineDuringParsingPlugin(analysis, providers));
+            if(!analysis)
+                System.out.println("Number for inline: " + NativeImageInlineDuringParsingPlugin.getNumberForInline());
         }
 
         plugins.appendNodePlugin(new IntrinsifyMethodHandlesInvocationPlugin(analysis, providers, aUniverse, hUniverse));
