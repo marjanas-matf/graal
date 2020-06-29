@@ -33,6 +33,7 @@ import os
 import re
 import json
 import matplotlib.pyplot as plt
+import numpy as np
 from os.path import dirname, join
 
 _suite = mx.suite('vm')
@@ -259,30 +260,47 @@ class NativeImageVM(GraalVm):
         self.plot_statistics(benchmark_suite, data)
 
     def plot_statistics(self, benchmark_suite, data):
-        plt.figure(num=1, figsize=(14, 7))
+        size=15
+        params = {'legend.fontsize': 'large',
+                  'axes.labelsize': size*0.90,
+                  'axes.titlesize': size,
+                  'xtick.labelsize': size*0.80,
+                  'ytick.labelsize': size*0.80,
+                  'axes.titlepad': size*2}
+        plt.rcParams.update(params)
 
         image_size_plugin_on = []
         image_name_plugin_on = []
-        list = data["plugin-on"]
-        if len(list) != 0:
-            for map in list:
+        listData = data["plugin-on"]
+        if len(listData) != 0:
+            for map in listData:
                 image_name_plugin_on.append(map["benchmark-name"])
                 image_size_plugin_on.append(map["image-size"])
-        plt.plot(image_name_plugin_on, image_size_plugin_on, 'ro', label="With plugin")
 
         image_size_plugin_off = []
         image_name_plugin_off = []
-        list = data["plugin-off"]
-        if len(list) != 0:
-            for map in list:
+        listData = data["plugin-off"]
+        if len(listData) != 0:
+            for map in listData:
                 image_name_plugin_off.append(map["benchmark-name"])
                 image_size_plugin_off.append(map["image-size"])
-        plt.plot(image_name_plugin_off, image_size_plugin_off, 'bo', label="Without plugin")
 
-        plt.ylabel('image size (MB)', labelpad=20)
-        plt.xlabel('benchmark name', labelpad=20)
-        plt.legend()
+        # missing complete information for benchmark
+        if image_name_plugin_on != image_name_plugin_off:
+            return
+        x = np.arange(len(image_name_plugin_on))
+        width = 0.35
+        fig, ax = plt.subplots(figsize=(14,7))
+        ax.bar(x - width/2, image_size_plugin_off, width, label='Default')
+        ax.bar(x + width/2, image_size_plugin_on, width, label='-H:+InlineBeforeAnalysis')
+        ax.tick_params(length = 10)
+        ax.set_ylabel('image size (MB)',  labelpad=20)
+        ax.set_xlabel('benchmark name',  labelpad=20)
         plt.title('Statistics for benchmark suite ' + benchmark_suite, pad=30)
+        ax.set_xticks(x)
+        ax.set_xticklabels(image_name_plugin_on)
+        ax.legend()
+        fig.tight_layout()
         plt.savefig(benchmark_suite + '_statistics.png')
         # plt.show()
 
