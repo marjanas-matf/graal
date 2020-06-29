@@ -26,17 +26,26 @@ package com.oracle.graal.pointsto.util;
 
 import org.graalvm.compiler.serviceprovider.GraalServices;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class Timer {
 
     private String prefix;
 
     private final String name;
     private final boolean autoPrint;
-    /** Timer start time in nanoseconds. */
+    /**
+     * Timer start time in nanoseconds.
+     */
     private long startTime;
-    /** Timer total time in nanoseconds. */
+    /**
+     * Timer total time in nanoseconds.
+     */
     private long totalTime;
-    /** Total VM memory in bytes recorded when the timer is printed. */
+    /**
+     * Total VM memory in bytes recorded when the timer is printed.
+     */
     private long totalMemory;
 
     public Timer(String name) {
@@ -92,16 +101,39 @@ public class Timer {
         System.out.format("%s%12s: %,10.2f ms, %,5.2f GB%n", concurrentPrefix, name, time / 1000000d, totalMemoryGB);
     }
 
+    private void printInFile(long time) {
+        if (prefix == null) {
+            prefix = " ";
+        }
+        String totalTime = String.format("%s: %,10.2f ms\n", prefix, time / 1000000d);
+        try {
+            FileWriter myWriter = new FileWriter("/opt/graal/graal/vm/renaissance_build_time.txt", true);
+            myWriter.write(totalTime);
+            myWriter.flush();
+            myWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void print() {
         print(totalTime);
     }
 
-    /** Get timer total time in milliseconds. */
+    public void printInFile() {
+        printInFile(totalTime);
+    }
+
+    /**
+     * Get timer total time in milliseconds.
+     */
     public double getTotalTime() {
         return totalTime / 1000000d;
     }
 
-    /** Get total VM memory in bytes. */
+    /**
+     * Get total VM memory in bytes.
+     */
     public long getTotalMemory() {
         return totalMemory;
     }
