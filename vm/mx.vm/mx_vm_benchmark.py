@@ -35,6 +35,7 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 from os.path import dirname, join
+import shutil
 
 _suite = mx.suite('vm')
 _native_image_vm_registry = mx_benchmark.VmRegistry('NativeImage', 'ni-vm')
@@ -260,13 +261,13 @@ class NativeImageVM(GraalVm):
         self.plot_statistics(benchmark_suite, data)
 
     def plot_statistics(self, benchmark_suite, data):
-        size=15
+        size = 15
         params = {'legend.fontsize': 'large',
-                  'axes.labelsize': size*0.90,
+                  'axes.labelsize': size * 0.90,
                   'axes.titlesize': size,
-                  'xtick.labelsize': size*0.80,
-                  'ytick.labelsize': size*0.80,
-                  'axes.titlepad': size*2}
+                  'xtick.labelsize': size * 0.80,
+                  'ytick.labelsize': size * 0.80,
+                  'axes.titlepad': size * 2}
         plt.rcParams.update(params)
 
         image_size_plugin_on = []
@@ -288,19 +289,52 @@ class NativeImageVM(GraalVm):
         # missing complete information for benchmark
         if image_name_plugin_on != image_name_plugin_off:
             return
+
         x = np.arange(len(image_name_plugin_on))
-        width = 0.35
-        fig, ax = plt.subplots(figsize=(14,7))
-        ax.bar(x - width/2, image_size_plugin_off, width, label='Default')
-        ax.bar(x + width/2, image_size_plugin_on, width, label='-H:+InlineBeforeAnalysis')
-        ax.tick_params(length = 10)
-        ax.set_ylabel('image size (MB)',  labelpad=20)
-        ax.set_xlabel('benchmark name',  labelpad=20)
-        plt.title('Statistics for benchmark suite ' + benchmark_suite, pad=30)
-        ax.set_xticks(x)
-        ax.set_xticklabels(image_name_plugin_on)
-        ax.legend()
+        width = 0.25
+        fig, ax = plt.subplots(2, 1, figsize=(14, 7), sharex=True)
+        # bar chart for image size
+        ax[0].bar(x - width / 2, image_size_plugin_off, width, label='Default')
+        ax[0].bar(x + width / 2, image_size_plugin_on, width, label='-H:+InlineBeforeAnalysis')
+        ax[0].tick_params(length=10)
+        ax[0].set_ylabel('image size (MB)', labelpad=20)
+        ax[0].set_title('Statistics for benchmark suite suite ' + benchmark_suite, pad=20)
+        ax[0].set_xticks(x)
+        ax[0].set_xticklabels(image_name_plugin_on)
+        ax[0].legend()
+
+        # try to open file with image build time information
+        try:
+            with open(benchmark_suite+'_build_time.txt', 'r') as in_file:
+                data = in_file.readlines()
+        except:
+            return
+
+        build_time_plugin_off = []
+        build_time_plugin_on = []
+        for name in image_name_plugin_on:
+            findBench = False
+            for line in data:
+                if line.startswith(name, line.find('-') + 1):
+                    if not findBench:
+                        build_time_plugin_on.append(float(line.split()[1]) * 0.001)
+                        print(name + "on" + str(float(line.split()[1]) * 0.001))
+                        findBench = True
+                    else:
+                        build_time_plugin_off.append(float(line.split()[1]) * 0.001)
+                        print(name + "off" + str(float(line.split()[1]) * 0.001))
+
+        # bar chart for image build time
+        ax[1].bar(x - width / 2, build_time_plugin_off, width, label='Default')
+        ax[1].bar(x + width / 2, build_time_plugin_on, width, label='-H:+InlineBeforeAnalysis')
+        ax[1].tick_params(length=10)
+        ax[1].set_ylabel('image build time (sec)', labelpad=20)
+        ax[1].set_xlabel('benchmark name', labelpad=20)
+        ax[1].set_xticks(x)
+        ax[1].set_xticklabels(image_name_plugin_on)
+        fig.subplots_adjust(hspace=2)
         fig.tight_layout()
+
         plt.savefig(benchmark_suite + '_statistics.png')
         # plt.show()
 
@@ -330,7 +364,8 @@ class NativeImageVM(GraalVm):
                                           'native-image-bench-' + executable_name + '-' + self.config_name())
                 if config.only_prepare_native_image:
                     if os.path.exists(output_dir_path):
-                        os.rmdir(output_dir_path)
+                        # os.rmdir(output_dir_path)
+                        shutil.rmtree(output_dir_path, ignore_errors=True)  # override existing mxbuild output patch
                     os.mkdir(output_dir_path)
                 config.output_dir = output_dir_path
             else:
