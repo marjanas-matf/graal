@@ -17,10 +17,10 @@ const delegateLanguageServers: Set<() => Thenable<String>> = new Set();
 
 let languageClient: Promise<LanguageClient> | undefined;
 let languageServerPID: number = 0;
+let hasR: boolean | undefined;
 
 export function registerLanguageServer(server: (() => Thenable<string>)): void {
     delegateLanguageServers.add(server);
-    stopLanguageServer().then(() => startLanguageServer(vscode.workspace.getConfiguration('graalvm').get('home') as string));
 }
 
 export function startLanguageServer(graalVMHome: string) {
@@ -33,8 +33,10 @@ export function startLanguageServer(graalVMHome: string) {
 				serverWorkDir = vscode.workspace.rootPath;
 			}
 			connectToLanguageServer(() => new Promise<StreamInfo>((resolve, reject) => {
-                lspArg().then((arg) => {
-					const serverProcess = cp.spawn(re, [arg, '--experimental-options', '--shell'], { cwd: serverWorkDir });
+                lspArgs().then(args => {
+					const lspArg = args.find(arg => arg.startsWith('--lsp='));
+					const lsPort = lspArg ? parseInt(lspArg.substring(6)) : LSPORT;
+					const serverProcess = cp.spawn(re, args.concat(['--experimental-options', '--shell']), { cwd: serverWorkDir });
 					if (!serverProcess || !serverProcess.pid) {
 						reject(`Launching server using command ${re} failed.`);
 					} else {
@@ -47,7 +49,7 @@ export function startLanguageServer(graalVMHome: string) {
 							socket.once('error', (e) => {
 								reject(e);
 							});
-							socket.connect(LSPORT, '127.0.0.1', () => {
+							socket.connect(lsPort, '127.0.0.1', () => {
 								resolve({
 									reader: socket,
 									writer: socket
@@ -92,12 +94,13 @@ export function connectToLanguageServer(connection: (() => Thenable<StreamInfo>)
 
 export function stopLanguageServer(): Thenable<void> {
 	if (languageClient) {
-		return languageClient.then((client) => client.stop().then(() => {
+		let terminate = () => {
 			languageClient = undefined;
 			if (languageServerPID > 0) {
 				terminateLanguageServer();
 			}
-		}));
+		};
+		return languageClient.then((client) => client.stop().then(terminate, terminate));
 	}
 	if (languageServerPID > 0) {
 		terminateLanguageServer();
@@ -105,12 +108,18 @@ export function stopLanguageServer(): Thenable<void> {
 	return Promise.resolve();
 }
 
-export function lspArg(): Thenable<string> {
+export async function lspArgs(): Promise<string[]> {
+	const port = utils.random(3000, 50000);
     let delegateServers: string | undefined = vscode.workspace.getConfiguration('graalvm').get('languageServer.delegateServers') as string;
-    const s = Array.from(delegateLanguageServers).map(server => server());
+	const s = Array.from(delegateLanguageServers).map(server => server());
+	const r = await hasRSource();
     return Promise.all(s).then((servers) => {
-        delegateServers = delegateServers ? delegateServers.concat(',', servers.join()) : servers.join();
-        return delegateServers ? '--lsp.Delegates=' + delegateServers : '--lsp';
+		let args = r ? ['--jvm', `--lsp=${port}`] : [`--lsp=${port}`];
+		delegateServers = delegateServers ? delegateServers.concat(',', servers.join()) : servers.join();
+		if (delegateServers) {
+			args = args.concat('--lsp.Delegates=' + delegateServers);
+		}
+		return args;
     });
 }
 
@@ -120,6 +129,21 @@ export function setLSPID(pid: number) {
 
 export function hasLSClient(): boolean {
     return languageClient !== undefined;
+}
+
+async function hasRSource(): Promise<boolean> {
+	if (hasR === undefined) {
+		const uris: vscode.Uri[] = await vscode.workspace.findFiles('*.{r,R}', undefined, 1);
+		hasR = uris.length > 0;
+		if (!hasR) {
+			const fsWatcher = vscode.workspace.createFileSystemWatcher('*.{r,R}', false, true, true);
+			fsWatcher.onDidCreate(_uri => {
+				hasR = true;
+				fsWatcher.dispose();
+			});
+		}
+	}
+	return hasR;
 }
 
 function terminateLanguageServer() {
@@ -135,4 +159,3 @@ function terminateLanguageServer() {
 	}
 	languageServerPID = 0;
 }
-

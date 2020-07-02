@@ -80,6 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
 		config();
 		startLanguageServer(graalVMHome);
 	}
+	vscode.window.setStatusBarMessage('GraalVM extension activated', 3000);
 }
 
 export function deactivate(): Thenable<void> {
@@ -90,6 +91,24 @@ export function deactivate(): Thenable<void> {
 function config() {
 	const graalVMHome = vscode.workspace.getConfiguration('graalvm').get('home') as string;
 	if (graalVMHome) {
+		const termConfig = vscode.workspace.getConfiguration('terminal.integrated');
+		let section: string = '';
+		if (process.platform === 'linux') {
+			section = 'env.linux';
+		} else if (process.platform === 'darwin') {
+			section = 'env.mac';
+		}
+		let env: any = termConfig.get(section);
+		env.GRAALVM_HOME = graalVMHome;
+		let envPath = process.env.PATH;
+		if (envPath) {
+			if (!envPath.includes(`${graalVMHome}/bin`)) {
+				env.PATH = `${graalVMHome}/bin:${envPath}`;
+			}
+		} else {
+			env.PATH = `${graalVMHome}/bin`;
+		}
+		termConfig.update(section, env, true);
 		const javaConfig = vscode.workspace.getConfiguration('java');
 		if (javaConfig) {
 			const home = javaConfig.inspect('home');

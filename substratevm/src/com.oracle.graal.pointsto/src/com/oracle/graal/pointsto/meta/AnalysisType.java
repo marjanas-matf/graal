@@ -508,7 +508,7 @@ public class AnalysisType implements WrappedJavaType, OriginalClassProvider, Com
             /* Races are not a problem because every thread is going to do the same steps. */
             isInHeap = true;
 
-            assert isArray() || (isInstanceClass() && !Modifier.isAbstract(getModifiers()));
+            assert isArray() || (isInstanceClass() && !Modifier.isAbstract(getModifiers())) : this;
             universe.hostVM.checkForbidden(this, UsageKind.InHeap);
         }
     }
@@ -1009,6 +1009,21 @@ public class AnalysisType implements WrappedJavaType, OriginalClassProvider, Com
          * will not be linked.
          */
         return wrapped.isLinked();
+    }
+
+    @Override
+    public void link() {
+        wrapped.link();
+    }
+
+    @Override
+    public boolean hasDefaultMethods() {
+        return wrapped.hasDefaultMethods();
+    }
+
+    @Override
+    public boolean declaresDefaultMethods() {
+        return wrapped.declaresDefaultMethods();
     }
 
     @Override

@@ -93,7 +93,8 @@ public abstract class LLVMStart extends LLVMIntrinsic {
     public abstract static class LLVMLangStartInternal extends LLVMStart {
 
         @TruffleBoundary
-        protected LangStartVtableType createLangStartVtable(Type vtableType) throws TypeOverflowException {
+        protected LangStartVtableType createLangStartVtable(LLVMGlobal vtableGlobal) throws TypeOverflowException {
+            Type vtableType = vtableGlobal.getPointeeType();
             LLVMFunctionStartNode startNode = (LLVMFunctionStartNode) getRootNode();
             DataLayout dataSpecConverter = startNode.getDatalayout();
             return LangStartVtableType.create(dataSpecConverter, vtableType);
@@ -111,7 +112,7 @@ public abstract class LLVMStart extends LLVMIntrinsic {
             LLVMGlobal vtableGlobal = ctx.findGlobal(vtable);
             assert vtableGlobal != null;
             try {
-                LangStartVtableType langStartVtable = createLangStartVtable(vtableGlobal.getPointeeType());
+                LangStartVtableType langStartVtable = createLangStartVtable(vtableGlobal);
                 LLVMNativePointer fn = readFn(memory, vtable, langStartVtable);
                 LLVMNativePointer dropInPlace = readDropInPlace(memory, vtable, langStartVtable);
                 LLVMNativePointer main = coerceMainForFn(memory, langStartVtable, mainPointer);
@@ -146,19 +147,19 @@ public abstract class LLVMStart extends LLVMIntrinsic {
             }
 
             long readFn(LLVMMemory memory, long address) {
-                return memory.getPointer(address + offsetFn).asNative();
+                return memory.getPointer(null, address + offsetFn).asNative();
             }
 
             long coerceMainForFn(LLVMMemory memory, long mainAddress) {
                 if (fnExpectsCoercedMain) {
-                    return memory.getPointer(mainAddress).asNative();
+                    return memory.getPointer(null, mainAddress).asNative();
                 }
                 return mainAddress;
             }
 
             @SuppressWarnings("static-method")
             long readDropInPlace(LLVMMemory memory, long address) {
-                return memory.getPointer(address).asNative();
+                return memory.getPointer(null, address).asNative();
             }
 
             static LangStartVtableType create(DataLayout datalayout, Type vtableType) throws TypeOverflowException {

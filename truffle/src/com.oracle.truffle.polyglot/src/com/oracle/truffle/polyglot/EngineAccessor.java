@@ -40,6 +40,8 @@
  */
 package com.oracle.truffle.polyglot;
 
+import static com.oracle.truffle.api.CompilerDirectives.shouldNotReachHere;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.ref.Reference;
@@ -83,6 +85,7 @@ import com.oracle.truffle.api.TruffleFile;
 import com.oracle.truffle.api.TruffleLanguage;
 import com.oracle.truffle.api.TruffleLanguage.Env;
 import com.oracle.truffle.api.TruffleLogger;
+import com.oracle.truffle.api.TruffleFile.FileTypeDetector;
 import com.oracle.truffle.api.frame.Frame;
 import com.oracle.truffle.api.impl.Accessor;
 import com.oracle.truffle.api.impl.TruffleLocator;
@@ -96,6 +99,7 @@ import com.oracle.truffle.api.nodes.Node;
 import com.oracle.truffle.api.nodes.RootNode;
 import com.oracle.truffle.api.source.Source;
 import com.oracle.truffle.api.source.SourceSection;
+import com.oracle.truffle.polyglot.PolyglotSource.EmbedderFileSystemContext;
 
 final class EngineAccessor extends Accessor {
 
@@ -242,17 +246,13 @@ final class EngineAccessor extends Accessor {
         @Override
         public TruffleFile getTruffleFile(String path) {
             PolyglotContextImpl context = PolyglotContextImpl.requireContext();
-            FileSystem fileSystem = context.config.fileSystem;
-            Supplier<Map<String, Collection<? extends TruffleFile.FileTypeDetector>>> fileTypeDetectorsSupplier = context.engine.getFileTypeDetectorsSupplier();
-            return EngineAccessor.LANGUAGE.getTruffleFile(path, fileSystem, fileTypeDetectorsSupplier);
+            return EngineAccessor.LANGUAGE.getTruffleFile(context.getHostContext().getPublicFileSystemContext(), path);
         }
 
         @Override
         public TruffleFile getTruffleFile(URI uri) {
             PolyglotContextImpl context = PolyglotContextImpl.requireContext();
-            FileSystem fileSystem = context.config.fileSystem;
-            Supplier<Map<String, Collection<? extends TruffleFile.FileTypeDetector>>> fileTypeDetectorsSupplier = context.engine.getFileTypeDetectorsSupplier();
-            return EngineAccessor.LANGUAGE.getTruffleFile(uri, fileSystem, fileTypeDetectorsSupplier);
+            return EngineAccessor.LANGUAGE.getTruffleFile(context.getHostContext().getPublicFileSystemContext(), uri);
         }
 
         @Override
@@ -281,7 +281,7 @@ final class EngineAccessor extends Accessor {
         @Override
         public <T> T lookup(InstrumentInfo info, Class<T> serviceClass) {
             PolyglotInstrument instrument = (PolyglotInstrument) LANGUAGE.getPolyglotInstrument(info);
-            return instrument.lookup(serviceClass, false);
+            return instrument.lookupInternal(serviceClass);
         }
 
         @Override
@@ -302,7 +302,7 @@ final class EngineAccessor extends Accessor {
             PolyglotLanguageContext context = PolyglotContextImpl.requireContext().getLanguageContext(languageClass);
             TruffleLanguage.Env env = context.env;
             if (env == null) {
-                CompilerDirectives.transferToInterpreter();
+                CompilerDirectives.transferToInterpreterAndInvalidate();
                 throw PolyglotEngineException.illegalState("Current context is not yet initialized or already disposed.");
             }
             return (C) LANGUAGE.getContext(env);
@@ -321,7 +321,7 @@ final class EngineAccessor extends Accessor {
             PolyglotContextImpl context = PolyglotContextImpl.requireContext();
             TruffleLanguage.Env env = context.getLanguageContext(languageClass).env;
             if (env == null) {
-                CompilerDirectives.transferToInterpreter();
+                CompilerDirectives.transferToInterpreterAndInvalidate();
                 throw PolyglotEngineException.illegalState("Current context is not yet initialized or already disposed.");
             }
             return (T) EngineAccessor.LANGUAGE.getLanguage(env);
@@ -348,7 +348,7 @@ final class EngineAccessor extends Accessor {
 
         private static PolyglotEngineImpl getEngine(Object polyglotObject) throws AssertionError {
             if (!(polyglotObject instanceof PolyglotImpl.VMObject)) {
-                throw new AssertionError();
+                throw shouldNotReachHere();
             }
             return ((PolyglotImpl.VMObject) polyglotObject).getEngine();
         }
@@ -365,8 +365,7 @@ final class EngineAccessor extends Accessor {
                 try {
                     return engine.getLanguage(lib.getLanguage(value), false);
                 } catch (UnsupportedMessageException e) {
-                    CompilerDirectives.transferToInterpreter();
-                    throw new AssertionError(e);
+                    throw shouldNotReachHere(e);
                 }
             } else {
                 return null;
@@ -379,8 +378,7 @@ final class EngineAccessor extends Accessor {
                 try {
                     return engine.getLanguage(lib.getLanguage(value), false);
                 } catch (UnsupportedMessageException e) {
-                    CompilerDirectives.transferToInterpreter();
-                    throw new AssertionError(e);
+                    throw shouldNotReachHere(e);
                 }
             } else {
                 return null;
@@ -466,6 +464,73 @@ final class EngineAccessor extends Accessor {
         }
 
         @Override
+        public Object getCurrentFileSystemContext() {
+            return PolyglotContextImpl.requireContext().getHostContext().getPublicFileSystemContext();
+        }
+
+        @Override
+        public Object getPublicFileSystemContext(Object polyglotLanguageContext) {
+            return ((PolyglotLanguageContext) polyglotLanguageContext).getPublicFileSystemContext();
+        }
+
+        @Override
+        public Object getInternalFileSystemContext(Object polyglotLanguageContext) {
+            return ((PolyglotLanguageContext) polyglotLanguageContext).getInternalFileSystemContext();
+        }
+
+        @Override
+        public Map<String, Collection<? extends FileTypeDetector>> getEngineFileTypeDetectors(Object engineFileSystemObject) {
+            if (engineFileSystemObject instanceof PolyglotLanguageContext) {
+                return ((PolyglotLanguageContext) engineFileSystemObject).context.engine.getFileTypeDetectorsSupplier().get();
+            } else if (engineFileSystemObject instanceof EmbedderFileSystemContext) {
+                return ((EmbedderFileSystemContext) engineFileSystemObject).fileTypeDetectors.get();
+            } else {
+                throw new AssertionError();
+            }
+        }
+
+        @Override
+        public Set<String> getValidMimeTypes(Object engineObject, String language) {
+            LanguageCache lang = getLanguageCache(engineObject, language);
+            if (lang != null) {
+                return lang.getMimeTypes();
+            } else {
+                return Collections.emptySet();
+            }
+        }
+
+        private static LanguageCache getLanguageCache(Object engineObject, String language) throws AssertionError {
+            if (engineObject instanceof PolyglotLanguageContext) {
+                PolyglotLanguage polyglotLanguage = ((PolyglotLanguageContext) engineObject).context.engine.idToLanguage.get(language);
+                if (polyglotLanguage != null) {
+                    return polyglotLanguage.cache;
+                } else {
+                    return null;
+                }
+            } else if (engineObject instanceof EmbedderFileSystemContext) {
+                return ((EmbedderFileSystemContext) engineObject).cachedLanguages.get(language);
+            } else {
+                throw new AssertionError();
+            }
+        }
+
+        @Override
+        public boolean isCharacterBasedSource(Object fsEngineObject, String language, String mimeType) {
+            LanguageCache cache = getLanguageCache(fsEngineObject, language);
+            if (cache == null) {
+                return true;
+            }
+            String useMimeType = mimeType;
+            if (useMimeType == null) {
+                useMimeType = cache.getDefaultMimeType();
+            }
+            if (useMimeType == null || !cache.getMimeTypes().contains(useMimeType)) {
+                return true;
+            }
+            return cache.isCharacterMimeType(useMimeType);
+        }
+
+        @Override
         public boolean isMimeTypeSupported(Object polyglotLanguageContext, String mimeType) {
             PolyglotEngineImpl engine = getEngine(polyglotLanguageContext);
             for (PolyglotLanguage language : engine.idToLanguage.values()) {
@@ -533,8 +598,10 @@ final class EngineAccessor extends Accessor {
                 polyglotContext = (PolyglotContextImpl) polyglotObject;
             } else if (polyglotObject instanceof PolyglotLanguageContext) {
                 polyglotContext = ((PolyglotLanguageContext) polyglotObject).context;
+            } else if (polyglotObject instanceof EmbedderFileSystemContext) {
+                return false;
             } else {
-                throw new AssertionError();
+                throw shouldNotReachHere();
             }
             return polyglotContext.inContextPreInitialization;
         }
@@ -584,7 +651,7 @@ final class EngineAccessor extends Accessor {
             } else if (guestObject instanceof TruffleObject) {
                 return guestObject;
             } else {
-                CompilerDirectives.transferToInterpreter();
+                CompilerDirectives.transferToInterpreterAndInvalidate();
                 throw new IllegalArgumentException("Provided value not an interop value.");
             }
         }
@@ -699,7 +766,7 @@ final class EngineAccessor extends Accessor {
         @Override
         public Throwable asHostException(Throwable exception) {
             if (!(exception instanceof HostException)) {
-                CompilerDirectives.transferToInterpreter();
+                CompilerDirectives.transferToInterpreterAndInvalidate();
                 throw new IllegalArgumentException("Provided value not a host exception.");
             }
             return ((HostException) exception).getOriginal();
@@ -723,8 +790,7 @@ final class EngineAccessor extends Accessor {
                 try {
                     return lib.getMetaObject(value);
                 } catch (UnsupportedMessageException e) {
-                    CompilerDirectives.transferToInterpreter();
-                    throw new AssertionError("Unexpected unsupported message.", e);
+                    throw shouldNotReachHere("Unexpected unsupported message.", e);
                 }
             }
             return null;
@@ -850,36 +916,6 @@ final class EngineAccessor extends Accessor {
         }
 
         @Override
-        public Set<String> getValidMimeTypes(String language) {
-            if (language == null) {
-                return LanguageCache.languageMimes().keySet();
-            } else {
-                LanguageCache lang = LanguageCache.languages().get(language);
-                if (lang != null) {
-                    return lang.getMimeTypes();
-                } else {
-                    return Collections.emptySet();
-                }
-            }
-        }
-
-        @Override
-        public boolean isCharacterBasedSource(String language, String mimeType) {
-            LanguageCache cache = LanguageCache.languages().get(language);
-            if (cache == null) {
-                return true;
-            }
-            String useMimeType = mimeType;
-            if (useMimeType == null) {
-                useMimeType = cache.getDefaultMimeType();
-            }
-            if (useMimeType == null || !cache.getMimeTypes().contains(useMimeType)) {
-                return true;
-            }
-            return cache.isCharacterMimeType(useMimeType);
-        }
-
-        @Override
         public Object asHostObject(Object obj) {
             assert isHostObject(obj);
             HostObject javaObject = (HostObject) obj;
@@ -982,11 +1018,6 @@ final class EngineAccessor extends Accessor {
         @Override
         public FileSystem getFileSystem(Object polyglotContext) {
             return ((PolyglotContextImpl) polyglotContext).config.fileSystem;
-        }
-
-        @Override
-        public Supplier<Map<String, Collection<? extends TruffleFile.FileTypeDetector>>> getFileTypeDetectorsSupplier(Object polyglotContext) {
-            return ((PolyglotContextImpl) polyglotContext).engine.getFileTypeDetectorsSupplier();
         }
 
         @Override

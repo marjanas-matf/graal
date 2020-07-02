@@ -44,54 +44,69 @@ public final class StructureType extends AggregateType {
 
     private final String name;
     private final boolean isPacked;
+    private final boolean isNamed;
     @CompilationFinal(dimensions = 1) private final Type[] types;
     private long size = -1;
 
-    private StructureType(String name, boolean isPacked, Type[] types) {
+    private StructureType(String name, boolean isPacked, boolean isNamed, Type[] types) {
         this.name = name;
         this.isPacked = isPacked;
+        this.isNamed = isNamed;
         this.types = types;
     }
 
     /**
+     * Creates a named structure type with one element type.
+     */
+    public static StructureType createNamed(String name, boolean isPacked, Type type0) {
+        return new StructureType(name, isPacked, true, new Type[]{type0});
+    }
+
+    /**
+     * Creates a named structure type with two element types.
+     */
+    public static StructureType createNamed(String name, boolean isPacked, Type type0, Type type1) {
+        return new StructureType(name, isPacked, true, new Type[]{type0, type1});
+    }
+
+    /**
      * Creates a named structure type with known element types.
-     *
-     * <b>Attention!</b> the {@code types} array will be copied. Modifications to the original array
-     * are not propagated. Use {@link #setElementType} to modify the types. If you want create a
-     * structure with unknown element types use {@link #StructureType(String, boolean, int)}
-     * instead.
      */
-    public static StructureType createNamedByCopy(String name, boolean isPacked, Type[] types) {
-        return new StructureType(name, isPacked, types.clone());
+    public static StructureType createNamedFromList(String name, boolean isPacked, ArrayList<Type> types) {
+        return new StructureType(name, isPacked, true, types.toArray(Type.EMPTY_ARRAY));
     }
 
     /**
-     * @see #createNamedByCopy(String, boolean, Type[])
+     * Creates an unnamed structure type with one element type.
      */
-    public static StructureType createNamedByCopy(String name, boolean isPacked, ArrayList<Type> types) {
-        return new StructureType(name, isPacked, types.toArray(Type.EMPTY_ARRAY));
+    public static StructureType createUnnamed(boolean isPacked, Type type0) {
+        return new StructureType(LLVMIdentifier.UNKNOWN, isPacked, false, new Type[]{type0});
     }
 
     /**
-     * Creates an unnamed structure type with known element types.
-     *
-     * <b>Attention!</b> the {@code types} array will be copied. Modifications to the original array
-     * are not propagated. Use {@link #setElementType} to modify the types. If you want create a
-     * structure with unknown element types use {@link #StructureType(boolean, int)} instead.
+     * Creates an unnamed structure type with two element types.
      */
-    public static StructureType createUnnamedByCopy(boolean isPacked, Type[] types) {
-        return new StructureType(LLVMIdentifier.UNKNOWN, isPacked, types.clone());
+    public static StructureType createUnnamed(boolean isPacked, Type type0, Type type1) {
+        return new StructureType(LLVMIdentifier.UNKNOWN, isPacked, false, new Type[]{type0, type1});
+    }
+
+    /**
+     * Creates an unnamed structure type with three element types.
+     */
+    public static StructureType createUnnamed(boolean isPacked, Type type0, Type type1, Type type2) {
+        return new StructureType(LLVMIdentifier.UNKNOWN, isPacked, false, new Type[]{type0, type1, type2});
     }
 
     public StructureType(String name, boolean isPacked, int numElements) {
-        this(name, isPacked, new Type[numElements]);
+        this(name, isPacked, true, new Type[numElements]);
     }
 
     public StructureType(boolean isPacked, int numElements) {
-        this(LLVMIdentifier.UNKNOWN, isPacked, new Type[numElements]);
+        this(LLVMIdentifier.UNKNOWN, isPacked, false, new Type[numElements]);
     }
 
     public void setElementType(int idx, Type type) {
+        verifyCycleFree(type);
         types[idx] = type;
     }
 
@@ -101,6 +116,10 @@ public final class StructureType extends AggregateType {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isNamed() {
+        return isNamed;
     }
 
     @Override
@@ -191,7 +210,7 @@ public final class StructureType extends AggregateType {
     @Override
     @TruffleBoundary
     public String toString() {
-        if (LLVMIdentifier.UNKNOWN.equals(name)) {
+        if (!isNamed()) {
             return Arrays.stream(types).map(String::valueOf).collect(Collectors.joining(", ", "%{", "}"));
         } else {
             return name;

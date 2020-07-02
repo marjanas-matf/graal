@@ -390,21 +390,21 @@ final class PolyglotEngineImpl extends AbstractPolyglotImpl.AbstractEngineImpl i
 
         assert this.logLevels.isEmpty();
         parseOptions(newOptions, newUseSystemProperties, originalEngineOptions, languagesOptions, instrumentsOptions, logLevels);
-
-        this.engineOptionValues.putAll(originalEngineOptions, newAllowExperimentalOptions);
+        boolean useAllowExperimentalOptions = newAllowExperimentalOptions || Boolean.parseBoolean(EngineAccessor.RUNTIME.getSavedProperty(PROP_ALLOW_EXPERIMENTAL_OPTIONS));
+        this.engineOptionValues.putAll(originalEngineOptions, useAllowExperimentalOptions);
 
         if (this.runtimeData != null) {
             EngineAccessor.RUNTIME.reloadEngineOptions(this.runtimeData, this.engineOptionValues);
         }
 
         for (PolyglotLanguage language : languagesOptions.keySet()) {
-            language.getOptionValues().putAll(languagesOptions.get(language), newAllowExperimentalOptions);
+            language.getOptionValues().putAll(languagesOptions.get(language), useAllowExperimentalOptions);
         }
 
         // Set instruments options but do not call onCreate. OnCreate is called only in case of
         // successful context patch.
         for (PolyglotInstrument instrument : instrumentsOptions.keySet()) {
-            instrument.getOptionValues().putAll(instrumentsOptions.get(instrument), newAllowExperimentalOptions);
+            instrument.getOptionValues().putAll(instrumentsOptions.get(instrument), useAllowExperimentalOptions);
         }
         registerShutDownHook();
         return true;
@@ -754,11 +754,6 @@ final class PolyglotEngineImpl extends AbstractPolyglotImpl.AbstractEngineImpl i
                                         duplicateId, className1, className2));
     }
 
-    /*
-     * Do not call this when exception wrapping is done in one of the callees. It is expected to be
-     * thrown directly to the embedder. Save to call this from within a language as the engine is
-     * never closed there.
-     */
     void checkState() {
         if (closed) {
             throw PolyglotEngineException.illegalState("Engine is already closed.");
@@ -937,7 +932,7 @@ final class PolyglotEngineImpl extends AbstractPolyglotImpl.AbstractEngineImpl i
         PolyglotLanguage foundLanguage = getLanguage(languageClass, true);
         PolyglotLanguageContext context = foundLanguage.getCurrentLanguageContext();
         if (!context.isCreated()) {
-            CompilerDirectives.transferToInterpreter();
+            CompilerDirectives.transferToInterpreterAndInvalidate();
             throw PolyglotEngineException.illegalState(String.format("A context for language %s was not yet created.", languageClass.getName()));
         }
         return context.getLanguageInstance();
@@ -1089,10 +1084,10 @@ final class PolyglotEngineImpl extends AbstractPolyglotImpl.AbstractEngineImpl i
                     List<OptionDescriptors> allDescriptors = new ArrayList<>();
                     allDescriptors.add(engineOptions);
                     for (PolyglotLanguage language : idToLanguage.values()) {
-                        allDescriptors.add(language.getOptions());
+                        allDescriptors.add(language.getOptionsInternal());
                     }
                     for (PolyglotInstrument instrument : idToInstrument.values()) {
-                        allDescriptors.add(instrument.getOptions());
+                        allDescriptors.add(instrument.getOptionsInternal());
                     }
                     allOptions = OptionDescriptors.createUnion(allDescriptors.toArray(new OptionDescriptors[0]));
                 }
@@ -1385,7 +1380,7 @@ final class PolyglotEngineImpl extends AbstractPolyglotImpl.AbstractEngineImpl i
             final FileSystem internalFs;
             if (!ALLOW_IO) {
                 if (fileSystem == null) {
-                    throw PolyglotEngineException.illegalArgument("A FileSystem must be provided when the allowIO() privilege is removed at image build time");
+                    fileSystem = FileSystems.newNoIOFileSystem();
                 }
                 fs = fileSystem;
                 internalFs = fileSystem;
@@ -1579,7 +1574,7 @@ final class PolyglotEngineImpl extends AbstractPolyglotImpl.AbstractEngineImpl i
         if (needsEnter(context)) {
             return enter(context);
         }
-        assert PolyglotContextImpl.requireContext() != null;
+        assert PolyglotContextImpl.currentNotEntered() != null;
         return NO_ENTER;
     }
 
@@ -1618,8 +1613,8 @@ final class PolyglotEngineImpl extends AbstractPolyglotImpl.AbstractEngineImpl i
         if (CompilerDirectives.injectBranchProbability(CompilerDirectives.LIKELY_PROBABILITY, info.getThread() == Thread.currentThread())) {
             info.leave(this);
         } else {
-            if (singleThreadPerContext.isValid()) {
-                CompilerDirectives.transferToInterpreter();
+            if (singleThreadPerContext.isValid() && singleContext.isValid()) {
+                CompilerDirectives.transferToInterpreterAndInvalidate();
             }
             polyglotContext.leaveThreadChanged();
         }

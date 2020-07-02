@@ -56,14 +56,16 @@ public @interface TruffleFromLibGraal {
     // Please keep sorted
     enum Id implements FromLibGraalId {
         // @formatter:off
+        AddTargetToDequeue(void.class, Object.class, Object.class),
         AsCompilableTruffleAST(Object.class, Object.class, long.class),
         AsJavaConstant(long.class, Object.class),
         CallNodeHashCode(int.class, Object.class),
-        CancelInstalledTask(void.class, Object.class),
+        CancelCompilation(boolean.class, Object.class, String.class),
         CompilableToString(String.class, Object.class),
         ConsumeOptimizedAssumptionDependency(void.class, Consumer.class, Object.class),
         CreateInliningPlan(Object.class, Object.class, Object.class, Object.class),
         CreateStringSupplier(Supplier.class, long.class),
+        DequeueTargets(void.class, Object.class),
         FindCallNode(Object.class, Object.class, long.class),
         FindDecision(Object.class, Object.class, long.class),
         GetCallCount(int.class, Object.class),

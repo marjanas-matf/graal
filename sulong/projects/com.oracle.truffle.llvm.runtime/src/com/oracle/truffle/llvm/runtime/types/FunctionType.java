@@ -33,40 +33,34 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.oracle.truffle.api.Assumption;
-import com.oracle.truffle.api.CompilerDirectives;
-import com.oracle.truffle.api.CompilerDirectives.CompilationFinal;
+import com.oracle.truffle.api.CompilerAsserts;
 import com.oracle.truffle.api.CompilerDirectives.TruffleBoundary;
-import com.oracle.truffle.api.Truffle;
-import com.oracle.truffle.llvm.runtime.nodes.api.LLVMNode;
 import com.oracle.truffle.llvm.runtime.datalayout.DataLayout;
+import com.oracle.truffle.llvm.runtime.nodes.api.LLVMNode;
 import com.oracle.truffle.llvm.runtime.types.visitors.TypeVisitor;
 
 public final class FunctionType extends Type {
 
-    @CompilationFinal private Assumption returnTypeAssumption;
-    @CompilationFinal private Type returnType;
+    private Type returnType;
 
     private final Type[] argumentTypes;
     private final boolean isVarargs;
 
     private FunctionType(Type returnType, Type[] argumentTypes, boolean isVarargs) {
-        this.returnTypeAssumption = Truffle.getRuntime().createAssumption("FunctionType.returnType");
         this.returnType = returnType;
         this.argumentTypes = argumentTypes;
         this.isVarargs = isVarargs;
     }
 
     /**
-     * Creates a function type with known argument types.
-     *
-     * <b>Attention!</b> the {@code argumentTypes} array will be copied. Modifications to the
-     * original array are not propagated. Use {@link #setArgumentType} to modify the types. If you
-     * want create a function with unknown argument types use
-     * {@link #FunctionType(Type, int, boolean)} )} instead.
+     * Creates a function type with a single argument type.
      */
-    public static FunctionType createByCopy(Type returnType, Type[] argumentTypes, boolean isVarargs) {
-        return new FunctionType(returnType, argumentTypes.clone(), isVarargs);
+    public static FunctionType create(Type returnType, Type arg0, boolean isVarargs) {
+        return new FunctionType(returnType, new Type[]{arg0}, isVarargs);
+    }
+
+    public FunctionType(Type returnType, TypeArrayBuilder argumentTypes, boolean isVarargs) {
+        this(returnType, getRawTypeArray(argumentTypes), isVarargs);
     }
 
     public FunctionType(Type returnType, int numArguments, boolean isVarargs) {
@@ -74,10 +68,11 @@ public final class FunctionType extends Type {
     }
 
     public static FunctionType copy(FunctionType type) {
-        return createByCopy(type.returnType, type.argumentTypes, type.isVarargs);
+        return new FunctionType(type.returnType, type.argumentTypes.clone(), type.isVarargs);
     }
 
     public void setArgumentType(int idx, Type type) {
+        verifyCycleFree(type);
         argumentTypes[idx] = type;
     }
 
@@ -94,17 +89,14 @@ public final class FunctionType extends Type {
     }
 
     public Type getReturnType() {
-        if (!returnTypeAssumption.isValid()) {
-            CompilerDirectives.transferToInterpreterAndInvalidate();
-        }
+        CompilerAsserts.neverPartOfCompilation();
         return returnType;
     }
 
     public void setReturnType(Type returnType) {
-        CompilerDirectives.transferToInterpreterAndInvalidate();
-        this.returnTypeAssumption.invalidate();
+        CompilerAsserts.neverPartOfCompilation();
+        verifyCycleFree(returnType);
         this.returnType = returnType;
-        this.returnTypeAssumption = Truffle.getRuntime().createAssumption("FunctionType.returnType");
     }
 
     public boolean isVarargs() {
