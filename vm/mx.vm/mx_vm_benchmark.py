@@ -28,6 +28,7 @@
 import os
 import pipes
 import re
+import shutil
 from os.path import dirname, join
 from traceback import print_tb
 
