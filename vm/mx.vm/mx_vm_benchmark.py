@@ -25,17 +25,20 @@
 # questions.
 #
 # ----------------------------------------------------------------------------------------------------
-import pipes
-
-import mx, mx_benchmark
-import mx_sdk_vm, mx_sdk_vm_impl
-import os
-import re
 import json
+import os
+import pipes
+import re
+import shutil
+from os.path import dirname, join
+
 import matplotlib.pyplot as plt
 import numpy as np
-from os.path import dirname, join
-import shutil
+
+import mx
+import mx_benchmark
+import mx_sdk_vm
+import mx_sdk_vm_impl
 
 _suite = mx.suite('vm')
 _native_image_vm_registry = mx_benchmark.VmRegistry('NativeImage', 'ni-vm')
@@ -258,9 +261,9 @@ class NativeImageVM(GraalVm):
         with open(benchmark_suite + '_statistics.json', 'w') as outfile:
             json.dump(data, outfile)
 
-        self.plot_statistics(benchmark_suite, data)
+        # self.plot_statistics(benchmark_suite, data)
 
-    def plot_statistics(self, benchmark_suite, data):
+    def marjana(self, benchmark_suite, data):
         size = 15
         params = {'legend.fontsize': 'large',
                   'axes.labelsize': size * 0.90,
@@ -305,7 +308,7 @@ class NativeImageVM(GraalVm):
 
         # try to open file with image build time information
         try:
-            with open(benchmark_suite+'_build_time.txt', 'r') as in_file:
+            with open(benchmark_suite + '_build_time.txt', 'r') as in_file:
                 data = in_file.readlines()
         except:
             return
