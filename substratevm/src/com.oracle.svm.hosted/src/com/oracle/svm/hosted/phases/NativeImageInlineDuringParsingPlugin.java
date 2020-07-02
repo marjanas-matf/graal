@@ -97,7 +97,7 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         public static final HostedOptionKey<Boolean> InlineBeforeAnalysis = new HostedOptionKey<>(false);
 
         @Option(help = "Inlining is explored up to this number of nonparametric nodes in the graph.")
-        public static final HostedOptionKey<Integer> InlineBeforeAnalysisMaxNumberOfNodes = new HostedOptionKey<>(100);
+        public static final HostedOptionKey<Integer> InlineBeforeAnalysisMaxNumberOfNodes = new HostedOptionKey<>(50);
     }
 
     static final class CallSite {
@@ -477,10 +477,10 @@ class TrivialMethodDetector {
         @Override
         public InlineInfo shouldInlineInvoke(GraphBuilderContext b, ResolvedJavaMethod method, ValueNode[] args) {
 
-            if (getNonParameterNodeCount() > NativeImageInlineDuringParsingPlugin.Options.InlineBeforeAnalysisMaxNumberOfNodes.getValue()) {
+            //if (getNonParameterNodeCount() > NativeImageInlineDuringParsingPlugin.Options.InlineBeforeAnalysisMaxNumberOfNodes.getValue()) {
                 /* Node limit is exceed */
-                return null;
-            }
+              //  return null;
+            //}
 
             if (method.getAnnotation(NeverInline.class) != null || method.getAnnotation(NeverInlineTrivial.class) != null) {
                 return null;

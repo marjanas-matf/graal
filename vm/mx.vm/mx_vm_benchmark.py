@@ -26,6 +26,7 @@
 #
 # ----------------------------------------------------------------------------------------------------
 import os
+import pipes
 import re
 from os.path import dirname, join
 from traceback import print_tb

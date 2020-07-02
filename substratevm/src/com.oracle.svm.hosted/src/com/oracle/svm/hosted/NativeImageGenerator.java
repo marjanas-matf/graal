@@ -28,6 +28,7 @@ import static org.graalvm.compiler.hotspot.JVMCIVersionCheck.JVMCI11_RELEASES_UR
 import static org.graalvm.compiler.hotspot.JVMCIVersionCheck.JVMCI8_RELEASES_URL;
 import static org.graalvm.compiler.replacements.StandardGraphBuilderPlugins.registerInvocationPlugins;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -577,6 +578,7 @@ public class NativeImageGenerator {
                     printTypes();
                 }
 
+
                 /* Find the entry point methods in the hosted world. */
                 for (AnalysisMethod m : aUniverse.getMethods()) {
                     if (m.isEntryPoint()) {
@@ -1112,9 +1114,9 @@ public class NativeImageGenerator {
         SubstrateReplacements replacements = (SubstrateReplacements) providers.getReplacements();
         plugins.appendInlineInvokePlugin(replacements);
 
-        if(NativeImageInlineDuringParsingPlugin.Options.InlineBeforeAnalysis.getValue()) {
+        if (NativeImageInlineDuringParsingPlugin.Options.InlineBeforeAnalysis.getValue()) {
             plugins.appendInlineInvokePlugin(new NativeImageInlineDuringParsingPlugin(analysis, providers));
-            if(!analysis)
+            if (!analysis)
                 System.out.println("Number for inline: " + NativeImageInlineDuringParsingPlugin.getNumberForInline());
         }
 
@@ -1554,6 +1556,7 @@ public class NativeImageGenerator {
     }
 
     private void printTypes() {
+        int methodsNumber = 0;
         for (HostedType type : hUniverse.getTypes()) {
             System.out.format("%8d %s  ", type.getTypeID(), type.toJavaName(true));
             if (type.getSuperclass() != null) {
@@ -1628,13 +1631,27 @@ public class NativeImageGenerator {
                         printMethod(vtable[i], i);
                     }
                 }
+
                 for (HostedMethod method : hUniverse.getMethods()) {
                     if (method.getDeclaringClass() == type && !method.hasVTableIndex()) {
+                        methodsNumber++;
                         printMethod(method, -1);
                     }
                 }
             }
         }
+        try {
+            FileWriter myWriter = new FileWriter("/opt/graal/graal/vm/types_and_methods.txt", true);
+            String types = " T " + hUniverse.getTypes().size();
+            String methods = " M " + hUniverse.getMethods().size();
+            String data = "FIRST " + types + methods + " " + methodsNumber + "\n";
+            myWriter.write(data);
+            myWriter.flush();
+            myWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Number of methods: " + methodsNumber);
     }
 
     private static void printMethod(HostedMethod method, int vtableIndex) {

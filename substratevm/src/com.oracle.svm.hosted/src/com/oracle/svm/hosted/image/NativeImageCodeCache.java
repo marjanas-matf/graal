@@ -181,7 +181,7 @@ public abstract class NativeImageCodeCache {
 
         if (!imageHeap.getMetaAccess().lookupJavaType(obj.getClass()).getWrapped().isInstantiated()) {
             throw shouldNotReachHere("Non-instantiated type referenced by a compiled method: " + obj.getClass().getName() + "." +
-                            (reason != null ? " Method: " + reason : ""));
+                    (reason != null ? " Method: " + reason : ""));
         }
 
         imageHeap.addObject(obj, false, constantReasons.get(constant));
