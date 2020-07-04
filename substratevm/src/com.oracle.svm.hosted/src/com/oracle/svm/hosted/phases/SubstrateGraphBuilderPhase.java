@@ -52,8 +52,8 @@ import jdk.vm.ci.meta.ResolvedJavaMethod;
 public class SubstrateGraphBuilderPhase extends SharedGraphBuilderPhase {
 
     public SubstrateGraphBuilderPhase(Providers providers,
-                                      GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes,
-                                      NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
+                    GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes,
+                    NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
         super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, inlineInvocationData);
     }
 
@@ -64,7 +64,7 @@ public class SubstrateGraphBuilderPhase extends SharedGraphBuilderPhase {
 
     public static class SubstrateBytecodeParser extends SharedBytecodeParser {
         public SubstrateBytecodeParser(GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI,
-                                       IntrinsicContext intrinsicContext, boolean explicitExceptionEdges, NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
+                        IntrinsicContext intrinsicContext, boolean explicitExceptionEdges, NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
             super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, explicitExceptionEdges, inlineInvocationData);
         }
 

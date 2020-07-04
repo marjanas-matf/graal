@@ -44,7 +44,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
 
-import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin;
 import org.graalvm.compiler.core.common.spi.ForeignCallDescriptor;
 import org.graalvm.compiler.core.common.spi.ForeignCallsProvider;
 import org.graalvm.compiler.graph.Node;
@@ -92,6 +91,7 @@ import com.oracle.svm.hosted.classinitialization.ClassInitializationSupport;
 import com.oracle.svm.hosted.code.InliningUtilities;
 import com.oracle.svm.hosted.meta.HostedType;
 import com.oracle.svm.hosted.phases.AnalysisGraphBuilderPhase;
+import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin;
 import com.oracle.svm.hosted.substitute.UnsafeAutomaticSubstitutionProcessor;
 import com.oracle.svm.util.ReflectionUtil;
 
@@ -185,8 +185,8 @@ public final class SVMHost implements HostVM {
             EnumSet<AnalysisType.UsageKind> forbiddenType = forbiddenTypes.get(cur.getWrapped().toJavaName());
             if (forbiddenType != null && forbiddenType.contains(kind)) {
                 throw new UnsupportedFeatureException("Forbidden type " + cur.getWrapped().toJavaName() +
-                        (cur.equals(type) ? "" : " (superclass of " + type.getWrapped().toJavaName() + ")") +
-                        " UsageKind: " + kind);
+                                (cur.equals(type) ? "" : " (superclass of " + type.getWrapped().toJavaName() + ")") +
+                                " UsageKind: " + kind);
             }
         }
     }
@@ -197,7 +197,8 @@ public final class SVMHost implements HostVM {
     }
 
     @Override
-    public Instance createGraphBuilderPhase(BigBang bb, HostedProviders providers, GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext) {
+    public Instance createGraphBuilderPhase(BigBang bb, HostedProviders providers, GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts,
+                    IntrinsicContext initialIntrinsicContext) {
         return new AnalysisGraphBuilderPhase(bb, providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, providers.getWordTypes(), inlineInvocationData);
     }
 
@@ -338,7 +339,7 @@ public final class SVMHost implements HostVM {
         }
 
         final DynamicHub dynamicHub = new DynamicHub(className, computeHubType(type), computeReferenceType(type), type.isLocal(), isAnonymousClass(javaClass), superHub, componentHub, sourceFileName,
-                modifiers, hubClassLoader, isHidden, nestHost);
+                        modifiers, hubClassLoader, isHidden, nestHost);
         if (JavaVersionUtil.JAVA_SPEC > 8) {
             ModuleAccess.extractAndSetModule(dynamicHub, javaClass);
         }
@@ -347,7 +348,7 @@ public final class SVMHost implements HostVM {
 
     /**
      * @return boolean if class is available or NoClassDefFoundError if class' parents are not on
-     * the classpath or InternalError if the class is invalid.
+     *         the classpath or InternalError if the class is invalid.
      */
     private static Object isAnonymousClass(Class<?> javaClass) {
         try {
@@ -359,9 +360,9 @@ public final class SVMHost implements HostVM {
                 return e;
             } else {
                 String message = "Discovered a type for which isAnonymousClass can't be called: " + javaClass.getTypeName() +
-                        ". To avoid this issue at build time use the " +
-                        SubstrateOptionsParser.commandArgument(NativeImageOptions.AllowIncompleteClasspath, "+") +
-                        " option. The NoClassDefFoundError will then be reported at run time when this method is called for the first time.";
+                                ". To avoid this issue at build time use the " +
+                                SubstrateOptionsParser.commandArgument(NativeImageOptions.AllowIncompleteClasspath, "+") +
+                                " option. The NoClassDefFoundError will then be reported at run time when this method is called for the first time.";
                 throw new UnsupportedFeatureException(message);
             }
         }
@@ -473,10 +474,10 @@ public final class SVMHost implements HostVM {
 
                     if (node.getReason() == DeoptimizationReason.JavaSubroutineMismatch) {
                         bb.getUnsupportedFeatures().addMessage(method.format("%H.%n(%p)"), method, "The bytecodes of the method " + method.format("%H.%n(%p)") +
-                                " contain a JSR/RET structure that could not be simplified by the compiler. The JSR bytecode is unused and deprecated since Java 6. Please recompile your application with a newer Java compiler." +
-                                System.lineSeparator() + "To diagnose the issue, you can add the option " +
-                                SubstrateOptionsParser.commandArgument(NativeImageOptions.ReportUnsupportedElementsAtRuntime, "+") +
-                                ". The error is then reported at run time when the JSR/RET is executed.");
+                                        " contain a JSR/RET structure that could not be simplified by the compiler. The JSR bytecode is unused and deprecated since Java 6. Please recompile your application with a newer Java compiler." +
+                                        System.lineSeparator() + "To diagnose the issue, you can add the option " +
+                                        SubstrateOptionsParser.commandArgument(NativeImageOptions.ReportUnsupportedElementsAtRuntime, "+") +
+                                        ". The error is then reported at run time when the JSR/RET is executed.");
                     }
                 }
             }

@@ -82,10 +82,10 @@ import com.oracle.svm.core.option.HostedOptionKey;
 import com.oracle.svm.core.util.VMError;
 import com.oracle.svm.hosted.meta.HostedMethod;
 import com.oracle.svm.hosted.phases.AnalysisGraphBuilderPhase.AnalysisBytecodeParser;
-import com.oracle.svm.hosted.phases.SharedGraphBuilderPhase.SharedBytecodeParser;
 import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.CallSite;
 import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.InvocationResult;
 import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.InvocationResultInline;
+import com.oracle.svm.hosted.phases.SharedGraphBuilderPhase.SharedBytecodeParser;
 
 import jdk.vm.ci.code.BailoutException;
 import jdk.vm.ci.meta.ResolvedJavaMethod;
@@ -96,8 +96,8 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         @Option(help = "Inline methods during parsing before the static analysis.")//
         public static final HostedOptionKey<Boolean> InlineBeforeAnalysis = new HostedOptionKey<>(false);
 
-        @Option(help = "Inlining is explored up to this number of nonparametric nodes in the graph.")
-        public static final HostedOptionKey<Integer> InlineBeforeAnalysisMaxNumberOfNodes = new HostedOptionKey<>(50);
+        @Option(help = "Inlining is explored up to this number of nonparametric nodes in the graph.") public static final HostedOptionKey<Integer> InlineBeforeAnalysisMaxNumberOfNodes = new HostedOptionKey<>(
+                        50);
     }
 
     static final class CallSite {
@@ -225,7 +225,7 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         }
 
         if (method.getAnnotation(RestrictHeapAccess.class) != null || method.getAnnotation(Uninterruptible.class) != null ||
-                b.getMethod().getAnnotation(RestrictHeapAccess.class) != null || b.getMethod().getAnnotation(Uninterruptible.class) != null) {
+                        b.getMethod().getAnnotation(RestrictHeapAccess.class) != null || b.getMethod().getAnnotation(Uninterruptible.class) != null) {
             /*
              * Caller or callee have an annotation that might prevent inlining. We don't check the
              * exact condition but instead always bail out for simplicity.
@@ -278,7 +278,7 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
                     receiverType.registerAsInHeap();
                 }
             }
-            //System.out.println(method.format("INLINE: %n, %H"));
+            // System.out.println(method.format("INLINE: %n, %H"));
             numberForInline++;
             return InlineInfo.createStandardInlineInfo(method);
         } else {
@@ -393,7 +393,7 @@ class TrivialMethodDetector {
         try (DebugContext.Scope ignored = debug.scope("InlineDuringParsingAnalysis", graph, method, this)) {
 
             TrivialMethodDetectorGraphBuilderPhase builderPhase = new TrivialMethodDetectorGraphBuilderPhase(bb, providers, graphBuilderConfig, OptimisticOptimizations.NONE, null,
-                    providers.getWordTypes());
+                            providers.getWordTypes());
 
             try (NodeEventScope ignored1 = graph.trackNodeEvents(methodState)) {
                 builderPhase.apply(graph);
@@ -526,7 +526,7 @@ class TrivialMethodDetectorBailoutException extends BailoutException {
 class TrivialMethodDetectorGraphBuilderPhase extends AnalysisGraphBuilderPhase {
 
     TrivialMethodDetectorGraphBuilderPhase(BigBang bb, Providers providers,
-                                           GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes) {
+                    GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes) {
         super(bb, providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, null);
     }
 
@@ -539,7 +539,7 @@ class TrivialMethodDetectorGraphBuilderPhase extends AnalysisGraphBuilderPhase {
 
 class TrivialMethodDetectorBytecodeParser extends AnalysisBytecodeParser {
     protected TrivialMethodDetectorBytecodeParser(BigBang bb, GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI,
-                                                  IntrinsicContext intrinsicContext) {
+                    IntrinsicContext intrinsicContext) {
         super(bb, graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, null);
     }
 
