@@ -72,13 +72,13 @@ public class HostedGraphKit extends SubstrateGraphKit {
 
     @Override
     protected Instance createGraphBuilderInstance(Providers theProviders, GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts,
-                    IntrinsicContext initialIntrinsicContext) {
+                                                  IntrinsicContext initialIntrinsicContext) {
 
         ResolvedJavaMethod method = graph.method();
         if (method instanceof AnalysisMethod) {
-            return new AnalysisGraphBuilderPhase(theProviders, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes);
+            return new AnalysisGraphBuilderPhase(null, theProviders, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, null);
         } else if (method instanceof HostedMethod) {
-            return new HostedGraphBuilderPhase(theProviders, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes);
+            return new HostedGraphBuilderPhase(theProviders, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, null);
         } else {
             throw VMError.shouldNotReachHere();
         }
