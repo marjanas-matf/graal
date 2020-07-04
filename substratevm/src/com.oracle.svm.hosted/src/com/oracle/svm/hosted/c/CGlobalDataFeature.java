@@ -24,21 +24,17 @@
  */
 package com.oracle.svm.hosted.c;
 
-import com.oracle.svm.core.annotate.AutomaticFeature;
-import com.oracle.svm.core.c.CGlobalData;
-import com.oracle.svm.core.c.CGlobalDataImpl;
-import com.oracle.svm.core.config.ConfigurationValues;
-import com.oracle.svm.core.graal.GraalFeature;
-import com.oracle.svm.core.graal.code.CGlobalDataInfo;
-import com.oracle.svm.core.c.CGlobalDataNonConstantRegistry;
-import com.oracle.svm.core.graal.nodes.CGlobalDataLoadAddressNode;
-import com.oracle.svm.core.meta.SubstrateObjectConstant;
-import com.oracle.svm.core.util.VMError;
-import com.oracle.svm.hosted.image.RelocatableBuffer;
-import com.oracle.svm.util.ReflectionUtil;
-import jdk.vm.ci.meta.JavaConstant;
-import jdk.vm.ci.meta.ResolvedJavaField;
-import jdk.vm.ci.meta.ResolvedJavaMethod;
+import static org.graalvm.compiler.nodes.CallTargetNode.InvokeKind;
+import static org.graalvm.compiler.nodes.extended.BranchProbabilityNode.VERY_SLOW_PATH_PROBABILITY;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
+import java.util.stream.IntStream;
+
 import org.graalvm.compiler.api.replacements.SnippetReflectionProvider;
 import org.graalvm.compiler.core.common.type.IntegerStamp;
 import org.graalvm.compiler.nodes.AbstractBeginNode;
@@ -69,16 +65,22 @@ import org.graalvm.compiler.nodes.memory.address.OffsetAddressNode;
 import org.graalvm.compiler.phases.util.Providers;
 import org.graalvm.nativeimage.ImageSingletons;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiFunction;
-import java.util.stream.IntStream;
+import com.oracle.svm.core.annotate.AutomaticFeature;
+import com.oracle.svm.core.c.CGlobalData;
+import com.oracle.svm.core.c.CGlobalDataImpl;
+import com.oracle.svm.core.c.CGlobalDataNonConstantRegistry;
+import com.oracle.svm.core.config.ConfigurationValues;
+import com.oracle.svm.core.graal.GraalFeature;
+import com.oracle.svm.core.graal.code.CGlobalDataInfo;
+import com.oracle.svm.core.graal.nodes.CGlobalDataLoadAddressNode;
+import com.oracle.svm.core.meta.SubstrateObjectConstant;
+import com.oracle.svm.core.util.VMError;
+import com.oracle.svm.hosted.image.RelocatableBuffer;
+import com.oracle.svm.util.ReflectionUtil;
 
-import static org.graalvm.compiler.nodes.CallTargetNode.InvokeKind;
-import static org.graalvm.compiler.nodes.extended.BranchProbabilityNode.VERY_SLOW_PATH_PROBABILITY;
+import jdk.vm.ci.meta.JavaConstant;
+import jdk.vm.ci.meta.ResolvedJavaField;
+import jdk.vm.ci.meta.ResolvedJavaMethod;
 
 @AutomaticFeature
 public class CGlobalDataFeature implements GraalFeature {

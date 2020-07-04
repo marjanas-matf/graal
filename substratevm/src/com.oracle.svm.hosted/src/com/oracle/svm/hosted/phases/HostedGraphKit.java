@@ -72,7 +72,7 @@ public class HostedGraphKit extends SubstrateGraphKit {
 
     @Override
     protected Instance createGraphBuilderInstance(Providers theProviders, GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts,
-                                                  IntrinsicContext initialIntrinsicContext) {
+                    IntrinsicContext initialIntrinsicContext) {
 
         ResolvedJavaMethod method = graph.method();
         if (method instanceof AnalysisMethod) {

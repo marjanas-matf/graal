@@ -31,8 +31,8 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.graalvm.collections.EconomicSet;
-import org.graalvm.nativeimage.hosted.Feature;
 import org.graalvm.nativeimage.ImageSingletons;
+import org.graalvm.nativeimage.hosted.Feature;
 
 import com.oracle.graal.pointsto.meta.AnalysisType;
 import com.oracle.graal.pointsto.meta.AnalysisUniverse;

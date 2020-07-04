@@ -24,16 +24,17 @@
  */
 package com.oracle.svm.hosted.dashboard;
 
-import com.oracle.svm.core.annotate.AutomaticFeature;
 import java.io.File;
-import org.graalvm.nativeimage.hosted.Feature;
-
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.graalvm.nativeimage.hosted.Feature;
+
+import com.oracle.svm.core.annotate.AutomaticFeature;
 
 @AutomaticFeature
 public class DashboardDumpFeature implements Feature {

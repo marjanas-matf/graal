@@ -24,7 +24,6 @@
  */
 package com.oracle.svm.hosted.phases;
 
-import com.oracle.graal.pointsto.BigBang;
 import org.graalvm.compiler.api.replacements.Fold;
 import org.graalvm.compiler.graph.Node;
 import org.graalvm.compiler.java.BytecodeParser;
@@ -42,6 +41,7 @@ import org.graalvm.compiler.phases.OptimisticOptimizations;
 import org.graalvm.compiler.phases.util.Providers;
 import org.graalvm.compiler.word.WordTypes;
 
+import com.oracle.graal.pointsto.BigBang;
 import com.oracle.graal.pointsto.meta.AnalysisMethod;
 
 import jdk.vm.ci.meta.JavaKind;
@@ -51,8 +51,8 @@ public class AnalysisGraphBuilderPhase extends SharedGraphBuilderPhase {
     protected final BigBang bb;
 
     public AnalysisGraphBuilderPhase(BigBang bb, Providers providers,
-                                     GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes,
-                                     NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
+                    GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes,
+                    NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
         super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, inlineInvocationData);
         this.bb = bb;
     }
@@ -66,7 +66,7 @@ public class AnalysisGraphBuilderPhase extends SharedGraphBuilderPhase {
         protected final BigBang bb;
 
         protected AnalysisBytecodeParser(BigBang bb, GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI,
-                                         IntrinsicContext intrinsicContext, NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
+                        IntrinsicContext intrinsicContext, NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
             super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, true, inlineInvocationData);
             this.bb = bb;
         }
