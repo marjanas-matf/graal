@@ -53,7 +53,7 @@ public class SubstrateGraphBuilderPhase extends SharedGraphBuilderPhase {
 
     public SubstrateGraphBuilderPhase(Providers providers,
                     GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes,
-                                      NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
+                    NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
         super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, inlineInvocationData);
     }
 
