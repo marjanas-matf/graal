@@ -44,6 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
 
+import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin;
 import org.graalvm.compiler.core.common.spi.ForeignCallDescriptor;
 import org.graalvm.compiler.core.common.spi.ForeignCallsProvider;
 import org.graalvm.compiler.graph.Node;
@@ -111,6 +112,7 @@ public final class SVMHost implements HostVM {
     private final HostedStringDeduplication stringTable;
     private final UnsafeAutomaticSubstitutionProcessor automaticSubstitutions;
     private final List<BiConsumer<DuringAnalysisAccess, Class<?>>> classReachabilityListeners;
+    private final NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData;
 
     /**
      * Optionally keep the Graal graphs alive during analysis. This increases the memory footprint
@@ -138,6 +140,11 @@ public final class SVMHost implements HostVM {
         this.classReachabilityListeners = new ArrayList<>();
         this.forbiddenTypes = setupForbiddenTypes(options);
         this.automaticSubstitutions = automaticSubstitutions;
+        this.inlineInvocationData = new NativeImageInlineDuringParsingPlugin.InvocationData();
+    }
+
+    public NativeImageInlineDuringParsingPlugin.InvocationData getInlineInvocationData() {
+        return inlineInvocationData;
     }
 
     private static Map<String, EnumSet<AnalysisType.UsageKind>> setupForbiddenTypes(OptionValues options) {
@@ -190,8 +197,8 @@ public final class SVMHost implements HostVM {
     }
 
     @Override
-    public Instance createGraphBuilderPhase(HostedProviders providers, GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext) {
-        return new AnalysisGraphBuilderPhase(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, providers.getWordTypes());
+    public Instance createGraphBuilderPhase(BigBang bb, HostedProviders providers, GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext) {
+        return new AnalysisGraphBuilderPhase(bb, providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, providers.getWordTypes(), inlineInvocationData);
     }
 
     @Override
