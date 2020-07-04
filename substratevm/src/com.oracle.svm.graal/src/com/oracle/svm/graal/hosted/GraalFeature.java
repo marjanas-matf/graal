@@ -42,6 +42,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import com.oracle.svm.hosted.SVMHost;
+import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin;
 import org.graalvm.compiler.api.replacements.Fold;
 import org.graalvm.compiler.api.runtime.GraalRuntime;
 import org.graalvm.compiler.core.common.spi.MetaAccessExtensionProvider;
@@ -241,23 +243,23 @@ public final class GraalFeature implements Feature {
         final CallTreeNode node;
 
         RuntimeGraphBuilderPhase(Providers providers,
-                        GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes,
-                        CallTreeNode node) {
-            super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes);
+                                 GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes,
+                                 NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData, CallTreeNode node) {
+            super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, inlineInvocationData);
             this.node = node;
         }
 
         @Override
         protected BytecodeParser createBytecodeParser(StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI, IntrinsicContext intrinsicContext) {
-            return new RuntimeBytecodeParser(this, graph, parent, method, entryBCI, intrinsicContext);
+            return new RuntimeBytecodeParser(this, graph, parent, method, entryBCI, intrinsicContext, inlineInvocationData);
         }
     }
 
     public static class RuntimeBytecodeParser extends SubstrateGraphBuilderPhase.SubstrateBytecodeParser {
 
         RuntimeBytecodeParser(GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI,
-                        IntrinsicContext intrinsicContext) {
-            super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, false);
+                        IntrinsicContext intrinsicContext, NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
+            super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, false, inlineInvocationData);
         }
 
         @Override
@@ -512,7 +514,7 @@ public final class GraalFeature implements Feature {
 
             try (DebugContext.Scope scope = debug.scope("RuntimeCompile", graph)) {
                 if (parse) {
-                    RuntimeGraphBuilderPhase builderPhase = new RuntimeGraphBuilderPhase(hostedProviders, graphBuilderConfig, optimisticOpts, null, hostedProviders.getWordTypes(), node);
+                    RuntimeGraphBuilderPhase builderPhase = new RuntimeGraphBuilderPhase(hostedProviders, graphBuilderConfig, optimisticOpts, null, hostedProviders.getWordTypes(), ((SVMHost) bb.getHostVM()).getInlineInvocationData(), node);
                     builderPhase.apply(graph);
                 }
 
