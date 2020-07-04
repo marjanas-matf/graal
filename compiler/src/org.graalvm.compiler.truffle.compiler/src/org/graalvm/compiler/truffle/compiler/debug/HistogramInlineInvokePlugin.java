@@ -38,6 +38,7 @@ import org.graalvm.compiler.nodes.BeginNode;
 import org.graalvm.compiler.nodes.DeoptimizeNode;
 import org.graalvm.compiler.nodes.StructuredGraph;
 import org.graalvm.compiler.nodes.VirtualState;
+import org.graalvm.compiler.nodes.graphbuilderconf.GraphBuilderContext;
 import org.graalvm.compiler.nodes.graphbuilderconf.InlineInvokePlugin;
 import org.graalvm.compiler.nodes.java.MethodCallTargetNode;
 import org.graalvm.compiler.nodes.virtual.VirtualObjectNode;
@@ -57,12 +58,12 @@ public class HistogramInlineInvokePlugin implements InlineInvokePlugin {
     }
 
     @Override
-    public void notifyBeforeInline(ResolvedJavaMethod methodToInline) {
+    public void notifyBeforeInline(GraphBuilderContext b, ResolvedJavaMethod methodToInline) {
         currentStatistic = new MethodStatistic(currentStatistic, methodToInline, countNodes(), countCalls());
     }
 
     @Override
-    public void notifyAfterInline(ResolvedJavaMethod methodToInline) {
+    public void notifyAfterInline(GraphBuilderContext b, ResolvedJavaMethod methodToInline) {
         assert methodToInline.equals(currentStatistic.method);
 
         currentStatistic.applyNodeCountAfter(countNodes());
