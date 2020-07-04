@@ -25,16 +25,17 @@
 
 package com.oracle.svm.hosted.xml;
 
-import com.oracle.svm.core.annotate.AutomaticFeature;
-import com.oracle.svm.core.jdk.JNIRegistrationUtil;
-import org.graalvm.nativeimage.hosted.Feature;
-
 import static com.oracle.svm.hosted.xml.XMLParsersRegistration.DOMImplementationRegistryClasses;
 import static com.oracle.svm.hosted.xml.XMLParsersRegistration.DOMParserClasses;
 import static com.oracle.svm.hosted.xml.XMLParsersRegistration.DatatypeFactoryClasses;
 import static com.oracle.svm.hosted.xml.XMLParsersRegistration.SAXParserClasses;
 import static com.oracle.svm.hosted.xml.XMLParsersRegistration.StAXParserClasses;
 import static com.oracle.svm.hosted.xml.XMLParsersRegistration.TransformerClassesAndResources;
+
+import org.graalvm.nativeimage.hosted.Feature;
+
+import com.oracle.svm.core.annotate.AutomaticFeature;
+import com.oracle.svm.core.jdk.JNIRegistrationUtil;
 
 @AutomaticFeature
 public class JavaxXmlClassAndResourcesLoaderFeature extends JNIRegistrationUtil implements Feature {

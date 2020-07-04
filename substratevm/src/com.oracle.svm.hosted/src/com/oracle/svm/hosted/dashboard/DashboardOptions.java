@@ -24,9 +24,10 @@
  */
 package com.oracle.svm.hosted.dashboard;
 
-import com.oracle.svm.core.option.HostedOptionKey;
 import org.graalvm.compiler.options.Option;
 import org.graalvm.compiler.options.OptionType;
+
+import com.oracle.svm.core.option.HostedOptionKey;
 
 class DashboardOptions {
 

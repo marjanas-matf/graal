@@ -86,12 +86,12 @@ public abstract class SharedGraphBuilderPhase extends GraphBuilderPhase.Instance
         protected NativeImageInlineDuringParsingPlugin.InvocationResultInline inlineDuringParsingState;
 
         protected SharedBytecodeParser(GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI,
-                        IntrinsicContext intrinsicContext, boolean explicitExceptionEdges, NativeImageInlineDuringParsingPlugin.InvocationData  inlineInvocationData) {
+                        IntrinsicContext intrinsicContext, boolean explicitExceptionEdges, NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
             this(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, explicitExceptionEdges, NativeImageOptions.AllowIncompleteClasspath.getValue(), inlineInvocationData);
         }
 
         protected SharedBytecodeParser(GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI,
-                        IntrinsicContext intrinsicContext, boolean explicitExceptionEdges, boolean allowIncompleteClasspath, NativeImageInlineDuringParsingPlugin.InvocationData  inlineInvocationData) {
+                        IntrinsicContext intrinsicContext, boolean explicitExceptionEdges, boolean allowIncompleteClasspath, NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
             super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext);
             this.explicitExceptionEdges = explicitExceptionEdges;
             this.allowIncompleteClassPath = allowIncompleteClasspath;

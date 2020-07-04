@@ -24,15 +24,21 @@
  */
 package com.oracle.svm.hosted.dashboard;
 
-import com.oracle.svm.hosted.dashboard.ToJson.JsonObject;
-import com.oracle.svm.hosted.dashboard.ToJson.JsonArray;
-import com.oracle.svm.hosted.dashboard.ToJson.JsonString;
-import com.oracle.svm.hosted.dashboard.ToJson.JsonNumber;
-import com.oracle.svm.hosted.dashboard.ToJson.JsonValue;
-import com.oracle.graal.pointsto.flow.ActualParameterTypeFlow;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
 import org.graalvm.nativeimage.hosted.Feature.OnAnalysisExitAccess;
 
 import com.oracle.graal.pointsto.BigBang;
+import com.oracle.graal.pointsto.flow.ActualParameterTypeFlow;
 import com.oracle.graal.pointsto.flow.ActualReturnTypeFlow;
 import com.oracle.graal.pointsto.flow.AllInstantiatedTypeFlow;
 import com.oracle.graal.pointsto.flow.AllSynchronizedTypeFlow;
@@ -71,19 +77,13 @@ import com.oracle.graal.pointsto.meta.AnalysisType;
 import com.oracle.graal.pointsto.typestate.TypeState;
 import com.oracle.svm.core.util.VMError;
 import com.oracle.svm.hosted.FeatureImpl;
+import com.oracle.svm.hosted.dashboard.ToJson.JsonArray;
+import com.oracle.svm.hosted.dashboard.ToJson.JsonNumber;
+import com.oracle.svm.hosted.dashboard.ToJson.JsonObject;
+import com.oracle.svm.hosted.dashboard.ToJson.JsonString;
+import com.oracle.svm.hosted.dashboard.ToJson.JsonValue;
 
 import jdk.vm.ci.code.BytecodePosition;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
 
 /**
  * Creates a JSON representation of the pointsto graph, in the format expected by the dashboard. The
