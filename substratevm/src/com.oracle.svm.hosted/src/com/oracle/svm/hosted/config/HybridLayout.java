@@ -26,6 +26,8 @@ package com.oracle.svm.hosted.config;
 
 import java.lang.reflect.Modifier;
 
+import org.graalvm.compiler.core.common.NumUtil;
+
 import com.oracle.svm.core.annotate.Hybrid;
 import com.oracle.svm.core.config.ObjectLayout;
 import com.oracle.svm.hosted.meta.HostedField;
@@ -35,7 +37,6 @@ import com.oracle.svm.hosted.meta.HostedMetaAccess;
 import jdk.vm.ci.meta.JavaKind;
 import jdk.vm.ci.meta.ResolvedJavaField;
 import jdk.vm.ci.meta.ResolvedJavaType;
-import org.graalvm.compiler.core.common.NumUtil;
 
 /**
  * Defines the layout for a hybrid class.

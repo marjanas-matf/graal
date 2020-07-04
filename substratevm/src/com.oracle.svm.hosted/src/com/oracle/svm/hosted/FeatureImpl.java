@@ -45,7 +45,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import com.oracle.svm.hosted.code.CompileQueue;
 import org.graalvm.collections.Pair;
 import org.graalvm.compiler.debug.DebugContext;
 import org.graalvm.nativeimage.hosted.Feature;
@@ -71,6 +70,7 @@ import com.oracle.svm.hosted.analysis.Inflation;
 import com.oracle.svm.hosted.c.NativeLibraries;
 import com.oracle.svm.hosted.code.CEntryPointData;
 import com.oracle.svm.hosted.code.CompilationInfoSupport;
+import com.oracle.svm.hosted.code.CompileQueue;
 import com.oracle.svm.hosted.code.SharedRuntimeConfigurationBuilder;
 import com.oracle.svm.hosted.image.AbstractBootImage;
 import com.oracle.svm.hosted.image.AbstractBootImage.NativeImageKind;

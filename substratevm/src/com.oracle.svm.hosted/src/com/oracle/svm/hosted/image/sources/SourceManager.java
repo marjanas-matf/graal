@@ -26,12 +26,13 @@
 
 package com.oracle.svm.hosted.image.sources;
 
-import com.oracle.svm.util.ModuleSupport;
-import jdk.vm.ci.meta.ResolvedJavaType;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+
+import com.oracle.svm.util.ModuleSupport;
+
+import jdk.vm.ci.meta.ResolvedJavaType;
 
 /**
  * A singleton class responsible for locating source files for classes included in a native image
