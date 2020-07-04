@@ -24,10 +24,11 @@
  */
 package com.oracle.svm.hosted.lambda;
 
-import org.graalvm.compiler.java.LambdaUtils;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.graalvm.compiler.java.LambdaUtils;
 
 import com.oracle.graal.pointsto.meta.AnalysisType;
 import com.oracle.svm.core.SubstrateUtil;

@@ -27,9 +27,6 @@ package com.oracle.svm.hosted.phases;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.oracle.svm.core.util.VMError;
-import jdk.vm.ci.meta.JavaKind;
-import jdk.vm.ci.meta.JavaType;
 import org.graalvm.compiler.core.common.type.StampPair;
 import org.graalvm.compiler.graph.Node;
 import org.graalvm.compiler.java.BytecodeParser;
@@ -59,11 +56,14 @@ import org.graalvm.compiler.word.WordTypes;
 import com.oracle.svm.core.code.FrameInfoEncoder;
 import com.oracle.svm.core.graal.nodes.DeoptEntryNode;
 import com.oracle.svm.core.graal.nodes.DeoptProxyAnchorNode;
+import com.oracle.svm.core.util.VMError;
 import com.oracle.svm.hosted.meta.HostedMethod;
 import com.oracle.svm.hosted.nodes.DeoptProxyNode;
 import com.oracle.svm.hosted.nodes.SubstrateMethodCallTargetNode;
 import com.oracle.svm.hosted.phases.SubstrateGraphBuilderPhase.SubstrateBytecodeParser;
 
+import jdk.vm.ci.meta.JavaKind;
+import jdk.vm.ci.meta.JavaType;
 import jdk.vm.ci.meta.JavaTypeProfile;
 import jdk.vm.ci.meta.ResolvedJavaMethod;
 
@@ -88,7 +88,7 @@ class HostedBytecodeParser extends SubstrateBytecodeParser {
     private Map<Long, DeoptProxyAnchorNode> deoptEntries = new HashMap<>();
 
     HostedBytecodeParser(GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI, IntrinsicContext intrinsicContext,
-                         NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
+                    NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
         super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, true, inlineInvocationData);
     }
 
@@ -132,7 +132,7 @@ class HostedBytecodeParser extends SubstrateBytecodeParser {
 
     @Override
     protected Invoke createNonInlinedInvoke(ExceptionEdgeAction exceptionEdge, int invokeBci, ValueNode[] invokeArgs, ResolvedJavaMethod targetMethod,
-                                            InvokeKind invokeKind, JavaKind resultType, JavaType returnType, JavaTypeProfile profile) {
+                    InvokeKind invokeKind, JavaKind resultType, JavaType returnType, JavaTypeProfile profile) {
 
         return super.createNonInlinedInvoke(exceptionEdge, invokeBci, invokeArgs, targetMethod, invokeKind, resultType, returnType, profile);
     }

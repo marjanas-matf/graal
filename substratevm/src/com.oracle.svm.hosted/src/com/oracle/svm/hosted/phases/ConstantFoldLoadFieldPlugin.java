@@ -24,7 +24,6 @@
  */
 package com.oracle.svm.hosted.phases;
 
-import com.oracle.svm.core.hub.DynamicHub;
 import org.graalvm.compiler.nodes.ConstantNode;
 import org.graalvm.compiler.nodes.ValueNode;
 import org.graalvm.compiler.nodes.graphbuilderconf.GraphBuilderContext;
@@ -32,6 +31,7 @@ import org.graalvm.compiler.nodes.graphbuilderconf.NodePlugin;
 import org.graalvm.compiler.nodes.util.ConstantFoldUtil;
 
 import com.oracle.graal.pointsto.meta.AnalysisMetaAccess;
+import com.oracle.svm.core.hub.DynamicHub;
 import com.oracle.svm.core.meta.SubstrateObjectConstant;
 import com.oracle.svm.hosted.classinitialization.ClassInitializationSupport;
 
@@ -85,8 +85,8 @@ public final class ConstantFoldLoadFieldPlugin implements NodePlugin {
                      * from a field, so we do not have a root.
                      */
                     assert root != null ||
-                            SubstrateObjectConstant.asObject(receiver) instanceof String ||
-                            SubstrateObjectConstant.asObject(receiver) instanceof DynamicHub : receiver.toValueString() + " : " + field + " : " + b.getGraph();
+                                    SubstrateObjectConstant.asObject(receiver) instanceof String ||
+                                    SubstrateObjectConstant.asObject(receiver) instanceof DynamicHub : receiver.toValueString() + " : " + field + " : " + b.getGraph();
                 }
                 sValue.setRoot(root);
             }

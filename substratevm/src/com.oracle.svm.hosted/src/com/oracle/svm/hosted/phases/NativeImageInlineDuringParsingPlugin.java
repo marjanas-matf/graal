@@ -24,26 +24,12 @@
  */
 package com.oracle.svm.hosted.phases;
 
-import com.oracle.graal.pointsto.BigBang;
-import com.oracle.graal.pointsto.infrastructure.GraphProvider.Purpose;
-import com.oracle.graal.pointsto.meta.AnalysisMethod;
-import com.oracle.graal.pointsto.meta.AnalysisType;
-import com.oracle.graal.pointsto.meta.HostedProviders;
-import com.oracle.graal.pointsto.util.CompletionExecutor.DebugContextRunnable;
-import com.oracle.svm.core.annotate.NeverInline;
-import com.oracle.svm.core.annotate.NeverInlineTrivial;
-import com.oracle.svm.core.annotate.RestrictHeapAccess;
-import com.oracle.svm.core.annotate.Uninterruptible;
-import com.oracle.svm.core.option.HostedOptionKey;
-import com.oracle.svm.core.util.VMError;
-import com.oracle.svm.hosted.meta.HostedMethod;
-import com.oracle.svm.hosted.phases.AnalysisGraphBuilderPhase.AnalysisBytecodeParser;
-import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.CallSite;
-import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.InvocationResult;
-import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.InvocationResultInline;
-import com.oracle.svm.hosted.phases.SharedGraphBuilderPhase.SharedBytecodeParser;
-import jdk.vm.ci.code.BailoutException;
-import jdk.vm.ci.meta.ResolvedJavaMethod;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.graalvm.compiler.core.common.type.Stamp;
 import org.graalvm.compiler.core.common.type.StampPair;
 import org.graalvm.compiler.debug.DebugContext;
@@ -57,7 +43,6 @@ import org.graalvm.compiler.java.GraphBuilderPhase;
 import org.graalvm.compiler.nodes.CallTargetNode;
 import org.graalvm.compiler.nodes.ConstantNode;
 import org.graalvm.compiler.nodes.FrameState;
-import org.graalvm.compiler.nodes.InvokeNode;
 import org.graalvm.compiler.nodes.NodeView;
 import org.graalvm.compiler.nodes.ParameterNode;
 import org.graalvm.compiler.nodes.ReturnNode;
@@ -84,11 +69,27 @@ import org.graalvm.compiler.phases.OptimisticOptimizations;
 import org.graalvm.compiler.phases.util.Providers;
 import org.graalvm.compiler.word.WordTypes;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import com.oracle.graal.pointsto.BigBang;
+import com.oracle.graal.pointsto.infrastructure.GraphProvider.Purpose;
+import com.oracle.graal.pointsto.meta.AnalysisMethod;
+import com.oracle.graal.pointsto.meta.AnalysisType;
+import com.oracle.graal.pointsto.meta.HostedProviders;
+import com.oracle.graal.pointsto.util.CompletionExecutor.DebugContextRunnable;
+import com.oracle.svm.core.annotate.NeverInline;
+import com.oracle.svm.core.annotate.NeverInlineTrivial;
+import com.oracle.svm.core.annotate.RestrictHeapAccess;
+import com.oracle.svm.core.annotate.Uninterruptible;
+import com.oracle.svm.core.option.HostedOptionKey;
+import com.oracle.svm.core.util.VMError;
+import com.oracle.svm.hosted.meta.HostedMethod;
+import com.oracle.svm.hosted.phases.AnalysisGraphBuilderPhase.AnalysisBytecodeParser;
+import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.CallSite;
+import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.InvocationResult;
+import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.InvocationResultInline;
+import com.oracle.svm.hosted.phases.SharedGraphBuilderPhase.SharedBytecodeParser;
+
+import jdk.vm.ci.code.BailoutException;
+import jdk.vm.ci.meta.ResolvedJavaMethod;
 
 public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin {
 
@@ -96,8 +97,8 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         @Option(help = "Inline methods witch folds to constant during parsing before the static analysis.")//
         public static final HostedOptionKey<Boolean> InlineBeforeAnalysis = new HostedOptionKey<>(false);
 
-        @Option(help = "Inlining is explored up to this number of nonparametric nodes in the graph.")
-        public static final HostedOptionKey<Integer> InlineBeforeAnalysisMaxNumberOfNodes = new HostedOptionKey<>(50);
+        @Option(help = "Inlining is explored up to this number of nonparametric nodes in the graph.") public static final HostedOptionKey<Integer> InlineBeforeAnalysisMaxNumberOfNodes = new HostedOptionKey<>(
+                        50);
     }
 
     static final class CallSite {
@@ -225,7 +226,7 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         }
 
         if (method.getAnnotation(RestrictHeapAccess.class) != null || method.getAnnotation(Uninterruptible.class) != null ||
-                b.getMethod().getAnnotation(RestrictHeapAccess.class) != null || b.getMethod().getAnnotation(Uninterruptible.class) != null) {
+                        b.getMethod().getAnnotation(RestrictHeapAccess.class) != null || b.getMethod().getAnnotation(Uninterruptible.class) != null) {
             /*
              * Caller or callee have an annotation that might prevent inlining. We don't check the
              * exact condition but instead always bail out for simplicity.
@@ -392,7 +393,7 @@ class TrivialMethodDetector {
         try (DebugContext.Scope ignored = debug.scope("InlineDuringParsingAnalysis", graph, method, this)) {
 
             TrivialMethodDetectorGraphBuilderPhase builderPhase = new TrivialMethodDetectorGraphBuilderPhase(bb, providers, graphBuilderConfig, OptimisticOptimizations.NONE, null,
-                    providers.getWordTypes());
+                            providers.getWordTypes());
 
             try (NodeEventScope ignored1 = graph.trackNodeEvents(methodState)) {
                 builderPhase.apply(graph);
@@ -563,7 +564,7 @@ class TrivialMethodDetectorBailoutException extends BailoutException {
 class TrivialMethodDetectorGraphBuilderPhase extends AnalysisGraphBuilderPhase {
 
     TrivialMethodDetectorGraphBuilderPhase(BigBang bb, Providers providers,
-                                           GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes) {
+                    GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes) {
         super(bb, providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, null);
     }
 
@@ -576,7 +577,7 @@ class TrivialMethodDetectorGraphBuilderPhase extends AnalysisGraphBuilderPhase {
 
 class TrivialMethodDetectorBytecodeParser extends AnalysisBytecodeParser {
     protected TrivialMethodDetectorBytecodeParser(BigBang bb, GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI,
-                                                  IntrinsicContext intrinsicContext) {
+                    IntrinsicContext intrinsicContext) {
         super(bb, graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, null);
     }
 
