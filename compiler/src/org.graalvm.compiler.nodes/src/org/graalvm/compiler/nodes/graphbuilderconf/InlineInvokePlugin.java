@@ -132,9 +132,9 @@ public interface InlineInvokePlugin extends GraphBuilderPlugin {
      * Null return value: This plugin made no decision, other plugins with a lower priority are
      * asked.
      *
-     * @param b the context
+     * @param b      the context
      * @param method the target method of an invoke
-     * @param args the arguments to the invoke
+     * @param args   the arguments to the invoke
      */
     default InlineInfo shouldInlineInvoke(GraphBuilderContext b, ResolvedJavaMethod method, ValueNode[] args) {
         return null;
@@ -143,24 +143,26 @@ public interface InlineInvokePlugin extends GraphBuilderPlugin {
     /**
      * Notification that a method is about to be inlined.
      *
+     * @param b              the context
      * @param methodToInline the inlined method
      */
-    default void notifyBeforeInline(ResolvedJavaMethod methodToInline) {
+    default void notifyBeforeInline(GraphBuilderContext b, ResolvedJavaMethod methodToInline) {
     }
 
     /**
      * Notification that a method was inlined.
      *
+     * @param b              the context
      * @param methodToInline the inlined method
      */
-    default void notifyAfterInline(ResolvedJavaMethod methodToInline) {
+    default void notifyAfterInline(GraphBuilderContext b, ResolvedJavaMethod methodToInline) {
     }
 
     /**
      * Notifies this plugin of the {@link Invoke} node created for a method that was not inlined per
      * {@link #shouldInlineInvoke}.
      *
-     * @param b the context
+     * @param b      the context
      * @param method the method that was not inlined
      * @param invoke the invoke node created for the call to {@code method}
      */

@@ -41,7 +41,9 @@ import java.util.Deque;
 import java.util.HashMap;
 
 import static org.graalvm.compiler.nodes.graphbuilderconf.InlineInvokePlugin.InlineInfo.createStandardInlineInfo;
+
 import org.graalvm.compiler.truffle.common.CompilableTruffleAST;
+
 import static org.graalvm.compiler.truffle.compiler.TruffleCompilerOptions.getPolyglotOptionValue;
 import static org.graalvm.compiler.truffle.options.PolyglotCompilerOptions.MaximumInlineNodeCount;
 import static org.graalvm.compiler.truffle.options.PolyglotCompilerOptions.TraceInlining;
@@ -121,7 +123,7 @@ final class PEInliningPlanInvokePlugin implements InlineInvokePlugin {
     }
 
     @Override
-    public void notifyAfterInline(ResolvedJavaMethod inlinedTargetMethod) {
+    public void notifyAfterInline(GraphBuilderContext b, ResolvedJavaMethod inlinedTargetMethod) {
         if (inlinedTargetMethod.equals(partialEvaluator.callInlined)) {
             inlining.pop();
         }

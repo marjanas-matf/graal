@@ -24,6 +24,7 @@
  */
 package com.oracle.svm.hosted.phases;
 
+import com.oracle.svm.core.hub.DynamicHub;
 import org.graalvm.compiler.nodes.ConstantNode;
 import org.graalvm.compiler.nodes.ValueNode;
 import org.graalvm.compiler.nodes.graphbuilderconf.GraphBuilderContext;
@@ -83,13 +84,15 @@ public final class ConstantFoldLoadFieldPlugin implements NodePlugin {
                      * String constants are directly embedded in the bytecode without being loaded
                      * from a field, so we do not have a root.
                      */
-                    assert root != null || SubstrateObjectConstant.asObject(receiver) instanceof String : receiver.toValueString() + " : " + field + " : " + b.getGraph();
+                    assert root != null ||
+                            SubstrateObjectConstant.asObject(receiver) instanceof String ||
+                            SubstrateObjectConstant.asObject(receiver) instanceof DynamicHub : receiver.toValueString() + " : " + field + " : " + b.getGraph();
                 }
                 sValue.setRoot(root);
             }
             assert !classInitializationSupport.shouldInitializeAtRuntime(field.getDeclaringClass()) ||
-                            value.isDefaultForKind() : "Fields in classes that are marked for initialization at run time must not be constant folded, unless they are not written in the static initializer, i.e., have the default value: " +
-                                            field.format("%H.%n");
+                    value.isDefaultForKind() : "Fields in classes that are marked for initialization at run time must not be constant folded, unless they are not written in the static initializer, i.e., have the default value: " +
+                    field.format("%H.%n");
 
             result = b.getGraph().unique(result);
             b.push(field.getJavaKind(), result);
