@@ -28,6 +28,7 @@ import static org.graalvm.compiler.hotspot.JVMCIVersionCheck.JVMCI11_RELEASES_UR
 import static org.graalvm.compiler.hotspot.JVMCIVersionCheck.JVMCI8_RELEASES_URL;
 import static org.graalvm.compiler.replacements.StandardGraphBuilderPlugins.registerInvocationPlugins;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -574,6 +575,17 @@ public class NativeImageGenerator {
 
                 if (NativeImageOptions.PrintUniverse.getValue()) {
                     printTypes();
+                    try {
+                        FileWriter myWriter = new FileWriter("/opt/graal/graal/vm/types_and_methods.txt", true);
+                        String types = " T " + hUniverse.getTypes().size();
+                        String methods = " M " + hUniverse.getMethods().size();
+                        String data = imageName + " " + types + methods + " " + "\n";
+                        myWriter.write(data);
+                        myWriter.flush();
+                        myWriter.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 /* Find the entry point methods in the hosted world. */
@@ -1113,9 +1125,6 @@ public class NativeImageGenerator {
 
         if (NativeImageInlineDuringParsingPlugin.Options.InlineBeforeAnalysis.getValue()) {
             plugins.appendInlineInvokePlugin(new NativeImageInlineDuringParsingPlugin(analysis, providers));
-            if (!analysis) {
-                System.out.println("Number for inline: " + NativeImageInlineDuringParsingPlugin.getNumberForInline());
-            }
         }
 
         plugins.appendNodePlugin(new IntrinsifyMethodHandlesInvocationPlugin(analysis, providers, aUniverse, hUniverse));

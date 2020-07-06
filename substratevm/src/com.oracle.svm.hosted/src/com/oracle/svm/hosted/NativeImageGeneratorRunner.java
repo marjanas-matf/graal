@@ -402,6 +402,7 @@ public class NativeImageGeneratorRunner implements ImageBuildTask {
             ImageSingletonsSupportImpl.HostedManagement.clearInThread();
         }
         totalTimer.print();
+        totalTimer.printInFile();
         return 0;
     }
 

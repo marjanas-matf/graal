@@ -251,9 +251,9 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
                 TrivialMethodDetector detector = new TrivialMethodDetector(bb, providers, ((SharedBytecodeParser) b).getGraphBuilderConfig(), b.getOptions(), b.getDebug());
                 newResult = detector.analyzeMethod(callSite, (AnalysisMethod) method, args, null);
                 InvocationResult existingResult = data.putIfAbsent(b.getMethod(), b.bci(), newResult);
-                if (existingResult != null) {
+                /*if (existingResult != null) {
                     throw VMError.shouldNotReachHere("Analysis result already present: " + b.getMethod().asStackTraceElement(b.bci()));
-                }
+                }*/
                 inline = newResult;
             } else {
                 inline = data.get(b.getMethod(), b.bci());

@@ -26,6 +26,9 @@ package com.oracle.graal.pointsto.util;
 
 import org.graalvm.compiler.serviceprovider.GraalServices;
 
+import java.io.FileWriter;
+import java.io.IOException;
+
 public class Timer {
 
     private String prefix;
@@ -92,8 +95,27 @@ public class Timer {
         System.out.format("%s%12s: %,10.2f ms, %,5.2f GB%n", concurrentPrefix, name, time / 1000000d, totalMemoryGB);
     }
 
+    private void printInFile(long time) {
+        if (prefix == null) {
+            prefix = " ";
+        }
+        String totalTime = String.format("%s: %,10.2f ms\n", prefix, time / 1000000d);
+        try {
+            FileWriter myWriter = new FileWriter("/opt/graal/graal/vm/renaissance_build_time.txt", true);
+            myWriter.write(totalTime);
+            myWriter.flush();
+            myWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void print() {
         print(totalTime);
+    }
+
+    public void printInFile() {
+        printInFile(totalTime);
     }
 
     /** Get timer total time in milliseconds. */

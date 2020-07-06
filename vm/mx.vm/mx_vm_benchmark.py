@@ -35,6 +35,10 @@ import mx_benchmark
 import mx_sdk_vm
 import mx_sdk_vm_impl
 
+import matplotlib.pyplot as plt
+import numpy as np
+import json
+
 _suite = mx.suite('vm')
 _native_image_vm_registry = mx_benchmark.VmRegistry('NativeImage', 'ni-vm')
 _gu_vm_registry = mx_benchmark.VmRegistry('GraalUpdater', 'gu-vm')
@@ -115,6 +119,7 @@ class NativeImageVM(GraalVm):
                            'extra-agent-profile-run-arg', 'benchmark-output-dir', 'stages']
             self.stages = {'agent', 'instrument-image', 'instrument-run', 'image', 'run'}
             self.last_stage = 'run'
+            self.print_statistics = False
 
         def parse(self, args):
             def add_to_list(arg, name, arg_list):
@@ -143,6 +148,9 @@ class NativeImageVM(GraalVm):
                         stages_list = trimmed_arg[len(self.params[6] + '='):].split(',')
                         self.stages = set(stages_list)
                         self.last_stage = stages_list.pop()
+                        found = True
+                    if trimmed_arg.startswith('print-statistics='):
+                        self.print_statistics = trimmed_arg[len('print-statistics='):] == 'true'
                         found = True
 
                     # not for end-users
@@ -219,6 +227,107 @@ class NativeImageVM(GraalVm):
                 i += 1
 
         return executable, classpath_arguments, system_properties, image_vm_args + image_run_args
+
+    def print_statistics(self, benchmark_suite, benchmark_name, image_size, plugin):
+        mx.log('Print statistics for ' + benchmark_suite)
+        try:
+            with open(benchmark_suite + '_statistics.json', 'r') as in_file:
+                data = json.load(in_file)
+        except:
+            data = {"plugin-on": [], "plugin-off": []}
+
+        image_size /= 1024.0 * 1024.0  # from B to MB
+        newdata = {
+            "benchmark-name": benchmark_name,
+            "image-size": image_size,
+        }
+
+        if plugin:
+            data["plugin-on"].append(newdata)
+        else:
+            data["plugin-off"].append(newdata)
+        with open(benchmark_suite + '_statistics.json', 'w') as outfile:
+            json.dump(data, outfile)
+
+        # self.plot_statistics(benchmark_suite, data)
+
+    def plot_statistics(self, benchmark_suite, data):
+        size = 15
+        params = {'legend.fontsize': 'large',
+                  'axes.labelsize': size * 0.90,
+                  'axes.titlesize': size,
+                  'xtick.labelsize': size * 0.80,
+                  'ytick.labelsize': size * 0.80,
+                  'axes.titlepad': size * 2}
+        plt.rcParams.update(params)
+
+        image_size_plugin_on = []
+        image_name_plugin_on = []
+        listData = data["plugin-on"]
+        if len(listData) != 0:
+            for map in listData:
+                image_name_plugin_on.append(map["benchmark-name"])
+                image_size_plugin_on.append(map["image-size"])
+
+        image_size_plugin_off = []
+        image_name_plugin_off = []
+        listData = data["plugin-off"]
+        if len(listData) != 0:
+            for map in listData:
+                image_name_plugin_off.append(map["benchmark-name"])
+                image_size_plugin_off.append(map["image-size"])
+
+        # missing complete information for benchmark
+        if image_name_plugin_on != image_name_plugin_off:
+            return
+
+        x = np.arange(len(image_name_plugin_on))
+        width = 0.25
+        fig, ax = plt.subplots(2, 1, figsize=(14, 7), sharex=True)
+        # bar chart for image size
+        ax[0].bar(x - width / 2, image_size_plugin_off, width, label='Default')
+        ax[0].bar(x + width / 2, image_size_plugin_on, width, label='-H:+InlineBeforeAnalysis')
+        ax[0].tick_params(length=10)
+        ax[0].set_ylabel('image size (MB)', labelpad=20)
+        ax[0].set_title('Statistics for benchmark suite suite ' + benchmark_suite, pad=20)
+        ax[0].set_xticks(x)
+        ax[0].set_xticklabels(image_name_plugin_on)
+        ax[0].legend()
+
+        # try to open file with image build time information
+        try:
+            with open(benchmark_suite + '_build_time.txt', 'r') as in_file:
+                data = in_file.readlines()
+        except:
+            return
+
+        build_time_plugin_off = []
+        build_time_plugin_on = []
+        for name in image_name_plugin_on:
+            findBench = False
+            for line in data:
+                if line.startswith(name, line.find('-') + 1):
+                    if not findBench:
+                        build_time_plugin_on.append(float(line.split()[1]) * 0.001)
+                        print(name + "on" + str(float(line.split()[1]) * 0.001))
+                        findBench = True
+                    else:
+                        build_time_plugin_off.append(float(line.split()[1]) * 0.001)
+                        print(name + "off" + str(float(line.split()[1]) * 0.001))
+
+        # bar chart for image build time
+        ax[1].bar(x - width / 2, build_time_plugin_off, width, label='Default')
+        ax[1].bar(x + width / 2, build_time_plugin_on, width, label='-H:+InlineBeforeAnalysis')
+        ax[1].tick_params(length=10)
+        ax[1].set_ylabel('image build time (sec)', labelpad=20)
+        ax[1].set_xlabel('benchmark name', labelpad=20)
+        ax[1].set_xticks(x)
+        ax[1].set_xticklabels(image_name_plugin_on)
+        fig.subplots_adjust(hspace=2)
+        fig.tight_layout()
+
+        plt.savefig(benchmark_suite + '_statistics.png')
+        # plt.show()
 
     class Stages:
         def __init__(self, config, bench_out, bench_err, final_image_name, is_gate, non_zero_is_fatal, cwd):
@@ -372,10 +481,12 @@ class NativeImageVM(GraalVm):
             executable, classpath_arguments, system_properties, image_run_args = NativeImageVM.extract_benchmark_arguments(original_java_run_args)
             executable_suffix = ('-' + config.benchmark_name) if config.benchmark_name else ''
             executable_name = (os.path.splitext(os.path.basename(executable[1]))[0] + executable_suffix if executable[0] == '-jar' else executable[0] + executable_suffix).lower()
+            executable_suite = os.path.splitext(os.path.basename(executable[1]))[0]
             final_image_name = executable_name + '-' + self.config_name()
             stages = NativeImageVM.Stages(config, out, err, final_image_name, self.is_gate, True if self.is_gate else nonZeroIsFatal, os.path.abspath(cwd if cwd else os.getcwd()))
 
-            bench_suite = mx.suite('vm-enterprise')
+            #bench_suite = mx.suite('vm-enterprise')
+            bench_suite = mx.suite('vm')
             root_dir = config.benchmark_output_dir if config.benchmark_output_dir else mx.join(bench_suite.dir, 'mxbuild')
             config.output_dir = mx.join(os.path.abspath(root_dir), 'native-image-bench-' + executable_name + '-' + self.config_name())
             if not os.path.exists(config.output_dir):
@@ -486,6 +597,11 @@ class NativeImageVM(GraalVm):
                 image_run_cmd = [image_path] + image_run_args + config.extra_run_args
                 with stages.set_command(image_run_cmd) as s:
                     s.execute_command(True)
+                if config.print_statistics:
+                    plugin = False
+                    if "-H:+InlineBeforeAnalysis" in config.extra_image_build_arguments:
+                        plugin = True
+                    self.print_statistics(executable_suite, config.benchmark_name, image_size, plugin)
 
     def create_log_files(self, config, executable_name, stage):
         stdout_path = os.path.abspath(
