@@ -24,19 +24,18 @@
  */
 package com.oracle.svm.hosted.dashboard;
 
+import com.oracle.svm.hosted.dashboard.ToJson.JsonObject;
+import com.oracle.svm.hosted.dashboard.ToJson.JsonString;
+import com.oracle.svm.hosted.dashboard.ToJson.JsonNumber;
+import com.oracle.svm.hosted.dashboard.ToJson.JsonValue;
+import com.oracle.svm.hosted.dashboard.ToJson.JsonArray;
+import com.oracle.svm.hosted.FeatureImpl;
+import com.oracle.svm.hosted.code.CompileQueue;
+import org.graalvm.nativeimage.hosted.Feature;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
-
-import org.graalvm.nativeimage.hosted.Feature;
-
-import com.oracle.svm.hosted.FeatureImpl;
-import com.oracle.svm.hosted.code.CompileQueue;
-import com.oracle.svm.hosted.dashboard.ToJson.JsonArray;
-import com.oracle.svm.hosted.dashboard.ToJson.JsonNumber;
-import com.oracle.svm.hosted.dashboard.ToJson.JsonObject;
-import com.oracle.svm.hosted.dashboard.ToJson.JsonString;
-import com.oracle.svm.hosted.dashboard.ToJson.JsonValue;
 
 class CodeBreakdownJsonObject extends JsonObject {
 

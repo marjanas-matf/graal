@@ -26,7 +26,6 @@ package com.oracle.svm.hosted.c.query;
 
 import com.oracle.svm.hosted.c.NativeLibraries;
 import com.oracle.svm.hosted.c.info.InfoTreeVisitor;
-
 import jdk.vm.ci.meta.JavaKind;
 import jdk.vm.ci.meta.ResolvedJavaType;
 

@@ -25,19 +25,18 @@
 
 package com.oracle.svm.hosted.xml;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
+import com.oracle.svm.core.configure.ResourcesRegistry;
+import com.oracle.svm.core.jdk.JNIRegistrationUtil;
+import com.oracle.svm.hosted.FeatureImpl;
+import com.oracle.svm.hosted.classinitialization.ConfigurableClassInitialization;
 import org.graalvm.nativeimage.ImageSingletons;
 import org.graalvm.nativeimage.hosted.Feature;
 import org.graalvm.nativeimage.hosted.RuntimeReflection;
 import org.graalvm.nativeimage.impl.RuntimeClassInitializationSupport;
 
-import com.oracle.svm.core.configure.ResourcesRegistry;
-import com.oracle.svm.core.jdk.JNIRegistrationUtil;
-import com.oracle.svm.hosted.FeatureImpl;
-import com.oracle.svm.hosted.classinitialization.ConfigurableClassInitialization;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public abstract class XMLParsersRegistration extends JNIRegistrationUtil {
 

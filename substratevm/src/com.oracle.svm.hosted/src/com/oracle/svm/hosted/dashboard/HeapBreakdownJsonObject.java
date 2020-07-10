@@ -24,21 +24,20 @@
  */
 package com.oracle.svm.hosted.dashboard;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import org.graalvm.nativeimage.hosted.Feature;
-
-import com.oracle.svm.hosted.FeatureImpl;
-import com.oracle.svm.hosted.dashboard.ToJson.JsonArray;
-import com.oracle.svm.hosted.dashboard.ToJson.JsonNumber;
 import com.oracle.svm.hosted.dashboard.ToJson.JsonObject;
 import com.oracle.svm.hosted.dashboard.ToJson.JsonString;
+import com.oracle.svm.hosted.dashboard.ToJson.JsonNumber;
 import com.oracle.svm.hosted.dashboard.ToJson.JsonValue;
+import com.oracle.svm.hosted.dashboard.ToJson.JsonArray;
+import com.oracle.svm.hosted.FeatureImpl;
 import com.oracle.svm.hosted.image.NativeImageHeap;
+import org.graalvm.nativeimage.hosted.Feature;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 
 class HeapBreakdownJsonObject extends JsonObject {
 

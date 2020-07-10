@@ -45,11 +45,11 @@ import com.oracle.svm.hosted.c.info.PointerToInfo;
 import com.oracle.svm.hosted.c.info.PropertyInfo;
 import com.oracle.svm.hosted.c.info.RawStructureInfo;
 import com.oracle.svm.hosted.c.info.SizableInfo;
-import com.oracle.svm.hosted.c.info.SizableInfo.ElementKind;
-import com.oracle.svm.hosted.c.info.SizableInfo.SignednessValue;
 import com.oracle.svm.hosted.c.info.StructBitfieldInfo;
 import com.oracle.svm.hosted.c.info.StructFieldInfo;
 import com.oracle.svm.hosted.c.info.StructInfo;
+import com.oracle.svm.hosted.c.info.SizableInfo.ElementKind;
+import com.oracle.svm.hosted.c.info.SizableInfo.SignednessValue;
 import com.oracle.svm.hosted.c.util.FileUtils;
 
 import jdk.vm.ci.meta.JavaKind;

@@ -92,7 +92,6 @@ import com.oracle.svm.hosted.classinitialization.ClassInitializationSupport;
 import com.oracle.svm.hosted.code.InliningUtilities;
 import com.oracle.svm.hosted.meta.HostedType;
 import com.oracle.svm.hosted.phases.AnalysisGraphBuilderPhase;
-import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin;
 import com.oracle.svm.hosted.substitute.UnsafeAutomaticSubstitutionProcessor;
 import com.oracle.svm.util.ReflectionUtil;
 
@@ -198,8 +197,7 @@ public final class SVMHost implements HostVM {
     }
 
     @Override
-    public Instance createGraphBuilderPhase(BigBang bb, HostedProviders providers, GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts,
-                    IntrinsicContext initialIntrinsicContext) {
+    public Instance createGraphBuilderPhase(BigBang bb, HostedProviders providers, GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext) {
         return new AnalysisGraphBuilderPhase(bb, providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, providers.getWordTypes(), inlineInvocationData);
     }
 
