@@ -24,6 +24,7 @@
  */
 package com.oracle.svm.hosted.phases;
 
+import com.oracle.graal.pointsto.BigBang;
 import org.graalvm.compiler.api.replacements.Fold;
 import org.graalvm.compiler.graph.Node;
 import org.graalvm.compiler.java.BytecodeParser;

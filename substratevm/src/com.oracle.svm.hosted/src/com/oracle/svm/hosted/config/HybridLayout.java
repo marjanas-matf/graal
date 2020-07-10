@@ -30,8 +30,6 @@ import org.graalvm.nativeimage.ImageSingletons;
 
 import org.graalvm.compiler.core.common.NumUtil;
 
-import org.graalvm.compiler.core.common.NumUtil;
-
 import com.oracle.svm.core.annotate.Hybrid;
 import com.oracle.svm.core.config.ObjectLayout;
 import com.oracle.svm.hosted.meta.HostedField;
