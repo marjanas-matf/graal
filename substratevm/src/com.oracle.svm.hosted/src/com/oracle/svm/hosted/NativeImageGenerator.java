@@ -1113,8 +1113,6 @@ public class NativeImageGenerator {
 
         if (NativeImageInlineDuringParsingPlugin.Options.InlineBeforeAnalysis.getValue()) {
             plugins.appendInlineInvokePlugin(new NativeImageInlineDuringParsingPlugin(analysis, providers));
-            /*if (!analysis)
-                System.out.println("Number for inline: " + NativeImageInlineDuringParsingPlugin.getNumberForInline()); */
         }
 
         plugins.appendNodePlugin(new IntrinsifyMethodHandlesInvocationPlugin(analysis, providers, aUniverse, hUniverse));

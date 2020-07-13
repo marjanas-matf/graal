@@ -24,26 +24,12 @@
  */
 package com.oracle.svm.hosted.phases;
 
-import com.oracle.graal.pointsto.BigBang;
-import com.oracle.graal.pointsto.infrastructure.GraphProvider.Purpose;
-import com.oracle.graal.pointsto.meta.AnalysisMethod;
-import com.oracle.graal.pointsto.meta.AnalysisType;
-import com.oracle.graal.pointsto.meta.HostedProviders;
-import com.oracle.graal.pointsto.util.CompletionExecutor.DebugContextRunnable;
-import com.oracle.svm.core.annotate.NeverInline;
-import com.oracle.svm.core.annotate.NeverInlineTrivial;
-import com.oracle.svm.core.annotate.RestrictHeapAccess;
-import com.oracle.svm.core.annotate.Uninterruptible;
-import com.oracle.svm.core.option.HostedOptionKey;
-import com.oracle.svm.core.util.VMError;
-import com.oracle.svm.hosted.meta.HostedMethod;
-import com.oracle.svm.hosted.phases.AnalysisGraphBuilderPhase.AnalysisBytecodeParser;
-import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.CallSite;
-import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.InvocationResult;
-import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.InvocationResultInline;
-import com.oracle.svm.hosted.phases.SharedGraphBuilderPhase.SharedBytecodeParser;
-import jdk.vm.ci.code.BailoutException;
-import jdk.vm.ci.meta.ResolvedJavaMethod;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import org.graalvm.compiler.core.common.type.Stamp;
 import org.graalvm.compiler.core.common.type.StampPair;
 import org.graalvm.compiler.debug.DebugContext;
@@ -57,11 +43,9 @@ import org.graalvm.compiler.java.GraphBuilderPhase;
 import org.graalvm.compiler.nodes.CallTargetNode;
 import org.graalvm.compiler.nodes.ConstantNode;
 import org.graalvm.compiler.nodes.FrameState;
-import org.graalvm.compiler.nodes.InvokeNode;
 import org.graalvm.compiler.nodes.NodeView;
 import org.graalvm.compiler.nodes.ParameterNode;
 import org.graalvm.compiler.nodes.ReturnNode;
-import org.graalvm.compiler.nodes.StartNode;
 import org.graalvm.compiler.nodes.StructuredGraph;
 import org.graalvm.compiler.nodes.ValueNode;
 import org.graalvm.compiler.nodes.calc.FloatingNode;
@@ -84,11 +68,27 @@ import org.graalvm.compiler.phases.OptimisticOptimizations;
 import org.graalvm.compiler.phases.util.Providers;
 import org.graalvm.compiler.word.WordTypes;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import com.oracle.graal.pointsto.BigBang;
+import com.oracle.graal.pointsto.infrastructure.GraphProvider.Purpose;
+import com.oracle.graal.pointsto.meta.AnalysisMethod;
+import com.oracle.graal.pointsto.meta.AnalysisType;
+import com.oracle.graal.pointsto.meta.HostedProviders;
+import com.oracle.graal.pointsto.util.CompletionExecutor.DebugContextRunnable;
+import com.oracle.svm.core.annotate.NeverInline;
+import com.oracle.svm.core.annotate.NeverInlineTrivial;
+import com.oracle.svm.core.annotate.RestrictHeapAccess;
+import com.oracle.svm.core.annotate.Uninterruptible;
+import com.oracle.svm.core.option.HostedOptionKey;
+import com.oracle.svm.core.util.VMError;
+import com.oracle.svm.hosted.meta.HostedMethod;
+import com.oracle.svm.hosted.phases.AnalysisGraphBuilderPhase.AnalysisBytecodeParser;
+import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.CallSite;
+import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.InvocationResult;
+import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.InvocationResultInline;
+import com.oracle.svm.hosted.phases.SharedGraphBuilderPhase.SharedBytecodeParser;
+
+import jdk.vm.ci.code.BailoutException;
+import jdk.vm.ci.meta.ResolvedJavaMethod;
 
 public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin {
 
@@ -96,8 +96,8 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         @Option(help = "Inline methods witch folds to constant during parsing before the static analysis.")//
         public static final HostedOptionKey<Boolean> InlineBeforeAnalysis = new HostedOptionKey<>(false);
 
-        @Option(help = "Inlining is explored up to this number of nonparametric nodes in the graph.")
-        public static final HostedOptionKey<Integer> InlineBeforeAnalysisMaxNumberOfNodes = new HostedOptionKey<>(50);
+        @Option(help = "Inlining is explored up to this number of nonparametric nodes in the graph.") public static final HostedOptionKey<Integer> InlineBeforeAnalysisMaxNumberOfNodes = new HostedOptionKey<>(
+                        50);
     }
 
     static final class CallSite {
@@ -199,6 +199,7 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
     private final boolean analysis;
     private final HostedProviders providers;
     private static int numberForInline = 0;
+    private static final ConcurrentHashMap<AnalysisMethod, ConcurrentHashMap<Integer, InvocationResult>> dataInline = new ConcurrentHashMap<>();
 
     public NativeImageInlineDuringParsingPlugin(boolean analysis, HostedProviders providers) {
         this.analysis = analysis;
@@ -207,6 +208,25 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
 
     public static int getNumberForInline() {
         return numberForInline;
+    }
+
+    private static ConcurrentMap<Integer, InvocationResult> bciMap(ResolvedJavaMethod method) {
+        AnalysisMethod key;
+        if (method instanceof AnalysisMethod) {
+            key = (AnalysisMethod) method;
+        } else {
+            key = ((HostedMethod) method).getWrapped();
+        }
+
+        return dataInline.computeIfAbsent(key, unused -> new ConcurrentHashMap<>());
+    }
+
+    private static InvocationResult getResult(ResolvedJavaMethod method, int bci) {
+        return bciMap(method).get(bci);
+    }
+
+    public static InvocationResult putIfAbsent(ResolvedJavaMethod method, int bci, InvocationResult value) {
+        return bciMap(method).putIfAbsent(bci, value);
     }
 
     @Override
@@ -225,7 +245,7 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         }
 
         if (method.getAnnotation(RestrictHeapAccess.class) != null || method.getAnnotation(Uninterruptible.class) != null ||
-                b.getMethod().getAnnotation(RestrictHeapAccess.class) != null || b.getMethod().getAnnotation(Uninterruptible.class) != null) {
+                        b.getMethod().getAnnotation(RestrictHeapAccess.class) != null || b.getMethod().getAnnotation(Uninterruptible.class) != null) {
             /*
              * Caller or callee have an annotation that might prevent inlining. We don't check the
              * exact condition but instead always bail out for simplicity.
@@ -236,28 +256,21 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         CallSite callSite = new CallSite(toAnalysisMethod(b.getMethod()), b.bci());
 
         InvocationResult inline;
-        if (b.getDepth() > 0) {
-            /*
-             * We already decided to inline the first callee into the root method, so now
-             * recursively inline everything.
-             */
-            inline = ((SharedBytecodeParser) b.getParent()).inlineDuringParsingState.children.get(callSite);
 
-        } else {
-
-            if (analysis) {
-                BigBang bb = ((AnalysisBytecodeParser) b).bb;
-                InvocationResult newResult;
-                TrivialMethodDetector detector = new TrivialMethodDetector(bb, providers, ((SharedBytecodeParser) b).getGraphBuilderConfig(), b.getOptions(), b.getDebug());
-                newResult = detector.analyzeMethod(callSite, (AnalysisMethod) method, args, null);
-                InvocationResult existingResult = data.putIfAbsent(b.getMethod(), b.bci(), newResult);
-                if (existingResult != null) {
-                    throw VMError.shouldNotReachHere("Analysis result already present: " + b.getMethod().asStackTraceElement(b.bci()));
-                }
-                inline = newResult;
+        if (analysis) {
+            InvocationResult existingResult = getResult(method, b.bci());
+            if (existingResult != null) {
+                inline = existingResult;
             } else {
-                inline = data.get(b.getMethod(), b.bci());
+                BigBang bb = ((AnalysisBytecodeParser) b).bb;
+                TrivialMethodDetector detector = new TrivialMethodDetector(bb, providers, ((SharedBytecodeParser) b).getGraphBuilderConfig(), b.getOptions(), b.getDebug());
+                InvocationResult newResult = detector.analyzeMethod(callSite, (AnalysisMethod) method, args, null);
+                putIfAbsent(method, b.bci(), newResult);
+                inline = newResult;
             }
+        } else {
+            InvocationResult existingResult = getResult(method, b.bci());
+            inline = existingResult;
         }
 
         if (inline instanceof InvocationResultInline) {
@@ -392,18 +405,14 @@ class TrivialMethodDetector {
         try (DebugContext.Scope ignored = debug.scope("InlineDuringParsingAnalysis", graph, method, this)) {
 
             TrivialMethodDetectorGraphBuilderPhase builderPhase = new TrivialMethodDetectorGraphBuilderPhase(bb, providers, graphBuilderConfig, OptimisticOptimizations.NONE, null,
-                    providers.getWordTypes());
+                            providers.getWordTypes());
 
             try (NodeEventScope ignored1 = graph.trackNodeEvents(methodState)) {
                 builderPhase.apply(graph);
             }
 
             debug.dump(1, graph, "InlineDuringParsingAnalysis successful");
-            if (!methodState.isHasInvokes()) {
-                return analyzeGraph(callSite, method, graph);
-            } else {
-                return methodState.result;
-            }
+            return methodState.analyzeGraph();
         } catch (Throwable ex) {
             debug.dump(1, graph, "InlineDuringParsingAnalysis failed with " + ex.toString());
 
@@ -415,39 +424,15 @@ class TrivialMethodDetector {
         }
     }
 
-    private InvocationResult analyzeGraph(CallSite callSite, AnalysisMethod method, StructuredGraph graph) {
-        int countFrameStates = 0;
-
-        for (Node node : graph.getNodes()) {
-            if (node instanceof StartNode || node instanceof ParameterNode || node instanceof LoadFieldNode) {
-                continue;
-            }
-            if (node instanceof StoreFieldNode) {
-                return InvocationResult.ANALYSIS_TOO_COMPLICATED;
-            }
-            if (node instanceof FrameState) {
-                countFrameStates++;
-                if (countFrameStates > 1) {
-                    return InvocationResult.ANALYSIS_TOO_COMPLICATED;
-                }
-                if (((FrameState) node).stackSize() != 0) {
-                    return InvocationResult.ANALYSIS_TOO_COMPLICATED;
-                }
-            }
-            if (node instanceof MethodCallTargetNode) {
-                return InvocationResult.ANALYSIS_TOO_COMPLICATED;
-            }
-        }
-        return new InvocationResultInline(callSite, method);
-
-    }
-
     class MethodState extends NodeEventListener implements InlineInvokePlugin {
 
         final InvocationResultInline result;
         private int allNodeCount;
         private int parameterNodeCount;
+        private int countFrameStates;
+        private FrameState frameState;
         private boolean hasInvokes;
+        private boolean hasStoreField;
         Object singleAllowedElement;
 
         MethodState(InvocationResultInline result, Object existingSingleAllowedElement) {
@@ -456,6 +441,8 @@ class TrivialMethodDetector {
             this.allNodeCount = 1; // root node
             this.parameterNodeCount = 0;
             this.hasInvokes = false;
+            this.hasStoreField = false;
+            this.countFrameStates = 0;
         }
 
         public int getAllNodeCount() {
@@ -466,12 +453,24 @@ class TrivialMethodDetector {
             return parameterNodeCount;
         }
 
-        public boolean isHasInvokes() {
-            return hasInvokes;
-        }
-
         public int getNonParameterNodeCount() {
             return getAllNodeCount() - getParameterNodeCount();
+        }
+
+        public InvocationResult analyzeGraph() {
+            if (hasInvokes) {
+                return InvocationResult.ANALYSIS_TOO_COMPLICATED;
+            }
+            if (hasStoreField) {
+                return InvocationResult.ANALYSIS_TOO_COMPLICATED;
+            }
+            if (countFrameStates > 1) {
+                return InvocationResult.ANALYSIS_TOO_COMPLICATED;
+            }
+            if (countFrameStates == 1 && frameState.stackSize() != 0) {
+                return InvocationResult.ANALYSIS_TOO_COMPLICATED;
+            }
+            return result;
         }
 
         @Override
@@ -482,9 +481,9 @@ class TrivialMethodDetector {
             if (node instanceof ConstantNode) {
                 /* Nothing to do, an unlimited amount of constants is allowed. We like constants. */
             } else if (node instanceof FrameState) {
-                /* Nothing to do. */
+                countFrameStates++;
+                frameState = (FrameState) node;
             } else if (node instanceof ParameterNode) {
-                /* Nothing to do. */
                 parameterNodeCount += 1;
             } else if (node instanceof ReturnNode) {
                 /*
@@ -493,6 +492,8 @@ class TrivialMethodDetector {
                  */
             } else if (node instanceof MethodCallTargetNode) {
                 hasInvokes = true;
+            } else if (node instanceof StoreFieldNode) {
+                hasStoreField = true;
             } else if (node instanceof LoadFieldNode || node instanceof StoreFieldNode || node instanceof NewInstanceNode || node instanceof NewArrayNode) {
                 if (singleAllowedElement != null) {
                     throw new TrivialMethodDetectorBailoutException("Only a single element is allowed: new node " + node + ", existing element " + singleAllowedElement);
@@ -523,16 +524,8 @@ class TrivialMethodDetector {
             }
 
             InvocationResult state = analyzeMethod(new CallSite((AnalysisMethod) b.getMethod(), b.bci()), (AnalysisMethod) method, args, singleAllowedElement);
-
+            NativeImageInlineDuringParsingPlugin.putIfAbsent(method, b.bci(), state);
             if (state instanceof InvocationResultInline) {
-
-                if (b.getDepth() == 0) {
-                    InvocationResultInline inlineState = (InvocationResultInline) state;
-                    if (result.children.containsKey(inlineState.site)) {
-                        throw new TrivialMethodDetectorBailoutException("Invoke already registered: " + inlineState.site);
-                    }
-                    result.children.put(inlineState.site, inlineState);
-                }
                 return InlineInfo.createStandardInlineInfo(method);
             } else {
                 return null;
@@ -563,7 +556,7 @@ class TrivialMethodDetectorBailoutException extends BailoutException {
 class TrivialMethodDetectorGraphBuilderPhase extends AnalysisGraphBuilderPhase {
 
     TrivialMethodDetectorGraphBuilderPhase(BigBang bb, Providers providers,
-                                           GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes) {
+                    GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes) {
         super(bb, providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, null);
     }
 
@@ -576,7 +569,7 @@ class TrivialMethodDetectorGraphBuilderPhase extends AnalysisGraphBuilderPhase {
 
 class TrivialMethodDetectorBytecodeParser extends AnalysisBytecodeParser {
     protected TrivialMethodDetectorBytecodeParser(BigBang bb, GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI,
-                                                  IntrinsicContext intrinsicContext) {
+                    IntrinsicContext intrinsicContext) {
         super(bb, graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, null);
     }
 
