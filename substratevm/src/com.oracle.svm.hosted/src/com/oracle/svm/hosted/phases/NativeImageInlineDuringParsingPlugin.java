@@ -38,7 +38,6 @@ import org.graalvm.compiler.graph.Graph.NodeEventListener;
 import org.graalvm.compiler.graph.Graph.NodeEventScope;
 import org.graalvm.compiler.graph.Node;
 import org.graalvm.compiler.java.BytecodeParser;
-import org.graalvm.compiler.java.BytecodeParserOptions;
 import org.graalvm.compiler.java.GraphBuilderPhase;
 import org.graalvm.compiler.nodes.CallTargetNode;
 import org.graalvm.compiler.nodes.ConstantNode;
@@ -464,12 +463,6 @@ class TrivialMethodDetector {
             if (hasStoreField) {
                 return InvocationResult.ANALYSIS_TOO_COMPLICATED;
             }
-            if (countFrameStates > 1) {
-                return InvocationResult.ANALYSIS_TOO_COMPLICATED;
-            }
-            if (countFrameStates == 1 && frameState.stackSize() != 0) {
-                return InvocationResult.ANALYSIS_TOO_COMPLICATED;
-            }
             return result;
         }
 
@@ -490,11 +483,13 @@ class TrivialMethodDetector {
                  * Nothing to do, returning a value is fine. We don't allow control flow so there
                  * can never be more than one return.
                  */
+            } else if (node instanceof LoadFieldNode) {
+                /* Nothing to do, it's ok to read a static or instance field. */
             } else if (node instanceof MethodCallTargetNode) {
                 hasInvokes = true;
             } else if (node instanceof StoreFieldNode) {
                 hasStoreField = true;
-            } else if (node instanceof LoadFieldNode || node instanceof StoreFieldNode || node instanceof NewInstanceNode || node instanceof NewArrayNode) {
+            } else if (node instanceof NewInstanceNode || node instanceof NewArrayNode) {
                 if (singleAllowedElement != null) {
                     throw new TrivialMethodDetectorBailoutException("Only a single element is allowed: new node " + node + ", existing element " + singleAllowedElement);
                 }
@@ -511,15 +506,7 @@ class TrivialMethodDetector {
         @Override
         public InlineInfo shouldInlineInvoke(GraphBuilderContext b, ResolvedJavaMethod method, ValueNode[] args) {
 
-            if (getNonParameterNodeCount() > NativeImageInlineDuringParsingPlugin.Options.InlineBeforeAnalysisMaxNumberOfNodes.getValue()) {
-                /* Node limit is exceed */
-                return null;
-            }
-
             if (method.getAnnotation(NeverInline.class) != null || method.getAnnotation(NeverInlineTrivial.class) != null) {
-                return null;
-            }
-            if (b.getDepth() > BytecodeParserOptions.InlineDuringParsingMaxDepth.getValue(b.getOptions())) {
                 return null;
             }
 
