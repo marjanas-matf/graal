@@ -241,8 +241,7 @@ public final class GraalFeature implements Feature {
         final CallTreeNode node;
 
         RuntimeGraphBuilderPhase(Providers providers,
-                        GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes,
-                        CallTreeNode node) {
+                        GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes, CallTreeNode node) {
             super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes);
             this.node = node;
         }
