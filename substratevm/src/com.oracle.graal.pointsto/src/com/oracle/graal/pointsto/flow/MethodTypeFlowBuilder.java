@@ -1291,7 +1291,6 @@ public class MethodTypeFlowBuilder {
             } else if (n instanceof InvokeNode || n instanceof InvokeWithExceptionNode) {
                 Invoke invoke = (Invoke) n;
                 if (invoke.callTarget() instanceof MethodCallTargetNode) {
-                    // guarantee(invoke.stateAfter().outerFrameState() == null, "Outer FrameState must not be null.");
 
                     MethodCallTargetNode target = (MethodCallTargetNode) invoke.callTarget();
 
