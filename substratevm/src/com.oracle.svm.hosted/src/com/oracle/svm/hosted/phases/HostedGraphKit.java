@@ -74,9 +74,9 @@ public class HostedGraphKit extends SubstrateGraphKit {
 
         ResolvedJavaMethod method = graph.method();
         if (method instanceof AnalysisMethod) {
-            return new AnalysisGraphBuilderPhase(null, theProviders, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, null);
+            return new AnalysisGraphBuilderPhase(null, theProviders, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes);
         } else if (method instanceof HostedMethod) {
-            return new HostedGraphBuilderPhase(theProviders, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, null);
+            return new HostedGraphBuilderPhase(theProviders, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes);
         } else {
             throw VMError.shouldNotReachHere();
         }

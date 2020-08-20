@@ -27,7 +27,6 @@ package com.oracle.svm.hosted.phases;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.oracle.svm.core.util.VMError;
 import org.graalvm.compiler.core.common.type.StampPair;
 import org.graalvm.compiler.graph.Node;
 import org.graalvm.compiler.java.BytecodeParser;
@@ -57,6 +56,7 @@ import org.graalvm.compiler.word.WordTypes;
 import com.oracle.svm.core.code.FrameInfoEncoder;
 import com.oracle.svm.core.graal.nodes.DeoptEntryNode;
 import com.oracle.svm.core.graal.nodes.DeoptProxyAnchorNode;
+import com.oracle.svm.core.util.VMError;
 import com.oracle.svm.hosted.meta.HostedMethod;
 import com.oracle.svm.hosted.nodes.DeoptProxyNode;
 import com.oracle.svm.hosted.nodes.SubstrateMethodCallTargetNode;
@@ -70,13 +70,13 @@ import jdk.vm.ci.meta.ResolvedJavaMethod;
 public class HostedGraphBuilderPhase extends SubstrateGraphBuilderPhase {
 
     public HostedGraphBuilderPhase(Providers providers, GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext,
-                    WordTypes wordTypes, NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
-        super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, inlineInvocationData);
+                    WordTypes wordTypes) {
+        super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes);
     }
 
     @Override
     protected BytecodeParser createBytecodeParser(StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI, IntrinsicContext intrinsicContext) {
-        return new HostedBytecodeParser(this, graph, parent, method, entryBCI, intrinsicContext, inlineInvocationData);
+        return new HostedBytecodeParser(this, graph, parent, method, entryBCI, intrinsicContext);
     }
 }
 
@@ -87,9 +87,8 @@ class HostedBytecodeParser extends SubstrateBytecodeParser {
     private int currentDeoptIndex;
     private Map<Long, DeoptProxyAnchorNode> deoptEntries = new HashMap<>();
 
-    HostedBytecodeParser(GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI, IntrinsicContext intrinsicContext,
-                    NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
-        super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, true, inlineInvocationData);
+    HostedBytecodeParser(GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI, IntrinsicContext intrinsicContext) {
+        super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, true);
     }
 
     @Override

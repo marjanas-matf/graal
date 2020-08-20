@@ -52,20 +52,19 @@ import jdk.vm.ci.meta.ResolvedJavaMethod;
 public class SubstrateGraphBuilderPhase extends SharedGraphBuilderPhase {
 
     public SubstrateGraphBuilderPhase(Providers providers,
-                    GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes,
-                    NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
-        super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, inlineInvocationData);
+                    GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes) {
+        super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes);
     }
 
     @Override
     protected BytecodeParser createBytecodeParser(StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI, IntrinsicContext intrinsicContext) {
-        return new SubstrateBytecodeParser(this, graph, parent, method, entryBCI, intrinsicContext, false, inlineInvocationData);
+        return new SubstrateBytecodeParser(this, graph, parent, method, entryBCI, intrinsicContext, false);
     }
 
     public static class SubstrateBytecodeParser extends SharedBytecodeParser {
         public SubstrateBytecodeParser(GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI,
-                        IntrinsicContext intrinsicContext, boolean explicitExceptionEdges, NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
-            super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, explicitExceptionEdges, inlineInvocationData);
+                        IntrinsicContext intrinsicContext, boolean explicitExceptionEdges) {
+            super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, explicitExceptionEdges);
         }
 
         @Override
@@ -103,9 +102,6 @@ public class SubstrateGraphBuilderPhase extends SharedGraphBuilderPhase {
 
         @Override
         protected Invoke createNonInlinedInvoke(ExceptionEdgeAction exceptionEdge, int invokeBci, CallTargetNode callTarget, JavaKind resultType) {
-            if (inlineInvocationData != null) {
-                inlineInvocationData.onCreateInvoke(this, invokeBci, false);
-            }
             return super.createNonInlinedInvoke(exceptionEdge, invokeBci, callTarget, resultType);
         }
     }

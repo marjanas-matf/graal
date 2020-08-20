@@ -51,23 +51,22 @@ public class AnalysisGraphBuilderPhase extends SharedGraphBuilderPhase {
     protected final BigBang bb;
 
     public AnalysisGraphBuilderPhase(BigBang bb, Providers providers,
-                    GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes,
-                    NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
-        super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, inlineInvocationData);
+                    GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes) {
+        super(providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes);
         this.bb = bb;
     }
 
     @Override
     protected BytecodeParser createBytecodeParser(StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI, IntrinsicContext intrinsicContext) {
-        return new AnalysisBytecodeParser(bb, this, graph, parent, method, entryBCI, intrinsicContext, inlineInvocationData);
+        return new AnalysisBytecodeParser(bb, this, graph, parent, method, entryBCI, intrinsicContext);
     }
 
     public static class AnalysisBytecodeParser extends SharedBytecodeParser {
         protected final BigBang bb;
 
         protected AnalysisBytecodeParser(BigBang bb, GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI,
-                        IntrinsicContext intrinsicContext, NativeImageInlineDuringParsingPlugin.InvocationData inlineInvocationData) {
-            super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, true, inlineInvocationData);
+                        IntrinsicContext intrinsicContext) {
+            super(graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, true);
             this.bb = bb;
         }
 
@@ -100,9 +99,6 @@ public class AnalysisGraphBuilderPhase extends SharedGraphBuilderPhase {
 
         @Override
         protected Invoke createNonInlinedInvoke(ExceptionEdgeAction exceptionEdge, int invokeBci, CallTargetNode callTarget, JavaKind resultType) {
-            if (inlineInvocationData != null) {
-                inlineInvocationData.onCreateInvoke(this, invokeBci, true);
-            }
             return super.createNonInlinedInvoke(exceptionEdge, invokeBci, callTarget, resultType);
         }
     }

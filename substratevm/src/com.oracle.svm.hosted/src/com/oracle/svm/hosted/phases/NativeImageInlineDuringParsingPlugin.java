@@ -122,10 +122,6 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
      */
     @Override
     public InlineInfo shouldInlineInvoke(GraphBuilderContext b, ResolvedJavaMethod method, ValueNode[] args) {
-        InvocationData data = ((SharedBytecodeParser) b).inlineInvocationData;
-        if (data == null) {
-            throw VMError.shouldNotReachHere("must not use NativeImageInlineDuringParsingPlugin when bytecode parser does not have InvocationData");
-        }
 
         if (b.parsingIntrinsic()) {
             /* We are not interfering with any intrinsic method handling. */
@@ -177,6 +173,7 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
                     }
                 }
             }
+            System.out.println("Inline: " + method.format("%n, %H"));
             return InlineInfo.createStandardInlineInfo(method);
         } else {
             return null;
@@ -294,8 +291,6 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
 
     static class InvocationResult {
         static final InvocationResult ANALYSIS_TOO_COMPLICATED = new InvocationResult();
-        static final InvocationResult NO_ANALYSIS = new InvocationResult();
-
     }
 
     public static class InvocationResultInline extends InvocationResult {
@@ -325,29 +320,6 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         }
     }
 
-    public static class InvocationData {
-        private final ConcurrentMap<AnalysisMethod, ConcurrentMap<Integer, InvocationResult>> data = new ConcurrentHashMap<>();
-
-        private ConcurrentMap<Integer, InvocationResult> bciMap(ResolvedJavaMethod method) {
-            AnalysisMethod key;
-            if (method instanceof AnalysisMethod) {
-                key = (AnalysisMethod) method;
-            } else {
-                key = ((HostedMethod) method).getWrapped();
-            }
-
-            return data.computeIfAbsent(key, unused -> new ConcurrentHashMap<>());
-        }
-
-        public void onCreateInvoke(GraphBuilderContext b, int invokeBci, boolean analysis) {
-            if (b.getDepth() == 0) {
-                ConcurrentMap<Integer, InvocationResult> map = bciMap(b.getMethod());
-                if (analysis) {
-                    map.putIfAbsent(invokeBci, InvocationResult.NO_ANALYSIS);
-                }
-            }
-        }
-    }
 }
 
 /**
@@ -504,6 +476,7 @@ class TrivialMethodDetector {
             InvocationResult state = analyzeMethod(new CallSite((AnalysisMethod) b.getMethod(), b.bci()), (AnalysisMethod) method, args, singleAllowedElement);
             NativeImageInlineDuringParsingPlugin.putIfAbsent(method, b.bci(), state);
             if (state instanceof InvocationResultInline) {
+                System.out.println("ChildInline: " + method.format("%n, %H"));
                 return InlineInfo.createStandardInlineInfo(method);
             } else {
                 return null;
@@ -534,7 +507,7 @@ class TrivialMethodDetectorGraphBuilderPhase extends AnalysisGraphBuilderPhase {
 
     TrivialMethodDetectorGraphBuilderPhase(BigBang bb, Providers providers,
                     GraphBuilderConfiguration graphBuilderConfig, OptimisticOptimizations optimisticOpts, IntrinsicContext initialIntrinsicContext, WordTypes wordTypes) {
-        super(bb, providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes, null);
+        super(bb, providers, graphBuilderConfig, optimisticOpts, initialIntrinsicContext, wordTypes);
     }
 
     @Override
@@ -547,7 +520,7 @@ class TrivialMethodDetectorGraphBuilderPhase extends AnalysisGraphBuilderPhase {
 class TrivialMethodDetectorBytecodeParser extends AnalysisBytecodeParser {
     protected TrivialMethodDetectorBytecodeParser(BigBang bb, GraphBuilderPhase.Instance graphBuilderInstance, StructuredGraph graph, BytecodeParser parent, ResolvedJavaMethod method, int entryBCI,
                     IntrinsicContext intrinsicContext) {
-        super(bb, graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext, null);
+        super(bb, graphBuilderInstance, graph, parent, method, entryBCI, intrinsicContext);
     }
 
     @Override
