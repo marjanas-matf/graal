@@ -184,7 +184,6 @@ class HostedBytecodeParser extends SubstrateBytecodeParser {
 
     @Override
     protected void parseAndInlineCallee(ResolvedJavaMethod targetMethod, ValueNode[] args, IntrinsicContext calleeIntrinsicContext) {
-        assert calleeIntrinsicContext != null : "only inlining replacements";
         if (getMethod().compilationInfo.isDeoptEntry(bci(), false, false)) {
             VMError.guarantee(calleeIntrinsicContext != null, "only for inlining of replacements");
             /*

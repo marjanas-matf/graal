@@ -267,7 +267,8 @@ GraalTags = Tags([
     'build',
     'benchmarktest',
     "nativeimagehelp",
-    'muslcbuild'
+    'muslcbuild',
+    'reflection_test'
 ])
 
 
@@ -416,6 +417,10 @@ def svm_gate_body(args, tasks):
 
                     # We need the -H:+EnableAllSecurityServices for com.oracle.svm.test.SecurityServiceTest
                     native_unittest(['--build-args', _native_unittest_features, '-H:+EnableAllSecurityServices'] + blacklist_args)
+
+        with Task('Run reflection test', tasks, tags=[GraalTags.reflection_test]) as t:
+            if t:
+                native_unittest(['--build-args', '-H:+InlineBeforeAnalysis'] + ['com.oracle.svm.test.ReflectionTest'])
 
         with Task('Run Truffle NFI unittests with SVM image', tasks, tags=["svmjunit"]) as t:
             if t:
