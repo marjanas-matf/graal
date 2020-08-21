@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.graalvm.compiler.core.common.PermanentBailoutException;
 import org.graalvm.compiler.core.common.type.Stamp;
 import org.graalvm.compiler.core.common.type.StampPair;
 import org.graalvm.compiler.debug.DebugContext;
@@ -86,7 +87,6 @@ import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.Invocat
 import com.oracle.svm.hosted.phases.NativeImageInlineDuringParsingPlugin.InvocationResultInline;
 import com.oracle.svm.hosted.phases.SharedGraphBuilderPhase.SharedBytecodeParser;
 
-import jdk.vm.ci.code.BailoutException;
 import jdk.vm.ci.meta.ResolvedJavaMethod;
 
 /**
@@ -157,7 +157,7 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
 
         if (inline instanceof InvocationResultInline) {
             InvocationResultInline inlineData = (InvocationResultInline) inline;
-            VMError.guarantee(inlineData.callee == toAnalysisMethod(method));
+            VMError.guarantee(inlineData.callee.equals(toAnalysisMethod(method)));
 
             VMError.guarantee(((SharedBytecodeParser) b).inlineDuringParsingState == null);
             ((SharedBytecodeParser) b).inlineDuringParsingState = inlineData;
@@ -232,7 +232,7 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         SharedBytecodeParser parser = (SharedBytecodeParser) b;
         InvocationResultInline inlineData = parser.inlineDuringParsingState;
         if (inlineData != null) {
-            VMError.guarantee(inlineData.callee == toAnalysisMethod(methodToInline));
+            VMError.guarantee(inlineData.callee.equals(toAnalysisMethod(methodToInline)));
         }
     }
 
@@ -241,7 +241,7 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
         SharedBytecodeParser parser = (SharedBytecodeParser) b;
         InvocationResultInline inlineData = parser.inlineDuringParsingState;
         if (inlineData != null) {
-            VMError.guarantee(inlineData.callee == toAnalysisMethod(methodToInline));
+            VMError.guarantee(inlineData.callee.equals(toAnalysisMethod(methodToInline)));
             parser.inlineDuringParsingState = null;
         }
     }
@@ -485,7 +485,7 @@ class TrivialMethodDetector {
     }
 }
 
-class TrivialMethodDetectorBailoutException extends BailoutException {
+class TrivialMethodDetectorBailoutException extends PermanentBailoutException {
 
     private static final long serialVersionUID = -1063600090362390263L;
 
