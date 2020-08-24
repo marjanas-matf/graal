@@ -41,7 +41,6 @@ import org.graalvm.compiler.graph.Graph.NodeEventScope;
 import org.graalvm.compiler.graph.Node;
 import org.graalvm.compiler.java.BytecodeParser;
 import org.graalvm.compiler.java.GraphBuilderPhase;
-import org.graalvm.compiler.nodes.CallTargetNode;
 import org.graalvm.compiler.nodes.ConstantNode;
 import org.graalvm.compiler.nodes.FrameState;
 import org.graalvm.compiler.nodes.NodeView;
@@ -79,6 +78,7 @@ import com.oracle.svm.core.annotate.NeverInlineTrivial;
 import com.oracle.svm.core.annotate.RestrictHeapAccess;
 import com.oracle.svm.core.annotate.Uninterruptible;
 import com.oracle.svm.core.option.HostedOptionKey;
+import com.oracle.svm.core.option.OptionUtils;
 import com.oracle.svm.core.util.VMError;
 import com.oracle.svm.hosted.meta.HostedMethod;
 import com.oracle.svm.hosted.phases.AnalysisGraphBuilderPhase.AnalysisBytecodeParser;
@@ -99,6 +99,8 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
     public static class Options {
         @Option(help = "Inline methods which folds to constant during parsing before the static analysis.") public static final HostedOptionKey<Boolean> InlineBeforeAnalysis = new HostedOptionKey<>(
                         false);
+        @Option(help = "Comma separated list of wrapper method's names for java.lang.reflect.Constructor.newInstance") public static final HostedOptionKey<String[]> IncludeWrapperMethods = new HostedOptionKey<>(
+                        null);
 
     }
 
@@ -141,6 +143,25 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
             return null;
         }
 
+        /*
+         * Support newInstance() without reflection configuration when extracted to a wrapper method
+         * in the list specified by the user
+         */
+        if (OptionUtils.flatten(",", Options.IncludeWrapperMethods.getValue()).contains(method.getName())) {
+            if (analysis) {
+                AnalysisMethod aMethod = (AnalysisMethod) method;
+                aMethod.registerAsImplementationInvoked(null);
+                if (!aMethod.isStatic()) {
+                    ensureParsed(((AnalysisBytecodeParser) b).bb, aMethod);
+                    if (args[0].isConstant()) {
+                        AnalysisType receiverType = (AnalysisType) StampTool.typeOrNull(args[0]);
+                        receiverType.registerAsInHeap();
+                    }
+                }
+            }
+            return InlineInfo.createStandardInlineInfo(method);
+        }
+
         CallSite callSite = new CallSite(toAnalysisMethod(b.getMethod()), b.bci());
 
         InvocationResult inline;
@@ -165,7 +186,6 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
             if (analysis) {
                 AnalysisMethod aMethod = (AnalysisMethod) method;
                 aMethod.registerAsImplementationInvoked(null);
-
                 if (!aMethod.isStatic()) {
                     ensureParsed(((AnalysisBytecodeParser) b).bb, aMethod);
                     if (args[0].isConstant()) {
@@ -359,7 +379,6 @@ class TrivialMethodDetector {
 
     @SuppressWarnings("try")
     InvocationResult analyzeMethod(CallSite callSite, AnalysisMethod method, ValueNode[] args, Object existingSingleAllowedElement) {
-
         if (!method.hasBytecodes()) {
             /* Native method. */
             return InvocationResult.ANALYSIS_TOO_COMPLICATED;
@@ -457,9 +476,6 @@ class TrivialMethodDetector {
                     throw new TrivialMethodDetectorBailoutException("Only a single element is allowed: new node " + node + ", existing element " + singleAllowedElement);
                 }
                 singleAllowedElement = node;
-
-            } else if (node instanceof CallTargetNode) {
-                /* Nothing to do. */
             } else if (node instanceof FrameState) {
                 /* Nothing to do */
             } else {
