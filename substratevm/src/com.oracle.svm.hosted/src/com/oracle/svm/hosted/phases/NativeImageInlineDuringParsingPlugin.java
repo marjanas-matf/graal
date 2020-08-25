@@ -78,7 +78,6 @@ import com.oracle.svm.core.annotate.NeverInlineTrivial;
 import com.oracle.svm.core.annotate.RestrictHeapAccess;
 import com.oracle.svm.core.annotate.Uninterruptible;
 import com.oracle.svm.core.option.HostedOptionKey;
-import com.oracle.svm.core.option.OptionUtils;
 import com.oracle.svm.core.util.VMError;
 import com.oracle.svm.hosted.meta.HostedMethod;
 import com.oracle.svm.hosted.phases.AnalysisGraphBuilderPhase.AnalysisBytecodeParser;
@@ -99,8 +98,6 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
     public static class Options {
         @Option(help = "Inline methods which folds to constant during parsing before the static analysis.") public static final HostedOptionKey<Boolean> InlineBeforeAnalysis = new HostedOptionKey<>(
                         false);
-        @Option(help = "Comma separated list of wrapper method's names for java.lang.reflect.Constructor.newInstance") public static final HostedOptionKey<String[]> IncludeWrapperMethods = new HostedOptionKey<>(
-                        null);
 
     }
 
@@ -124,7 +121,6 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
      */
     @Override
     public InlineInfo shouldInlineInvoke(GraphBuilderContext b, ResolvedJavaMethod method, ValueNode[] args) {
-
         if (b.parsingIntrinsic()) {
             /* We are not interfering with any intrinsic method handling. */
             return null;
@@ -141,25 +137,6 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
              * exact condition but instead always bail out for simplicity.
              */
             return null;
-        }
-
-        /*
-         * Support newInstance() without reflection configuration when extracted to a wrapper method
-         * in the list specified by the user
-         */
-        if (OptionUtils.flatten(",", Options.IncludeWrapperMethods.getValue()).contains(method.getName())) {
-            if (analysis) {
-                AnalysisMethod aMethod = (AnalysisMethod) method;
-                aMethod.registerAsImplementationInvoked(null);
-                if (!aMethod.isStatic()) {
-                    ensureParsed(((AnalysisBytecodeParser) b).bb, aMethod);
-                    if (args[0].isConstant()) {
-                        AnalysisType receiverType = (AnalysisType) StampTool.typeOrNull(args[0]);
-                        receiverType.registerAsInHeap();
-                    }
-                }
-            }
-            return InlineInfo.createStandardInlineInfo(method);
         }
 
         CallSite callSite = new CallSite(toAnalysisMethod(b.getMethod()), b.bci());
@@ -311,7 +288,6 @@ public class NativeImageInlineDuringParsingPlugin implements InlineInvokePlugin 
 
     static class InvocationResult {
         static final InvocationResult ANALYSIS_TOO_COMPLICATED = new InvocationResult();
-        static final InvocationResult NO_ANALYSIS = new InvocationResult();
 
     }
 
@@ -416,7 +392,6 @@ class TrivialMethodDetector {
             return methodState.analyzeGraph();
         } catch (Throwable ex) {
             debug.dump(DebugContext.BASIC_LEVEL, graph, "InlineDuringParsingAnalysis failed with " + ex.toString());
-
             /*
              * Whatever happens during the analysis is non-fatal because we can just not inline that
              * invocation.
@@ -455,9 +430,8 @@ class TrivialMethodDetector {
 
         @Override
         public void nodeAdded(Node node) {
-
             if (node instanceof ConstantNode) {
-                /* Nothing to do, an unlimited amount of constants is allowed. */
+                /* An unlimited amount of constants is allowed. */
             } else if (node instanceof ParameterNode) {
                 /* Nothing to do, an unlimited amount of parameters is allowed. */
             } else if (node instanceof ReturnNode) {
@@ -485,7 +459,6 @@ class TrivialMethodDetector {
 
         @Override
         public InlineInfo shouldInlineInvoke(GraphBuilderContext b, ResolvedJavaMethod method, ValueNode[] args) {
-
             if (method.getAnnotation(NeverInline.class) != null || method.getAnnotation(NeverInlineTrivial.class) != null) {
                 return null;
             }
